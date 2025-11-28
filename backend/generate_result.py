@@ -3,7 +3,7 @@ import easyocr
 import numpy as np
 import os
 
-reader = easyocr.Reader(['en', 'ch_tra'])  # 英文+中文
+
 
 img_path = "../img"
 template_name = os.path.join(img_path, "chisa_template.png")
@@ -30,7 +30,8 @@ if __name__ == '__main__':
     # image open
     source = Image.open(source_name)
     template = Image.open(template_name)
-
+    reader = easyocr.Reader(['en', 'ch_tra'])  # 英文+中文
+    
     enhancer = ImageEnhance.Brightness(template)
     template = enhancer.enhance(0.5)
 
@@ -48,6 +49,9 @@ if __name__ == '__main__':
 
     avatar = Image.open(avatar_namae)
     avatar.thumbnail((400, 550))
+    draw = ImageDraw.Draw(avatar)
+    width = 3
+    draw.rectangle((0, 0, avatar.width-1, avatar.height-1), outline="black", width=width)
 
     template.paste(avatar, (47, 37), avatar)
     template.save(output_path)
