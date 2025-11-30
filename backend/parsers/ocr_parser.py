@@ -12,15 +12,11 @@ class EchoData:
     static_stat: Stat = field(default_factory=Stat)
     sub_stat: List[Stat] = field(default_factory=list)
 
-BAD_CHARS = ["文", "C", "+", "&", "F", " ", "*", "x", "戊"]
-
 def parse_ocr_output(ocr_result) -> EchoData:
     print("-----------------------------")
     new_echo = EchoData()
     texts = []
-    for bbox, text, prob in ocr_result:
-        for b in BAD_CHARS:
-            text = text.replace(b, "")
+    for _, text, prob in ocr_result:
         print(f"文字: {text}, 信心指數: {prob:.2f}")
         texts.append(text)
 

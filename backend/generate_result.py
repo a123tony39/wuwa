@@ -15,6 +15,7 @@ a_score_name = os.path.join(img_path, "A_score.png")
 b_score_name = os.path.join(img_path, "B_score.png")
 output_path = os.path.join(img_path, "output.png")
 font_path = "../ttf/Cubic_11.ttf"
+character_name = "贊尼"
 
 rank_images = {
     "SS": ss_score_name,
@@ -58,7 +59,7 @@ if __name__ == '__main__':
     template = Image.open(template_name)
 
     # create ocr reader
-    reader = easyocr.Reader(['en', 'ch_tra'])  # 英文+中文
+    reader = easyocr.Reader(['en', 'ch_tra'])  
     
     # make template darker
     enhancer = ImageEnhance.Brightness(template)
@@ -78,7 +79,7 @@ if __name__ == '__main__':
         new_echo = parse_ocr_output(results)
         
         # calculate echo score
-        total_score += calculate_score(new_echo)
+        total_score += calculate_score(new_echo, character_name)
 
         # paste echo to template
         cropped.thumbnail((400, 550))
