@@ -1,0 +1,9 @@
+贊尼:
+  main_attr: 攻擊
+  dmg_type: 重擊
+  role: 主要輸出
+
+千咲:
+  main_attr: 攻擊
+  dmg_type: 共鳴解放
+  role: 次要輸出

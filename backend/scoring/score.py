@@ -1,4 +1,22 @@
+import yaml
 
+def load_yaml(filename):
+    with open(filename, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+def get_valid_stats(character_name, stat_categories, character_templates):
+    template = character_templates[character_name]
+    valid = set()
+    # main_attr
+    valid.update(stat_categories["main_attr"][template["main_attr"]])
+    # dmg_type
+    valid.update(stat_categories["dmg_type"][template["dmg_type"]])
+    # role
+    valid.update(stat_categories["role"][template["role"]])
+    return valid
+STAT_CATEGORIES = load_yaml("stats_categories.yaml")
+CHARACTER_TEMPLATE = load_yaml("character_template.yaml")
+print(get_valid_stats("贊尼", STAT_CATEGORIES, CHARACTER_TEMPLATE))
 stats_range = {
     "生命": (320, 580),
     "生命%": (6.4, 11.6),
