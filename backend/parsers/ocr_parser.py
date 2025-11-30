@@ -12,7 +12,7 @@ class EchoData:
     static_stat: Stat = field(default_factory=Stat)
     sub_stat: List[Stat] = field(default_factory=list)
 
-BAD_CHARS = ["文", "C", "+", "&", "F", " "]
+BAD_CHARS = ["文", "C", "+", "&", "F", " ", "*", "x", "戊"]
 
 def parse_ocr_output(ocr_result) -> EchoData:
     print("-----------------------------")

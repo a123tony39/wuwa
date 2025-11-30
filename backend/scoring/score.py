@@ -1,11 +1,11 @@
 
 stats_range = {
-    ("生命", ""): (320, 580),
-    ("生命", "%"): (6.4, 11.6),
-    ("攻擊", ""): (30, 60),
-    ("攻擊", "%"): (6.4, 11.6),
-    ("防禦", ""): (40, 60),
-    ("防禦", "%"): (8.1, 15),
+    "生命": (320, 580),
+    "生命%": (6.4, 11.6),
+    "攻擊": (30, 60),
+    "攻擊%": (6.4, 11.6),
+    "防禦": (40, 60),
+    "防禦%": (8.1, 15),
     "暴擊" : (6.3, 10.5),
     "暴擊傷害" : (12.6, 21),
     "普攻傷害加成": (6.4, 11.6),
@@ -19,7 +19,7 @@ def calculate_score(echo):
     score = 0
     for sub in echo.sub_stat:
         if sub.type in PERCENTABLE:
-            key = (sub.type, "%") if "%" in sub.type else (sub.type, "")
+            key = f"{sub.type}%" if "%" in sub.type else sub.type
         else:
             key = sub.type
         max = stats_range[key][1]

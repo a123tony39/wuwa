@@ -8,7 +8,7 @@ from scoring.score import calculate_score, get_rank
 img_path = "../img"
 template_name = os.path.join(img_path, "chisa_template.png")
 avatar_namae = os.path.join(img_path, "chisa.png")
-source_name = os.path.join(img_path, "input.png")
+source_name = os.path.join(img_path, "zeni_input.png")
 ss_score_name = os.path.join(img_path, "SS_score.png")
 s_score_name = os.path.join(img_path, "S_score.png")
 a_score_name = os.path.join(img_path, "A_score.png")
