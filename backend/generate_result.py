@@ -3,7 +3,7 @@ import easyocr
 import numpy as np
 import os
 from parsers.ocr_parser import parse_ocr_output
-from scoring.score import calculate_score, get_rank
+from scoring.score import get_score, get_rank
 
 img_path = "../img"
 template_name = os.path.join(img_path, "chisa_template.png")
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         new_echo = parse_ocr_output(results)
         
         # calculate echo score
-        total_score += calculate_score(new_echo, character_name)
+        total_score += get_score(new_echo, character_name)
 
         # paste echo to template
         cropped.thumbnail((400, 550))

@@ -15,7 +15,6 @@ stats_range = {
     "共鳴解放傷害加成": (6.4, 11.6),
     "共鳴效率": (6.8, 12.4),
 }
-PERCENTABLE = ["生命", "攻擊", "防禦"]
 
 def load_yaml(filename):
     with open(filename, "r", encoding="utf-8") as f:
@@ -32,37 +31,53 @@ def get_valid_stats(character_name, stat_categories, character_templates):
     valid.update(stat_categories["role"][template["role"]])
     return valid
 
-def calculate_score(echo, character_name):
+def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
+    base = BASE_SCORE.get(stat_name)
+    info = STATS_EXPECT_BIAS.get(stat_name)
+    min, max = info['min'], info['max']
+    bias, expect = info['bias'], info['expect']
+
+    score = round(base + bias + (stat_value - expect) / (max - min), 2)
+    return score
+
+def get_score(echo, character_name):
+    BASE_SCORE = load_yaml("./scoring/base_score.yaml")
     STAT_CATEGORIES = load_yaml("./scoring/stats_categories.yaml")
     CHARACTER_TEMPLATE = load_yaml("./scoring/character_template.yaml")
+    STATS_EXPECT_BIAS = load_yaml("./scoring/stats_expect_bias.yaml") 
     valid = get_valid_stats(character_name, STAT_CATEGORIES, CHARACTER_TEMPLATE)
 
-    score = 0
-    for sub in echo.sub_stat:
-        if sub.type in PERCENTABLE:
-            key = f"{sub.type}%" if "%" in sub.type else sub.type
-        else:
-            key = sub.type
-        
-        if key not in valid:
+    total_score = 0
+    print("--------此聲骸分數--------")
+    for stat in echo.sub_stat:
+        if stat.name not in valid:
             continue
-        max = stats_range[key][1]
-        score += (float(sub.value.replace("%", "")) / max) * 4
+        
+        echo_score = calculate_score(stat.name, stat.value, BASE_SCORE, STATS_EXPECT_BIAS) * 4
+        total_score += echo_score
+        print(f"{stat.name} : {stat.value} : {echo_score}")
 
-    print(score)
-    return score
+    return total_score
 
 def compute_stat_expect(data):
     result = {}
     for stat, tiers in data.items():
         expect = 0
         # print(stat, info)
+        global_min = None
+        global_max = None
         for _, info in tiers.items():
-            low, high = info['range']
+            min, max = info['range']
             total_rate = info['rate'] * info['cnt']
-            expect += ((low+high)/2) * (total_rate/100)
-
-        result[stat] = round(expect, 2)
+            expect += ((min+max)/2) * (total_rate/100)
+        
+            if global_min is None:
+                global_min = min
+            global_max = max
+        expect = round(expect, 2)
+        bias = round(-(global_min-expect) / (global_max - global_min), 2) 
+       
+        result[stat] = {'min': global_min, 'max': global_max, 'bias': bias, 'expect': expect}
     return result
     
 def get_stat_tier(stat_name, value, config):
@@ -90,6 +105,27 @@ def get_rank(score):
 
 if __name__ == "__main__":
     STATS_TIER_RANGE = load_yaml("./stats_tier_range.yaml")
-    print(STATS_TIER_RANGE)
+    STATS_EXPECT_BIAS = load_yaml("./stats_expect_bias.yaml") 
     result = compute_stat_expect(STATS_TIER_RANGE)
     print(result)
+    with open("stats_expect_bias.yaml", "w", encoding="utf-8") as f:
+        yaml.dump(result, f, allow_unicode=True)
+
+    # score = calculate_score("暴擊", 6.3, STATS_EXPECT_BIAS)
+    # print(score)
+    # score = calculate_score("暴擊", 7.5, STATS_EXPECT_BIAS)
+    # print(score)
+    # score = calculate_score("暴擊", 10.5, STATS_EXPECT_BIAS)
+    # print(score)
+
+    # score = calculate_score("生命", 580, STATS_EXPECT_BIAS)
+    # print(score)
+
+    # score = calculate_score("生命", 441, STATS_EXPECT_BIAS)
+    # print(score)
+
+    score = calculate_score("暴擊傷害", 15.0, STATS_EXPECT_BIAS)
+    print(score)
+
+    score = calculate_score("攻擊", 60, STATS_EXPECT_BIAS)
+    print(score)

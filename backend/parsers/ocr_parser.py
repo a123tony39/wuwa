@@ -3,7 +3,7 @@ from typing import List
 
 @dataclass
 class Stat:
-    type: str = ""
+    name: str = ""
     value: float = 0.0
 
 @dataclass
@@ -12,6 +12,7 @@ class EchoData:
     static_stat: Stat = field(default_factory=Stat)
     sub_stat: List[Stat] = field(default_factory=list)
 
+PERCENTABLE = ["生命", "攻擊", "防禦"]
 def parse_ocr_output(ocr_result) -> EchoData:
     print("-----------------------------")
     new_echo = EchoData()
@@ -24,11 +25,11 @@ def parse_ocr_output(ocr_result) -> EchoData:
     
     for idx, (name, value) in enumerate(pairs):
         if idx == 0:
-            new_echo.main_stat.type = name
-            new_echo.main_stat.value = value
+            new_echo.main_stat.name = name
+            new_echo.main_stat.value = value # fix 
         elif idx == 1:
-            new_echo.static_stat.type = name
-            new_echo.static_stat.value = value
+            new_echo.static_stat.name = name
+            new_echo.static_stat.value = float(value.strip("%")) if '%' in value else float(value)
         else:
-            new_echo.sub_stat.append(Stat(type=name, value=value))
+            new_echo.sub_stat.append(Stat(name=f"{name}%" if '%' in value and name in PERCENTABLE else name, value=float(value.strip("%")) if '%' in value else float(value)))
     return new_echo
