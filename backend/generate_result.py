@@ -13,7 +13,7 @@ a_score_name = os.path.join(img_path, "A_score.png")
 b_score_name = os.path.join(img_path, "B_score.png")
 
 avatar_namae = os.path.join(img_path, "chisa.png")
-source_name = os.path.join(img_path, "input.png")
+source_name = os.path.join(img_path, "test.png")
 output_path = os.path.join(img_path, "output.png")
 font_path = "../ttf/Cubic_11.ttf"
 character_name = "千咲"
@@ -91,7 +91,8 @@ if __name__ == '__main__':
     rank = get_rank(total_score)
     print(f"{rank}: {total_score}")
     pic = get_rank_pic(rank)
-    pic.thumbnail((380, 400))
+    w, h = pic.size
+    pic = pic.resize((int(w*2), int(h*2)))
     template.paste(pic, (560, 40))
     # set text and font
     text = f"聲骸評分: {total_score:.2f}"
