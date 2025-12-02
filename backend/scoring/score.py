@@ -48,7 +48,8 @@ def get_score(echo, character_name):
     valid = get_valid_stats(character_name, STAT_CATEGORIES, CHARACTER_TEMPLATE)
 
     total_score = 0
-    print("--------此聲骸分數--------")
+    print("--------聲骸評分--------")
+    print(f"角色: {character_name} 適用詞條: {valid}")
     for stat in echo.sub_stat:
         if stat.name not in valid:
             continue
@@ -57,6 +58,7 @@ def get_score(echo, character_name):
         total_score += echo_score
         print(f"{stat.name} : {stat.value} : {echo_score}")
 
+    print(f"Total : {total_score}")
     return total_score
 
 def compute_stat_expect(data):

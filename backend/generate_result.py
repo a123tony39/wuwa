@@ -7,15 +7,16 @@ from scoring.score import get_score, get_rank
 
 img_path = "../img"
 template_name = os.path.join(img_path, "chisa_template.png")
-avatar_namae = os.path.join(img_path, "chisa.png")
-source_name = os.path.join(img_path, "zeni_input.png")
 ss_score_name = os.path.join(img_path, "SS_score.png")
 s_score_name = os.path.join(img_path, "S_score.png")
 a_score_name = os.path.join(img_path, "A_score.png")
 b_score_name = os.path.join(img_path, "B_score.png")
+
+avatar_namae = os.path.join(img_path, "chisa.png")
+source_name = os.path.join(img_path, "input.png")
 output_path = os.path.join(img_path, "output.png")
 font_path = "../ttf/Cubic_11.ttf"
-character_name = "贊尼"
+character_name = "千咲"
 
 rank_images = {
     "SS": ss_score_name,
