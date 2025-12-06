@@ -1,3 +1,8 @@
+# === 角色屬性模板 ===
+# main_attr：角色推薦主詞條
+# dmg_type：角色主要輸出方式
+# role：角色定位
+
 贊尼:
   main_attr: 攻擊
   dmg_type: 重擊
@@ -7,3 +12,8 @@
   main_attr: 攻擊
   dmg_type: 共鳴解放
   role: 次要輸出
+
+嘉貝莉娜:
+  main_attr: 攻擊
+  dmg_type: 重擊
+  role: 主要輸出

@@ -13,10 +13,10 @@ a_score_name = os.path.join(img_path, "A_score.png")
 b_score_name = os.path.join(img_path, "B_score.png")
 
 avatar_namae = os.path.join(img_path, "chisa.png")
-source_name = os.path.join(img_path, "test.png")
+source_name = os.path.join(img_path, "test_img/Galbrena.png")
 output_path = os.path.join(img_path, "output.png")
 font_path = "../ttf/Cubic_11.ttf"
-character_name = "千咲"
+character_name = "嘉貝莉娜"
 
 rank_images = {
     "SS": ss_score_name,
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     # process echos
     total_score = 0.0
-    for crop_area, paste_pos in zip(crop_areas, paste_positions):
+    for idx, (crop_area, paste_pos) in enumerate(zip(crop_areas, paste_positions)):
         # crop
         cropped = source.crop(crop_area)
         cropped_np = np.array(cropped)
@@ -80,6 +80,7 @@ if __name__ == '__main__':
         new_echo = parse_ocr_output(results)
         
         # calculate echo score
+        print(f"--------聲骸評分{idx+1}--------")
         total_score += get_score(new_echo, character_name)
 
         # paste echo to template
