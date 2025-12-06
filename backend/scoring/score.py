@@ -94,11 +94,11 @@ def get_stat_tier(stat_name, value, config):
     return None
 
 def get_rank(score):
-    if score >= 90:
+    if score >= 100:
         return "SS"
-    elif score >= 80:
+    elif score >= 85:
         return "S"
-    elif score >= 60:
+    elif score >= 70:
         return "A"
     else:
         return "B"

@@ -12,11 +12,12 @@ s_score_name = os.path.join(img_path, "S_score.png")
 a_score_name = os.path.join(img_path, "A_score.png")
 b_score_name = os.path.join(img_path, "B_score.png")
 
+character_name = "尤諾"
+source_name = os.path.join(img_path, "test_img/Yuno.png")
 avatar_namae = os.path.join(img_path, "chisa.png")
-source_name = os.path.join(img_path, "test_img/Galbrena.png")
 output_path = os.path.join(img_path, "output.png")
 font_path = "../ttf/Cubic_11.ttf"
-character_name = "嘉貝莉娜"
+
 
 rank_images = {
     "SS": ss_score_name,
@@ -89,6 +90,7 @@ if __name__ == '__main__':
         template.paste(cropped, paste_pos)
 
     # rank pic
+    total_score = round(total_score, 2)
     rank = get_rank(total_score)
     print(f"{rank}: {total_score}")
     pic = get_rank_pic(rank)

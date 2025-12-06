@@ -17,3 +17,8 @@
   main_attr: 攻擊
   dmg_type: 重擊
   role: 主要輸出
+
+尤諾:
+  main_attr: 攻擊
+  dmg_type: 共鳴解放
+  role: 次要輸出
