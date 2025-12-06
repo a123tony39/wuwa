@@ -12,8 +12,8 @@ s_score_name = os.path.join(img_path, "S_score.png")
 a_score_name = os.path.join(img_path, "A_score.png")
 b_score_name = os.path.join(img_path, "B_score.png")
 
-character_name = "尤諾"
-source_name = os.path.join(img_path, "test_img/Yuno.png")
+character_name = "嘉貝莉娜"
+source_name = os.path.join(img_path, "test_img/Galbrena.png")
 avatar_namae = os.path.join(img_path, "chisa.png")
 output_path = os.path.join(img_path, "output.png")
 font_path = "../ttf/Cubic_11.ttf"

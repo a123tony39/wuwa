@@ -58,6 +58,8 @@ def get_score(echo, character_name):
         print(f"{stat.name} : {stat.value} : {echo_score}")
 
     print(f"Total : {total_score}")
+    if total_score <= 15:
+        print("建議加強此聲骸")
     return total_score
 
 def compute_stat_expect(data):
