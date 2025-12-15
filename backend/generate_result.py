@@ -16,7 +16,7 @@ b_score_file = os.path.join(img_path, "B_score.png")
 
 source_file = os.path.join(img_path, "test_img/Chisa.png")
 output_path = os.path.join(img_path, "output.png")
-font_path = "../ttf/Cubic_11.ttf"
+stat_font = ImageFont.truetype("../ttf/Philosopher-Bold.ttf", 24)
 
 
 rank_images = {
@@ -36,6 +36,32 @@ def add_border(img, color, width):
 
     return img
 
+def process_echo_main_stat(paste_x, paste_y, echo):
+    main_stat_width, main_stat_height = 230, 50
+    stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
+    
+    for i in range(2):
+        if i == 0:
+            stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
+        elif i == 1:
+            paste_y += 50
+            stat_name, stat_value = echo.static_stat.name, echo.static_stat.value
+        # paste img
+        img = get_stat_img(stat_name, valid, STATS_NAME_MAP, False)
+        img = img.crop((0, 0, main_stat_width, main_stat_height))
+        region = canvas.crop((paste_x, paste_y, paste_x + img.width, paste_y + img.height))
+        composite = Image.alpha_composite(region, img)
+        canvas.paste(composite, (paste_x, paste_y))
+        # paste value
+        text_right_edge_gap = 3
+        text_optical_offset = 12.5
+        right_edge = paste_x + main_stat_width
+        text = f"{stat_value}%" if stat_name not in ["生命", "攻擊", "防禦"] else f"{stat_value}"
+        text_width = canvas_draw.textlength(text, font=stat_font)
+        text_x = right_edge - text_width - text_right_edge_gap
+        text_y = paste_y + text_optical_offset
+        canvas_draw.text((text_x, text_y), text=text, font=stat_font, fill = (255, 255, 255))
+
 def get_rank_pic(rank):
     if rank in rank_images:
         return Image.open(rank_images[rank])
@@ -43,9 +69,10 @@ def get_rank_pic(rank):
         raise ValueError(f"{rank} is not valid ranking")
 
 
-def get_stat_img(stat_name, valid, STATS_NAME_MAP):
-    filepath = "invalid" if stat_name not in valid else "valid"
-    img = Image.open(os.path.join(img_path, f"stat_img/{filepath}/{STATS_NAME_MAP[stat_name]}.png"))
+def get_stat_img(stat_name, valid, STATS_NAME_MAP, is_sub_stat):
+    folder = "sub_stat_img" if is_sub_stat else "main_stat_img"
+    is_valid = "invalid" if stat_name not in valid else "valid"
+    img = Image.open(os.path.join(img_path, f"{folder}/{is_valid}/{STATS_NAME_MAP[stat_name]}.png"))
     return img
 
 if __name__ == '__main__':
@@ -134,76 +161,32 @@ if __name__ == '__main__':
         x, y = paste_pos
         canvas.paste(echo_img, (x + 10, y + 13))
         # paste echo main stat
-        stat_name, stat_value = new_echo.main_stat.name, new_echo.main_stat.value
-        right_edge = x + 20 + echo_img.width + 230
-        ## top img
-        x = x + 20 + echo_img.width
-        img = get_stat_img(stat_name, valid, STATS_NAME_MAP)
-        img = img.crop((0, 0, 230, 50))
-        region = canvas.crop((x, y, x + img.width, y + img.height))
-        composite = Image.alpha_composite(region, img)
-        canvas.paste(composite, (x, y))
-        canvas_draw.rectangle(
-            (x, y, x + 230, y + 50),
-            outline = (255, 255, 255),
-            width = 1
-        )
-        ## top value
-        text = f"{stat_value}%" if stat_name not in ["生命", "攻擊", "防禦"] else f"{stat_value}"
-        font = ImageFont.truetype("../ttf/Philosopher-Bold.ttf", 24)
-
-        text_width = canvas_draw.textlength(text, font=font)
-        text_x = right_edge - text_width - 3
-        text_y = y + 12.5
-        canvas_draw.text((text_x, text_y), text=text, font=font, fill = (255, 255, 255))
-        ## bottom img
-        stat_name, stat_value = new_echo.static_stat.name, new_echo.static_stat.value
-        y += 50
-        img = get_stat_img(new_echo.static_stat.name, valid, STATS_NAME_MAP)
-        img = img.crop((0, 0, 230, 50))
-        region = canvas.crop((x, y, x + img.width, y + img.height))
-        composite = Image.alpha_composite(region, img)
-        canvas.paste(composite, (x, y))
-        canvas_draw.rectangle(
-            (x, y, x + 230, y + 50),
-            outline = (255, 255, 255),
-            width = 1
-        )
-        # bottom value
-        text = f"{stat_value}%" if stat_name not in ["生命", "攻擊", "防禦"] else f"{stat_value}"
-        font = ImageFont.truetype("../ttf/Philosopher-Bold.ttf", 24)
-        text_width = canvas_draw.textlength(text, font=font)
-        text_x = right_edge - text_width - 3
-        text_y = y + 12.5
-        canvas_draw.text((text_x, text_y), text=text, font=font, fill = (255, 255, 255))
+        img_main_stat_gap = 20
+        process_echo_main_stat(
+            paste_x = x + img_main_stat_gap + echo_img.width, 
+            paste_y = y, 
+            echo = new_echo
+        ) 
         # paste echo sub stat
         y_bias = 0
         start_x, start_y = paste_pos
         start_x += 10
         start_y += 108
         right_edge = start_x + sub_stat_slot_width
-        canvas_draw.rectangle(
-            (start_x, start_y, start_x + 330, start_y + 250),
-            outline = (255, 255, 255),
-            width = 1
-        )
         for stat_name, stat_value, stat_score in breakdown: 
             y = start_y + y_bias
-            filepath = "invalid" if stat_name not in valid else "valid"
             # paste img 
-            img = Image.open(os.path.join(img_path, f"stat_img/{filepath}/{STATS_NAME_MAP[stat_name]}.png"))
+            img = get_stat_img(stat_name, valid, STATS_NAME_MAP, True)
             region = canvas.crop((start_x, y, start_x + img.width, y + img.height))
             composite = Image.alpha_composite(region, img)
             canvas.paste(composite, (start_x, y))
 
             # paste value
             text = f"{stat_value}%" if stat_name not in ["生命", "攻擊", "防禦"] else f"{stat_value}"
-            font = ImageFont.truetype("../ttf/Philosopher-Bold.ttf", 24)
- 
-            text_width = canvas_draw.textlength(text, font=font)
+            text_width = canvas_draw.textlength(text, font=stat_font)
             x = right_edge - text_width - 3
             y = y + 12.5
-            canvas_draw.text((x, y), text=text, font=font, fill = (255, 255, 255))
+            canvas_draw.text((x, y), text=text, font=stat_font, fill = (255, 255, 255))
             # move y
             y_bias += 50
         
