@@ -4,21 +4,29 @@
 # role：角色定位
 
 贊尼:
+  en: Zeni
   main_attr: 攻擊
   dmg_type: 重擊
   role: 主要輸出
+  element: 衍射
 
 千咲:
+  en: Chisa
   main_attr: 攻擊
   dmg_type: 共鳴解放
   role: 次要輸出
+  element: 湮滅
 
 嘉貝莉娜:
+  en: Galbrena
   main_attr: 攻擊
   dmg_type: 重擊
   role: 主要輸出
+  element: 熱熔
 
 尤諾:
+  en: Yuno
   main_attr: 攻擊
   dmg_type: 共鳴解放
   role: 次要輸出
+  element: 氣動

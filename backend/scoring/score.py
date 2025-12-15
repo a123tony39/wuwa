@@ -1,5 +1,5 @@
 import yaml
-
+import difflib
 stats_range = {
     "生命": (320, 580),
     "生命%": (6.4, 11.6),
@@ -20,6 +20,20 @@ def load_yaml(filename):
     with open(filename, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
+
+def get_character_zh_and_en_name(character_name, character_template):
+    if character_name in character_template:
+        return [character_name, character_template[character_name]['en']]
+
+    candidates = list(character_template.keys())
+    close = difflib.get_close_matches(character_name, candidates, n=1, cutoff=0.3)
+    if close:
+        best_match = close[0]
+        return [best_match, character_template[best_match]['en']]
+    
+    raise ValueError(f"Unknown character name: {character_name}")
+    
+                            
 def get_valid_stats(character_name, stat_categories, character_templates):
     template = character_templates[character_name]
     valid = set()
@@ -29,6 +43,8 @@ def get_valid_stats(character_name, stat_categories, character_templates):
     valid.update(stat_categories["dmg_type"][template["dmg_type"]])
     # role
     valid.update(stat_categories["role"][template["role"]])
+    # element
+    valid.update(stat_categories["element"][template["element"]])
     return valid
 
 def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
@@ -36,31 +52,28 @@ def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
     info = STATS_EXPECT_BIAS.get(stat_name)
     min, max = info['min'], info['max']
     bias, expect = info['bias'], info['expect']
+    quality_ratio = bias + (stat_value - expect) / (max - min)
+    score = base * (0.7 + 0.3 * quality_ratio)
+    return round(score, 2) 
 
-    score = round(base + bias + (stat_value - expect) / (max - min), 2)
-    return score
-
-def get_score(echo, character_name):
-    BASE_SCORE = load_yaml("./scoring/base_score.yaml")
-    STAT_CATEGORIES = load_yaml("./scoring/stats_categories.yaml")
-    CHARACTER_TEMPLATE = load_yaml("./scoring/character_template.yaml")
-    STATS_EXPECT_BIAS = load_yaml("./scoring/stats_expect_bias.yaml") 
-    valid = get_valid_stats(character_name, STAT_CATEGORIES, CHARACTER_TEMPLATE)
-
+def get_score(echo, valid_stats, character_name, base_score, stats_expect_bias):
+    breakdown = []
     total_score = 0
-    print(f"角色: {character_name} 適用詞條: {valid}")
+    print(f"角色: {character_name} 適用詞條: {valid_stats}")
     for stat in echo.sub_stat:
-        if stat.name not in valid:
+        if stat.name not in valid_stats:
+            breakdown.append((stat.name, stat.value, 0))
             continue
         
-        echo_score = calculate_score(stat.name, stat.value, BASE_SCORE, STATS_EXPECT_BIAS) * 4
+        echo_score = calculate_score(stat.name, stat.value, base_score, stats_expect_bias)
         total_score += echo_score
+        breakdown.append((stat.name, stat.value, echo_score))
         print(f"{stat.name} : {stat.value} : {echo_score}")
 
     print(f"Total : {total_score}")
-    if total_score <= 15:
+    if total_score <= 13:
         print("建議加強此聲骸")
-    return total_score
+    return total_score, breakdown
 
 def compute_stat_expect(data):
     result = {}
@@ -96,11 +109,11 @@ def get_stat_tier(stat_name, value, config):
     return None
 
 def get_rank(score):
-    if score >= 100:
+    if score >= 95:
         return "SS"
     elif score >= 85:
         return "S"
-    elif score >= 70:
+    elif score >= 75:
         return "A"
     else:
         return "B"

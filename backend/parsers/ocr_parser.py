@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
+import re
 from typing import List
+from dataclasses import dataclass, field
 
 @dataclass
 class Stat:
@@ -34,10 +35,12 @@ def parse_ocr_output(ocr_result) -> EchoData:
     
     for idx, (name, value) in enumerate(pairs):
         if idx == 0:
-            new_echo.main_stat.name = name
-            new_echo.main_stat.value = value # fix 
+            new_echo.main_stat.name = f"{name}%" if '%' in value and name in PERCENTABLE else name 
+            numbers = re.findall(r'\d+\.?\d*%?', value)
+            value = numbers.pop()
+            new_echo.main_stat.value = float(value.strip("%")) if '%' in value else float(value)
         elif idx == 1:
-            new_echo.static_stat.name = name
+            new_echo.static_stat.name = f"{name}%" if '%' in value and name in PERCENTABLE else name 
             new_echo.static_stat.value = float(value.strip("%")) if '%' in value else float(value)
         else:
             new_echo.sub_stat.append(Stat(name=f"{name}%" if '%' in value and name in PERCENTABLE else name, value=float(value.strip("%")) if '%' in value else float(value)))
