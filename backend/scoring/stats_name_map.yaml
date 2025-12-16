@@ -12,9 +12,15 @@
 共鳴技能傷害加成: resonance_skill
 共鳴解放傷害加成: resonance_liberation
 治療效果加成: heal_effect
+熱熔: fire
 熱熔傷害加成: fire
+導電: thunder
 導電傷害加成: thunder
+冷凝: ice
 冷凝傷害加成: ice
+衍射: light
 衍射傷害加成: light
+湮滅: dark
 湮滅傷害加成: dark
+氣動: wind
 氣動傷害加成: wind

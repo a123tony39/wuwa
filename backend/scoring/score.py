@@ -40,7 +40,8 @@ def get_valid_stats(character_name, stat_categories, character_templates):
     # main_attr
     valid.update(stat_categories["main_attr"][template["main_attr"]])
     # dmg_type
-    valid.update(stat_categories["dmg_type"][template["dmg_type"]])
+    for dmg in template["dmg_type"]:
+        valid.update(stat_categories["dmg_type"][dmg])
     # role
     valid.update(stat_categories["role"][template["role"]])
     # element
@@ -54,7 +55,7 @@ def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
     bias, expect = info['bias'], info['expect']
     quality_ratio = bias + (stat_value - expect) / (max - min)
     score = base * (0.7 + 0.3 * quality_ratio)
-    return round(score, 2) 
+    return score
 
 def get_score(echo, valid_stats, character_name, base_score, stats_expect_bias):
     breakdown = []
@@ -115,8 +116,10 @@ def get_rank(score):
         return "S"
     elif score >= 75:
         return "A"
-    else:
+    elif score >= 60:
         return "B"
+    else:
+        return "F"
     
 
 if __name__ == "__main__":

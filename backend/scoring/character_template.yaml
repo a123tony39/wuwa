@@ -3,30 +3,59 @@
 # dmg_type：角色主要輸出方式
 # role：角色定位
 
-贊尼:
+弗洛洛:
+  en: Phrolova
+  main_attr: 攻擊
+  dmg_type:
+    - 共鳴技能
+  role: 弗洛洛
+  element: 湮滅
+
+坎特蕾拉:
+  en: Cantarella
+  main_attr: 攻擊
+  dmg_type:
+    - 普攻
+  role: 次要輸出
+  element: 湮滅
+
+贊妮:
   en: Zeni
   main_attr: 攻擊
-  dmg_type: 重擊
+  dmg_type: 
+    - 重擊
   role: 主要輸出
   element: 衍射
 
 千咲:
   en: Chisa
   main_attr: 攻擊
-  dmg_type: 共鳴解放
+  dmg_type: 
+    - 共鳴解放
   role: 次要輸出
   element: 湮滅
 
 嘉貝莉娜:
   en: Galbrena
   main_attr: 攻擊
-  dmg_type: 重擊
+  dmg_type: 
+    - 重擊
   role: 主要輸出
   element: 熱熔
 
 尤諾:
   en: Yuno
   main_attr: 攻擊
-  dmg_type: 共鳴解放
+  dmg_type: 
+    - 共鳴解放
   role: 次要輸出
+  element: 氣動
+
+卡提希婭:
+  en: Cartethyia
+  main_attr: 生命
+  dmg_type: 
+    - 普攻
+    - 共鳴解放
+  role: 主要輸出
   element: 氣動
