@@ -59,3 +59,19 @@
     - 共鳴解放
   role: 主要輸出
   element: 氣動
+
+椿:
+  en: Camellya
+  main_attr: 攻擊
+  dmg_type:
+    - 普攻
+  role: 主要輸出
+  element: 湮滅
+
+露帕:
+  en: Lupa
+  main_attr: 攻擊
+  dmg_type:
+    - 共鳴解放
+  role: 主要輸出
+  element: 熱熔

@@ -7,8 +7,9 @@ from scoring.score import get_score, get_rank,  get_character_zh_and_en_name,  g
 import yaml
 from collections import defaultdict
 
+
 img_path = "../img"
-background_file =  os.path.join(img_path, "background/Cantarella.png")
+background_file =  os.path.join(img_path, "background/Lupa.png")
 template_file = os.path.join(img_path, "new_template.png")
 ss_score_file = os.path.join(img_path, "score/SS_score.png")
 s_score_file = os.path.join(img_path, "score/S_score.png")
@@ -141,6 +142,12 @@ def process_image(source_file, output_file):
 
     # paste character
     cropped = source.crop((0, 0, 300, 150))
+
+    cropped = cropped.resize(
+        (int(cropped.width*2), int(cropped.height*2)),
+        resample=Image.NEAREST,
+    )
+    cropped = cropped.convert("L")
     cropped_np = np.array(cropped)
     results = reader.readtext(cropped_np)
 
@@ -148,25 +155,31 @@ def process_image(source_file, output_file):
     for _, text, prob in results:
         if character_name is None:
             character_name = text
-            continue
-        
-        if text == "玩家名稱":
-            excepting = "player_name"
-            continue
-        elif text == "特徵碼":
-            excepting = "feature_code"
-            continue
-            
-        if excepting == "player_name":
-            player_name = text
-            excepting = None
-            continue
-        elif excepting == "feature_code":
-            feature_code = text
-            excepting = None
-            continue
-        
-    print(character_name, player_name, feature_code)
+        elif "玩家名稱" in text:
+            colon_pos = text.find(":")
+            if colon_pos != -1:
+                player_name = text[colon_pos+1:].strip()
+        elif "特徵碼" in text:
+            colon_pos = text.find(":")
+            if colon_pos != -1:
+                uid = text[colon_pos+1:].strip()
+
+    #  player name / feature code
+    font = ImageFont.truetype("../ttf/NotoSansTC-SemiBold.ttf", 16)
+    text = f"玩家名稱: {player_name}\nUID: {uid}"
+    canvas_draw.text(
+        (canvas.width - 12, canvas.height - 12),
+        text=text,
+        font=font,
+        fill=(210, 210, 210),
+        anchor = "rd",  # right-bottom
+        align = "right",
+        spacing = 1,
+        stroke_width=1,
+        stroke_fill=(60, 60, 60)
+    )
+
+    print(character_name, player_name, uid)
     # charcter img
     character_img_x, character_img_y = 80, 119
     character_zh_name, character_en_name = get_character_zh_and_en_name(character_name = character_name, character_template=CHARACTER_TEMPLATE)
@@ -175,7 +188,7 @@ def process_image(source_file, output_file):
     character_img = character_img.resize((500, 700), Image.LANCZOS)
     character_img = add_border(character_img, color="black", width=3)
     canvas.paste(character_img, (character_img_x, character_img_y), character_img)
-    # character name / player name / feature code
+    # character name
     text = f"{character_zh_name}"
     font = ImageFont.truetype("../ttf/NotoSansTC-SemiBold.ttf", 36)
     text_width = canvas_draw.textlength(text, font = font)
@@ -338,9 +351,9 @@ if __name__ == "__main__":
     source_files = [
         # "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
-        # "../img/input/Zeni.png",
-        # "../img/input/Galbrena.png",
-        "../img/input/Cantarella.png",
+        "../img/input/Zeni.png",
+        # "../img/input/Cantarella.png",
+        # "../img/input/Lupa.png",
     ]
 
     for idx, src_file in enumerate(source_files, start=1):
