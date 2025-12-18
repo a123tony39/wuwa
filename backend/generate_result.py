@@ -6,7 +6,7 @@ from parsers.ocr_parser import parse_ocr_output
 from scoring.score import get_score, get_rank,  get_character_zh_and_en_name,  get_valid_stats
 import yaml
 from collections import defaultdict
-
+from render.canvas import paste_icon
 
 img_path = "../img"
 background_file =  os.path.join(img_path, "background/Lupa.png")
@@ -67,7 +67,8 @@ def process_echo_main_stat(paste_x, paste_y, canvas, canvas_draw, echo, total_st
         img = img.crop((0, 0, main_stat_width, main_stat_height))
         region = canvas.crop((paste_x, paste_y, paste_x + img.width, paste_y + img.height))
         composite = Image.alpha_composite(region, img)
-        canvas.paste(composite, (paste_x, paste_y))
+        paste_icon(canvas, composite, (paste_x, paste_y))
+
         # paste value
         text_right_edge_gap = 3
         text_optical_offset = 12.5
@@ -187,7 +188,8 @@ def process_image(source_file, output_file):
     character_img = Image.open(character_file)
     character_img = character_img.resize((500, 700), Image.LANCZOS)
     character_img = add_border(character_img, color="black", width=3)
-    canvas.paste(character_img, (character_img_x, character_img_y), character_img)
+    paste_icon(canvas, character_img, (character_img_x, character_img_y))
+        
     # character name
     text = f"{character_zh_name}"
     font = ImageFont.truetype("../ttf/NotoSansTC-SemiBold.ttf", 36)
@@ -197,7 +199,7 @@ def process_image(source_file, output_file):
     canvas_draw.text((text_x, text_y), text=text, font=font, fill = (210, 210, 210))
     # element
     img = Image.open(os.path.join(img_path, f"element/{STATS_NAME_MAP[CHARACTER_TEMPLATE[character_zh_name]['element']]}.png"))
-    canvas.paste(img, (int(text_x - img.width), text_y), img)
+    paste_icon(canvas, img, (int(text_x - img.width), text_y))
     # process echos
     total_score = 0.0
     sub_stat_slot_width = 330
@@ -230,7 +232,7 @@ def process_image(source_file, output_file):
         echo_img.thumbnail((90, 100))
         add_border(echo_img, color=(255, 255, 255, 160), width=1)
         x, y = paste_pos
-        canvas.paste(echo_img, (x + 10, y + 13))
+        paste_icon(canvas, echo_img, (x + 10, y + 13))
         # 聲骸主詞條 paste echo main stat
         img_main_stat_gap = 20
         process_echo_main_stat(
@@ -256,7 +258,7 @@ def process_image(source_file, output_file):
             img = get_stat_img(stat_name, valid_stats, STATS_NAME_MAP, True)
             region = canvas.crop((start_x, y, start_x + img.width, y + img.height))
             composite = Image.alpha_composite(region, img)
-            canvas.paste(composite, (start_x, y))
+            paste_icon(canvas, composite, (start_x, y))
 
             # paste value
             text = f"{stat_value}%" if stat_name not in FLAT_STATS else f"{stat_value}".rstrip('0').rstrip('.')
@@ -311,7 +313,7 @@ def process_image(source_file, output_file):
         img = Image.open(os.path.join(img_path, f"total_stat/{color}/{STATS_NAME_MAP[stat_name]}.png"))
         region = canvas.crop((stat_total_value_x, stat_total_value_y, stat_total_value_x + img.width, stat_total_value_y + img.height))
         composite = Image.alpha_composite(region, img)
-        canvas.paste(composite, (stat_total_value_x, stat_total_value_y))
+        paste_icon(canvas, composite, (stat_total_value_x, stat_total_value_y))
         # paste value
         text = f"{values:.1f}%" if stat_name not in FLAT_STATS else f"{values[0]}".rstrip('0').rstrip('.')  + " / " + f"{values[1]:.1f}%"
         text_width = canvas_draw.textlength(text, font=stat_font)
@@ -332,7 +334,7 @@ def process_image(source_file, output_file):
     img_w, img_h = rank_img.size
     mid_x = slot_x + (slow_w - img_w) // 2
     mid_y = slot_y + (slot_h - img_h) // 2
-    canvas.paste(rank_img, (mid_x, mid_y), rank_img)
+    paste_icon(canvas, rank_img, (mid_x, mid_y))
     # set text and font
     text_zh = f"練度評分:{total_score:.2f}".rstrip('0').rstrip('.')
     font_zh = ImageFont.truetype("../ttf/NotoSansTC-Bold.ttf", 36)
@@ -351,7 +353,7 @@ if __name__ == "__main__":
     source_files = [
         # "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
-        "../img/input/Zeni.png",
+        "../img/input/Zani.png",
         # "../img/input/Cantarella.png",
         # "../img/input/Lupa.png",
     ]
