@@ -6,7 +6,7 @@ from parsers.ocr_parser import parse_ocr_output
 from scoring.score import get_score, get_rank,  get_character_zh_and_en_name,  get_valid_stats
 import yaml
 from collections import defaultdict
-from render.canvas import paste_icon
+from render.canvas import paste_icon, draw_text
 
 img_path = "../img"
 background_file =  os.path.join(img_path, "background/Lupa.png")
@@ -77,7 +77,7 @@ def process_echo_main_stat(paste_x, paste_y, canvas, canvas_draw, echo, total_st
         text_width = canvas_draw.textlength(text, font=stat_font)
         text_x = right_edge - text_width - text_right_edge_gap
         text_y = paste_y + text_optical_offset
-        canvas_draw.text((text_x, text_y), text=text, font=stat_font, fill = (255, 255, 255))
+        draw_text(canvas_draw, (text_x, text_y), text=text, font=stat_font, fill = (255, 255, 255))
 
 def get_rank_pic(rank):
     if rank in rank_images:
@@ -168,7 +168,8 @@ def process_image(source_file, output_file):
     #  player name / feature code
     font = ImageFont.truetype("../ttf/NotoSansTC-SemiBold.ttf", 16)
     text = f"玩家名稱: {player_name}\nUID: {uid}"
-    canvas_draw.text(
+    draw_text(
+        canvas_draw,
         (canvas.width - 12, canvas.height - 12),
         text=text,
         font=font,
@@ -196,7 +197,7 @@ def process_image(source_file, output_file):
     text_width = canvas_draw.textlength(text, font = font)
     text_x = character_img_x + (character_img.width - text_width)//2
     text_y = character_img_y + character_img.height + 10
-    canvas_draw.text((text_x, text_y), text=text, font=font, fill = (210, 210, 210))
+    draw_text(canvas_draw, (text_x, text_y), text=text, font=font, fill = (210, 210, 210))
     # element
     img = Image.open(os.path.join(img_path, f"element/{STATS_NAME_MAP[CHARACTER_TEMPLATE[character_zh_name]['element']]}.png"))
     paste_icon(canvas, img, (int(text_x - img.width), text_y))
@@ -265,7 +266,7 @@ def process_image(source_file, output_file):
             text_width = canvas_draw.textlength(text, font=stat_font)
             x = right_edge - text_width - 3
             y = y + 12.5
-            canvas_draw.text((x, y), text=text, font=stat_font, fill = (255, 255, 255))
+            draw_text(canvas_draw, (x, y), text=text, font=stat_font, fill = (255, 255, 255))
             # move y
             y_bias += 50
         
@@ -285,8 +286,8 @@ def process_image(source_file, output_file):
             stroke = (125, 125, 125)
 
         for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
-            canvas_draw.text((x+dx, y+dy), text, font=font, fill=stroke)
-        canvas_draw.text((x, y), text=text, font=font, fill = fill)
+            draw_text(canvas_draw, (x+dx, y+dy), text, font=font, fill=stroke)
+        draw_text(canvas_draw, (x, y), text=text, font=font, fill = fill)
 
     # 聲骸總數值(有效詞條) process and sorted stats's total 
     print(total_stats)
@@ -319,7 +320,7 @@ def process_image(source_file, output_file):
         text_width = canvas_draw.textlength(text, font=stat_font)
         text_x = stat_total_value_x + stat_total_width - text_width - 10
         text_y = stat_total_value_y + 17.5
-        canvas_draw.text((text_x, text_y), text=text, font=stat_font,  fill = (255, 255, 255))
+        draw_text(canvas_draw, (text_x, text_y), text=text, font=stat_font,  fill = (255, 255, 255))
         # add cnt & move y
         stat_total_value_y += stat_total_height
         cnt += 1
@@ -343,7 +344,7 @@ def process_image(source_file, output_file):
     rank_img_center = mid_x + rank_img.width//2
     x = rank_img_center - w_zh//2
     y = mid_y + rank_img.height + 10
-    canvas_draw.text((x, y), text_zh, font=font_zh, fill=(220, 220, 220))
+    draw_text(canvas_draw, (x, y), text_zh, font=font_zh, fill=(220, 220, 220))
 
     # save the result
     canvas.save(output_file)
