@@ -9,7 +9,7 @@ from collections import defaultdict
 from render.canvas import paste_icon, draw_text
 
 img_path = "../img"
-background_file =  os.path.join(img_path, "background/Lupa.png")
+
 template_file = os.path.join(img_path, "new_template.png")
 ss_score_file = os.path.join(img_path, "score/SS_score.png")
 s_score_file = os.path.join(img_path, "score/S_score.png")
@@ -129,17 +129,9 @@ def process_image(source_file, output_file):
     source = Image.open(source_file)
     # read template 
     template = Image.open(template_file).convert("RGBA")
-    # background
-    background = Image.open(background_file).convert("RGBA")
-    background = background.resize((template.width, template.height))
-    background.putalpha(80)
-    # composite bg and template
-    canvas = Image.alpha_composite(background, template)
+
     # create ocr reader
     reader = easyocr.Reader(['en', 'ch_tra'])  
-    
-    # template draw
-    canvas_draw = ImageDraw.Draw(canvas)
 
     # paste character
     cropped = source.crop((0, 0, 300, 150))
@@ -164,6 +156,16 @@ def process_image(source_file, output_file):
             colon_pos = text.find(":")
             if colon_pos != -1:
                 uid = text[colon_pos+1:].strip()
+    # background
+    character_zh_name, character_en_name = get_character_zh_and_en_name(character_name = character_name, character_template=CHARACTER_TEMPLATE)
+    background_file =  os.path.join(img_path, f"background/{character_en_name}.png")
+    background = Image.open(background_file).convert("RGBA")
+    background = background.resize((template.width, template.height))
+    background.putalpha(80)
+    # composite bg and template
+    canvas = Image.alpha_composite(background, template)
+    # template draw
+    canvas_draw = ImageDraw.Draw(canvas)
 
     #  player name / feature code
     font = ImageFont.truetype("../ttf/NotoSansTC-SemiBold.ttf", 16)
@@ -184,7 +186,7 @@ def process_image(source_file, output_file):
     print(character_name, player_name, uid)
     # charcter img
     character_img_x, character_img_y = 80, 119
-    character_zh_name, character_en_name = get_character_zh_and_en_name(character_name = character_name, character_template=CHARACTER_TEMPLATE)
+    
     character_file = os.path.join(img_path, f"character/{character_en_name}.png")
     character_img = Image.open(character_file)
     character_img = character_img.resize((500, 700), Image.LANCZOS)
@@ -354,8 +356,8 @@ if __name__ == "__main__":
     source_files = [
         # "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
-        "../img/input/Zani.png",
-        # "../img/input/Cantarella.png",
+        # ../img/input/Zani.png",
+        "../img/input/Cantarella.png",
         # "../img/input/Lupa.png",
     ]
 
