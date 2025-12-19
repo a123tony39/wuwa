@@ -1,3 +1,4 @@
+from PIL import ImageDraw
 def draw_text(
     canvas_draw,
     pos,
@@ -28,3 +29,8 @@ def paste_icon(canvas, icon, pos):
         canvas.paste(icon, pos, icon)
     else:
         canvas.paste(icon, pos)
+
+def add_border(img, color, width):
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, img.width-1, img.height-1), outline = color, width=width)
+    return img
