@@ -1,6 +1,3 @@
-
-
-
 def draw_text(
     canvas_draw,
     pos,
