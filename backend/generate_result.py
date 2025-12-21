@@ -75,12 +75,11 @@ def process_image(source_file, output_file, reader):
     
     source = load_source_img(source_file)  
     template = load_template_img(template_file)
-
     user_info = get_player_info(source, reader)
 
     character_zh_name, character_en_name = get_character_zh_and_en_name(
         character_name = user_info["character_name"], 
-        character_template=CHARACTER_TEMPLATE
+        character_template = CHARACTER_TEMPLATE
     )
     background_file =  os.path.join(img_path, f"background/{character_en_name}.png")
     background = load_background(background_file, template.width, template.height)
@@ -156,7 +155,7 @@ def process_image(source_file, output_file, reader):
         under_panel_y = under_panel_y, 
     )
 
-    # save the result
+    # 儲存結果圖
     canvas.save(output_file)
     
 if __name__ == "__main__":
