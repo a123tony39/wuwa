@@ -1,5 +1,7 @@
 import os
+import io
 import yaml
+import base64
 import easyocr
 from pathlib import Path
 from collections import defaultdict
@@ -43,6 +45,7 @@ def load_template_img(template_file):
     return Image.open(template_file).convert("RGBA")
 
 def process_image(source_file, output_file, reader):
+
     img_path = "../img"
     IMG_PATH = Path(img_path)
     template_file = IMG_PATH / "new_template.png"
@@ -157,7 +160,126 @@ def process_image(source_file, output_file, reader):
 
     # 儲存結果圖
     canvas.save(output_file)
+
+
+def process_image_in_memory(source, reader):
+    img_path = "../img"
+    IMG_PATH = Path(img_path)
+    template_file = IMG_PATH / "new_template.png"
+    stat_font = ImageFont.truetype("../ttf/Philosopher-Bold.ttf", 24)
+    FLAT_STATS = {"生命", "攻擊", "防禦"}
+
+    total_stats = defaultdict(float)
+    BASE_SCORE = load_yaml("./scoring/base_score.yaml")
+    STATS_NAME_MAP = load_yaml("./scoring/stats_name_map.yaml")
+    STATS_CATEGORIES = load_yaml("./scoring/stats_categories.yaml")
+    STATS_EXPECT_BIAS = load_yaml("./scoring/stats_expect_bias.yaml") 
+    CHARACTER_TEMPLATE = load_yaml("./scoring/character_template.yaml")
+    crop_areas = [
+        (0, 650, 380, 1050),
+        (380, 650, 380*2, 1050),
+        (380*2, 650, 380*3, 1050),
+        (380*3, 650, 380*4, 1050),
+        (380*4, 650, 380*5, 1050),
+    ]
     
+    under_panel_x, under_panel_y = 87, 1050
+    upper_left_edge, under_left_edge = 401, 51
+    paste_positions = [
+        (under_panel_x + upper_left_edge, under_panel_y + 43), 
+        (under_panel_x + upper_left_edge + 350, under_panel_y + 43), 
+        (under_panel_x + under_left_edge, under_panel_y + 463),
+        (under_panel_x + under_left_edge + 350, under_panel_y + 463),
+        (under_panel_x + under_left_edge + 350*2, under_panel_y + 463),
+    ]
+    
+    template = load_template_img(template_file)
+    user_info = get_player_info(source, reader)
+
+    character_zh_name, character_en_name = get_character_zh_and_en_name(
+        character_name = user_info["character_name"], 
+        character_template = CHARACTER_TEMPLATE
+    )
+    background_file =  os.path.join(img_path, f"background/{character_en_name}.png")
+    background = load_background(background_file, template.width, template.height)
+
+    canvas = combine_background_template(background, template)
+    canvas_draw = prepare_canvas_for_drawing(canvas)
+    # 左上區塊
+    character_img_x, character_img_y = 80, 119
+    render_top_left_section(
+        canvas = canvas, 
+        img_path = IMG_PATH,
+        user_info = user_info,
+        canvas_draw = canvas_draw, 
+        STATS_NAME_MAP = STATS_NAME_MAP, 
+        character_img_x = character_img_x,
+        character_img_y = character_img_y,
+        character_zh_name = character_zh_name,
+        character_en_name = character_en_name,
+        CHARACTER_TEMPLATE = CHARACTER_TEMPLATE,
+    )
+    
+    # 下方區塊(聲骸部分)
+    sub_stat_width = 330
+    valid_stats = get_valid_stats(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
+    total_score = render_echo_section(
+        canvas = canvas,
+        reader = reader, 
+        source = source,
+        img_path = IMG_PATH,
+        stat_font = stat_font, 
+        crop_areas = crop_areas,
+        BASE_SCORE = BASE_SCORE,
+        FLAT_STATS = FLAT_STATS,
+        total_stats = total_stats,
+        canvas_draw = canvas_draw,
+        valid_stats = valid_stats, 
+        STATS_NAME_MAP = STATS_NAME_MAP,
+        sub_stat_width = sub_stat_width,
+        paste_positions = paste_positions,
+        character_zh_name = character_zh_name,
+        STATS_EXPECT_BIAS = STATS_EXPECT_BIAS,
+    )
+    
+    # 右上區塊
+    top_stat_total_gap = 50
+    stat_total_width, stat_total_height = 500, 70
+    stat_total_value_x, stat_total_value_y = 737, character_img_y + top_stat_total_gap
+    merge_flat_and_percent_stats(total_stats, FLAT_STATS)
+    allowed_stats = normalize_stats(valid_stats, FLAT_STATS) | FLAT_STATS
+    sorted_allowed_stats = sorted(allowed_stats, key = lambda x : stat_sort_key(x))
+
+    render_top_right_section(
+        canvas = canvas, 
+        font = stat_font,
+        img_path = IMG_PATH,
+        FLAT_STATS = FLAT_STATS,
+        canvas_draw = canvas_draw, 
+        total_stats =  total_stats, 
+        STATS_NAME_MAP = STATS_NAME_MAP,
+        stat_total_width = stat_total_width,
+        stat_total_height = stat_total_height,
+        stat_total_value_x = stat_total_value_x, 
+        stat_total_value_y = stat_total_value_y, 
+        sorted_allowed_stats = sorted_allowed_stats,
+    )
+    # 下方區塊(評級部分)
+    paste_rank(
+        canvas = canvas, 
+        img_path = IMG_PATH,
+        canvas_draw = canvas_draw,
+        total_score = total_score, 
+        under_panel_x = under_panel_x, 
+        under_panel_y = under_panel_y, 
+    )
+
+    # 儲存結果圖
+    buffered = io.BytesIO()
+    canvas.save(buffered, format = "PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    return {"text": "圖片處理完成", "image_base64": img_str}
+
 if __name__ == "__main__":
     source_files = [
         "../img/input/Cartethyia.png",
@@ -166,8 +288,8 @@ if __name__ == "__main__":
         "../img/input/Cantarella.png",
         "../img/input/Lupa.png",
     ]
-    ocr_reader = easyocr.Reader(['en', 'ch_tra'])  
 
+    ocr_reader = easyocr.Reader(['en', 'ch_tra'])  
     for idx, src_file in enumerate(source_files, start=1):
         filename = os.path.basename(src_file)
         name = os.path.splitext(filename)[0] 
