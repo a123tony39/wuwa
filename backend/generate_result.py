@@ -275,18 +275,20 @@ def process_image_in_memory(source, reader):
     )
 
     # 儲存結果圖
-    buffered = io.BytesIO()
-    canvas.save(buffered, format = "PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-    return {"text": "圖片處理完成", "image_base64": img_str}
+    # buffered = io.BytesIO()
+    # canvas.save(buffered, format = "PNG")
+    
+    return {"text": "圖片處理完成", "image": canvas}
+    # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    # return {"text": "圖片處理完成", "image_base64": img_str}
 
 if __name__ == "__main__":
     source_files = [
         "../img/input/Cartethyia.png",
-        "../img/input/Chisa.png",
-        "../img/input/Zani.png",
-        "../img/input/Cantarella.png",
-        "../img/input/Lupa.png",
+        # "../img/input/Chisa.png",
+        # "../img/input/Zani.png",
+        # "../img/input/Cantarella.png",
+        # "../img/input/Lupa.png",
     ]
 
     ocr_reader = easyocr.Reader(['en', 'ch_tra'])  

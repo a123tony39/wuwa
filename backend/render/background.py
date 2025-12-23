@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw
 
 def load_background(background_file, width, height):
     background = Image.open(background_file).convert("RGBA")
-    background = background.resize((width, height))
+    background = background.resize((width, height), resample = Image.LANCZOS)
     background.putalpha(80)
     return background
 

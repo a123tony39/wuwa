@@ -167,7 +167,7 @@ def draw_echo_sub_stats_score_text(echo_score, start_x, start_y, canvas_draw, su
     y = start_y + y_bias + 5
     if echo_score >= 20:
         fill = (220, 80, 80)
-        stroke = (30, 30, 30)
+        stroke = (150, 30, 30, 120)
     elif echo_score >= 15:
         fill = (225, 185, 110) 
         stroke = (120, 95, 40)

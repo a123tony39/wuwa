@@ -1,8 +1,9 @@
 import easyocr
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from PIL import Image
 from generate_result import process_image_in_memory
+from io import BytesIO
 
 app = Flask(__name__)
 CORS(app)
@@ -27,10 +28,21 @@ def analysis_echo():
 
     result =  process_image_in_memory(image, ocr_reader)
 
-    return jsonify({
-        "text": result.get("text", ""),
-        "image_base64": result["image_base64"],  
-    })
+    # return jsonify({
+    #     "text": result.get("text", ""),
+    #     "image_base64": result["image_base64"],  
+    # })
+    output_image = result["image"]
+    buf = BytesIO()
+    output_image.save(buf, format = "PNG")
+    buf.seek(0)
+
+    return send_file(
+        buf,
+        mimetype = "image/png",
+        as_attachment = False,
+        download_name = "result.png",
+    )
 
 if __name__ == "__main__":
     app.run(
