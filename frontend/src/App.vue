@@ -1,173 +1,227 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
-  const selectedFile = ref<File | null>(null)
-  const imgSrc = ref<string | null>(null)
-  const isAnalyzing = ref(false)
+import { ref, onMounted, onUnmounted } from 'vue'
+import cardBack from './assets/card/background.png'
+const tiltX = ref(0)
+const tiltY = ref(0)
+const selectedFile = ref<File | null>(null)
+const imgSrc = ref<string | null>(null)
+const isAnalyzing = ref(false)
+const isCardMode = ref(false)
+const isFlipped = ref(false)
+const isDragging = ref(false)
+// 檔案選擇
+const onFileChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  if (target.files && target.files[0]) selectedFile.value = target.files[0]
+}
 
-  const onFileChange = async (e: Event) => {
-    const target = e.target as HTMLInputElement
-    if (target.files && target.files[0]) {
-      selectedFile.value = target.files[0]
-    }
+// 上傳圖片
+const upload = async () => {
+  if (!selectedFile.value) return
+  isAnalyzing.value = true
+  imgSrc.value = null
+  try {
+    const formData = new FormData()
+    formData.append('file', selectedFile.value)
+    const res = await fetch("http://localhost:5000/api/process", {
+      method: "POST",
+      body: formData
+    })
+    const blob = await res.blob()
+    imgSrc.value = URL.createObjectURL(blob)
+  } catch(err) {
+    console.error(err)
+    alert("分析失敗")
+  } finally {
+    isAnalyzing.value = false
   }
-  const upload = async () =>{
-    if (!selectedFile.value) return
+}
 
-    isAnalyzing.value = true
-    imgSrc.value = null
+// 重置
+const reset = () => {
+  selectedFile.value = null
+  imgSrc.value = null
+  isCardMode.value = false
+  isFlipped.value = false
+}
 
-    try{
-      const formData = new FormData()
-      formData.append('file', selectedFile.value)
-      const res = await fetch("http://localhost:5000/api/process", {
-        method: "POST",
-        body: formData
-      })
-      const blob = await res.blob()
-      imgSrc.value = URL.createObjectURL(blob)
-    }catch(err){
-      console.error(err)
-      alert("分析失敗")
-      }finally{
-      isAnalyzing.value = false
-    }
+const onMouseDown = (e: MouseEvent) => {
+  e.preventDefault()
+  isDragging.value = true
+}
+const onMouseUp = () => {
+  if (!isDragging.value) return
+  isDragging.value = false
+  tiltX.value = 0
+  tiltY.value = 0
+  const front = document.querySelector('.card-front') as HTMLElement
+  const back = document.querySelector('.card-back') as HTMLElement
+  if (front) front.style.filter = 'brightness(1)'
+  if (back) back.style.filter = 'brightness(1)'
+}
+onMounted(() => {
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+})
+onUnmounted(() => {
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', onMouseUp)
+})
+// 滑鼠傾斜
+const onMouseMove = (e: MouseEvent) => {
+  if (!isDragging.value) return
+  const card = document.querySelector('.card') as HTMLElement
+  if (!card) return
+  const front = document.querySelector('.card-front') as HTMLElement
+  const back = document.querySelector('.card-back') as HTMLElement
+
+  const rect = card.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  const centerX = rect.width / 2
+  const centerY = rect.height / 2
+  const maxTilt = 8
+
+  tiltY.value = ((x - centerX) / centerX) * maxTilt
+  tiltX.value = -((y - centerY) / centerY) * maxTilt
+
+  // 卡片反光
+  const lightX = (x - centerX) / centerX
+  const lightY = (y - centerY) / centerY
+  const brightness = 1 + lightX*0.2 - lightY*0.2
+  if (!isFlipped.value && front) front.style.filter = `brightness(${brightness})`
+  if (isFlipped.value && back) back.style.filter = `brightness(${brightness})`
 }
 </script>
 
 <template>
-  <header class = "header">
+  <header class="header">
     <h1>聲骸分析工具</h1>
-  <p>上傳圖片，自動分析並產出分析結果圖</p>
-    </header>
-  <main class = "page">
-    <section class = "workspace">
-      <!-- 狀態1: 尚未上傳-->
-      <div v-if = "!isAnalyzing && !imgSrc" class = "panel">
-        <input type = "file" @change = "onFileChange" />
-        <button @click="upload" :disabled="!selectedFile">
-          上傳圖片
-        </button>
+    <p>上傳圖片，自動分析並產出分析結果圖</p>
+  </header>
+
+  <main class="page">
+    <section class="workspace">
+
+      <div v-if="!isAnalyzing && !imgSrc" class="panel">
+        <input type="file" @change="onFileChange" />
+        <button @click="upload" :disabled="!selectedFile">上傳圖片</button>
       </div>
 
-      <!-- 狀態2: 分析中-->
-      <div v-else-if = "isAnalyzing" class = "panel">
-        <p class = "loading">❤️❤️❤️正在分析中... 請稍後❤️❤️❤️</p>
+      <div v-else-if="isAnalyzing" class="panel">
+        <p class="loading">分析中... 請稍後</p>
       </div>
 
-      <!-- 狀態3: 產生結果-->
-      <div v-else-if = "imgSrc" class="panel">
-        <div class = "preview">
-          <img :src = "imgSrc" alt="處理後圖片"/>
-        </div>
+      <div v-else-if="imgSrc" class="panel">
+        <img
+          v-if="!isCardMode"
+          :src="imgSrc"
+          class="initial-img"
+          @click="isCardMode=true; isFlipped=false"
+        />
 
-        <div class = "actions">
+        <div v-else class="card-container">
+          <div class="page-overlay" @click="isCardMode=false; isFlipped=false"></div>
+          <div
+            class="card"
+            draggable="false"
+            @mousedown="onMouseDown"
+            @mouseup="onMouseUp"
+            @click="isFlipped=!isFlipped"
+            :style="{
+              transform: `rotateX(${tiltX}deg) rotateY(${tiltY}deg) ${isFlipped ? 'rotateY(180deg)' : ''}`
+            }"
+          >
+            <div class="card-face card-front">
+              <img :src="imgSrc" alt="預覽圖" />
+            </div>
+            <div class="card-face card-back"
+              :style="{ backgroundImage: `url(${cardBack})` }"
+            ></div>
+          </div>
+
+        </div>  
+        <div class="actions" v-if="imgSrc">
           <a :href="imgSrc" download="processed.png">
             <button>下載圖片</button>
           </a>
-          <button @click="selectedFile=null; imgSrc = null">
-            再來一次
-          </button>
+          <button @click="reset">再來一次</button>
         </div>
       </div>
+
     </section>
   </main>
 </template>
 
 <style scoped>
-/* ===== 全域文字 ===== */
-.header h1 {
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-  margin: 0;
-}
+.header { text-align:center; margin-bottom:16px }
+.page { min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:1px }
+.workspace { display:flex; flex-direction:column; align-items:center; padding:0; }
 
-.header p {
-  font-size: 13px;
-  color: #777;
-  margin-top: 4px;
-}
+.panel { display:flex; flex-direction:column; gap:8px; align-items:center }
+.initial-img { width:300px; cursor:pointer }
 
-/* ===== Header ===== */
-.header {
-  max-width: 420px;
-  margin: 0 auto 16px; /* ⬅ 底部留空間 */
-  text-align: center;    
-}
-/* ===== 頁面背景 ===== */
-.page {
-  min-height: 100vh;
-  background-color: #ffffff;
+/* 卡片容器 */
+.card-container {
+  perspective: 800px;
+  position: fixed;
+  inset: 0;
   display: flex;
   justify-content: center;
-  padding: 1px;
-  box-sizing: border-box;
-}
-
-
-/* ===== working space ===== */
-.workspace {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 32px 24px;
-
-  border: 1px solid #e0e0e0; 
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08); 
-}
-
-/* ===== Panel ===== */
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   align-items: center;
+  background: radial-gradient(circle at center, #333 0%, #111 100%);
+  z-index: 1001;
 }
 
-/* ===== 圖片預覽 ===== */
-.preview {
-  background-color: #3f3a3a;
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #e5e5e5;
-}
-
-.preview img {
-  width: 260px;
-  height: auto;
-  image-rendering: pixelated;
-  display: block;
-}
-
-/* ===== 按鈕 ===== */
-button {
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background-color: #fff;
+/* 卡片 */
+.card {
+  width: 320px;
+  height: 450px;
+  z-index: 2;
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease; /* 滑鼠傾斜快速 */
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-button:hover:not(:disabled) {
-  background-color: #f5f5f5;
-  border-color: #ccc;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ===== 操作區 ===== */
-.actions {
+/* 卡片翻轉 */
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
   display: flex;
-  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.card-face img { width: 100%; height: 100%; object-fit: contain }
+.card-front { transform: rotateY(0deg) }
+.card-back {
+  position: absolute;
+  inset: 0;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+}
+.back-content { padding:24px; text-align:center }
+
+.page-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0); /* 半透明黑色 */
+  z-index: 1; /* 卡片 z-index 高於 overlay */
 }
 
-/* ===== 分析中 ===== */
-.loading {
-  font-size: 15px;
-  color: #666;
-}
+/* 按鈕 */
+button { padding:10px 16px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer }
+button:hover:not(:disabled) { background:#f5f5f5; border-color:#ccc }
+button:disabled { opacity:.5; cursor:not-allowed }
+
+.actions { display:flex; gap:12px; margin-top:16px; position:relative; z-index:10 }
+.loading { font-size:15px; color:#666 }
 </style>

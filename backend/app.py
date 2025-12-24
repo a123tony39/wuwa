@@ -28,10 +28,6 @@ def analysis_echo():
 
     result =  process_image_in_memory(image, ocr_reader)
 
-    # return jsonify({
-    #     "text": result.get("text", ""),
-    #     "image_base64": result["image_base64"],  
-    # })
     output_image = result["image"]
     buf = BytesIO()
     output_image.save(buf, format = "PNG")
