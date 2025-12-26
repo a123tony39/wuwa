@@ -1,5 +1,5 @@
 <script setup lang = "ts">
-import { ref } from "vue"
+import { ref, onMounted, onUnmounted } from "vue"
 const props = defineProps<{
     isAnalyzing: boolean
     imgSrc: string | null
@@ -8,7 +8,31 @@ const emit = defineEmits<{
   (e: 'fileSelected', file: File): void
   (e: 'upload'): void
 }>()
+onMounted(() => {
+  window.addEventListener('paste', onPaste)
+})
 
+onUnmounted(() => {
+  window.removeEventListener('paste', onPaste)
+})
+const previewUrl = ref<string | null>(null)
+const onPaste = (e: ClipboardEvent) => {
+  const items = e.clipboardData?.items
+  if (!items) return
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    if (!item) continue
+    if (item.type.indexOf('image') !== -1) {
+      const file = item.getAsFile()
+      if (file) {
+        selectedFile.value = file
+        previewUrl.value = URL.createObjectURL(file)  // 生成預覽
+        emit('fileSelected', file)
+      }
+    }
+  }
+}
 const selectedFile = ref<File | null>(null)
 // 檔案選擇
 const onFileChange = (e: Event) => {
@@ -30,6 +54,19 @@ const onUploadClick = () => {
     <div class = "panel">
         <!-- 尚未選擇圖片 -->
         <div v-if = "!props.isAnalyzing && !props.imgSrc">
+            <!-- 可貼圖片區 -->
+            <div 
+              class="paste-area" 
+              @paste="onPaste"
+              tabindex="0"
+            >
+              <template v-if="previewUrl">
+                <img :src="previewUrl" alt="預覽圖片">
+              </template>
+              <template v-else>
+                點擊此區域並貼上圖片
+              </template>
+            </div>
             <input type="file" @change="onFileChange"/>
             <button @click="onUploadClick" :disabled="!selectedFile">上傳圖片</button>
          </div>
@@ -45,6 +82,7 @@ const onUploadClick = () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  justify-content: center;
   align-items: center;
 }
 .loading {
@@ -66,4 +104,38 @@ button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/*paste area*/
+.paste-area {
+  display: flex; /* 改回 flex，避免變成 inline 行內元素 */
+  width: auto;   /* 自動跟圖片大小適應 */
+  height: auto;  /* 自動跟圖片大小適應 */
+  min-width: 250px;        /* 最小寬度 */
+  min-height: 180px;       /* 最小高度 */
+  max-width: 600px;        /* 最大寬度 */
+  max-height: 400px;       /* 最大高度 */
+  border: 2px dashed #aaa;
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+  color: #999;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  text-align: center;
+  overflow: hidden;
+  padding: 4px;
+}
+.paste-area:focus {
+  outline: none;
+  border-color: #666;
+  color: #666;
+}
+
+/* 貼上圖片預覽 */
+.paste-area img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 </style>

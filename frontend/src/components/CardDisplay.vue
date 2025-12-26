@@ -67,7 +67,7 @@ const onMouseMove = (e: MouseEvent) => {
     // 光線效果
     const lightX = (x - centerX) / centerX
     const lightY = (y - centerY) / centerY
-    const brightness = 1 + lightX * 0.2 - lightY * 0.2
+    const brightness = 1 + lightX * 0.1 - lightY * 0.1
     const front = document.querySelector('.card-front') as HTMLElement
     const back = document.querySelector('.card-back') as HTMLElement
     if (!props.isFlipped && front) front.style.filter = `brightness(${brightness})`
@@ -100,7 +100,7 @@ onUnmounted(() => {
         @click="!hasMoved && $emit('update:isFlipped', !props.isFlipped)"
       >
         <div class="card-face card-front">
-          <img :src="imgSrc" alt="正面圖片" />
+            <img :src="imgSrc" />
         </div>
         <div class="card-face card-back">
           <img :src="cardBack" alt="背面圖片" />
@@ -137,7 +137,7 @@ onUnmounted(() => {
   width: 350px;
   height: 500px;
   transform-style: preserve-3d;
-  transition: transform 0.3s ease;
+  transition: transform 0.1s ease;
   cursor: pointer;
   position: relative;
 }

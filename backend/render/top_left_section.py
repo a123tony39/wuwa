@@ -39,7 +39,7 @@ def paste_character_img(canvas, character_en_name, pos, img_path):
     character_file = img_path / "character" / f"{character_en_name}.png"
     character_img = Image.open(character_file)
     character_img = character_img.resize((500, 700), Image.LANCZOS)
-    character_img = add_border(character_img, color="black", width=3)
+    character_img = add_border(character_img, color="black", width=1)
     paste_icon(canvas, character_img, pos)
 
 def draw_character_text(canvas_draw, character_zh_name, pos):
