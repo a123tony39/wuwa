@@ -16,6 +16,9 @@ from render.top_right_section import render_top_right_section, merge_flat_and_pe
 from render.echo_section import render_echo_section
 from render.rank_section import paste_rank
 
+
+from memory_profiler import profile
+
 def load_yaml(filename):
     with open(filename, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
@@ -282,7 +285,8 @@ def process_image_in_memory(source, reader):
     # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
     # return {"text": "圖片處理完成", "image_base64": img_str}
 
-if __name__ == "__main__":
+@profile
+def main():
     source_files = [
         "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
@@ -291,10 +295,13 @@ if __name__ == "__main__":
         # "../img/input/Lupa.png",
     ]
 
-    ocr_reader = easyocr.Reader(['ch_tra'])  
+    ocr_reader = easyocr.Reader(['ch_tra'])   
     for idx, src_file in enumerate(source_files, start=1):
         filename = os.path.basename(src_file)
         name = os.path.splitext(filename)[0] 
         output_file = f"../img/output/{name}.png"
         process_image(src_file, output_file, ocr_reader)
         print(f"處理完成: {output_file}")
+
+if __name__ == "__main__":
+    main()
