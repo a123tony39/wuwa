@@ -18,7 +18,7 @@ const upload = async () => {
   try {
     const formData = new FormData()
     formData.append('file', selectedFile.value)
-    const res = await fetch("http://localhost:5000/api/process", {
+    const res = await fetch("/api/process", {
       method: "POST",
       body: formData
     })

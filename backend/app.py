@@ -13,7 +13,11 @@ app = Flask(
     static_url_path="/" 
 ) 
 
-ocr_reader = easyocr.Reader(['en', 'ch_tra'])  
+ocr_reader = easyocr.Reader(
+    ['en', 'ch_tra'],
+    model_storage_directory="./easyOCR_model",  
+    download_enabled=False,  
+)
 
 @app.route("/api/health", methods =["GET"])
 def health_check():
