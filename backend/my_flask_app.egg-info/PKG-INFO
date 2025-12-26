@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: my_flask_app
+Version: 0.1.0
+Requires-Python: >=3.10
+Requires-Dist: flask>=2.3
+Requires-Dist: flask-cors>=3.0
+Requires-Dist: pillow>=10.0
+Requires-Dist: easyocr>=1.6
