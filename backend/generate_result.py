@@ -291,7 +291,7 @@ if __name__ == "__main__":
         # "../img/input/Lupa.png",
     ]
 
-    ocr_reader = easyocr.Reader(['en', 'ch_tra'])  
+    ocr_reader = easyocr.Reader(['ch_tra'])  
     for idx, src_file in enumerate(source_files, start=1):
         filename = os.path.basename(src_file)
         name = os.path.splitext(filename)[0] 

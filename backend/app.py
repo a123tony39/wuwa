@@ -14,7 +14,7 @@ app = Flask(
 ) 
 
 ocr_reader = easyocr.Reader(
-    ['en', 'ch_tra'],
+    ['ch_tra'],
 )
 
 @app.route("/api/health", methods =["GET"])
