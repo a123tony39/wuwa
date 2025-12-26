@@ -39,6 +39,7 @@ const onFileChange = (e: Event) => {
   const target = e.target as HTMLInputElement
   if (target.files && target.files[0]) {
     selectedFile.value = target.files[0]
+    previewUrl.value = URL.createObjectURL(target.files[0])
     emit('fileSelected', selectedFile.value)
   }
 }
