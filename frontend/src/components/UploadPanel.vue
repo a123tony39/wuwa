@@ -1,12 +1,16 @@
 <script setup lang = "ts">
-import { ref, onMounted, onUnmounted } from "vue"
+import { onMounted, onUnmounted } from "vue"
 const props = defineProps<{
     isAnalyzing: boolean
     imgSrc: string | null
+    previewUrl: string | null
+    hasFile: boolean
 }>()
 const emit = defineEmits<{
   (e: 'fileSelected', file: File): void
   (e: 'upload'): void
+  (e: 'update:previewUrl', url: string | null): void
+
 }>()
 onMounted(() => {
   window.addEventListener('paste', onPaste)
@@ -15,7 +19,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('paste', onPaste)
 })
-const previewUrl = ref<string | null>(null)
+
 const onPaste = (e: ClipboardEvent) => {
   const items = e.clipboardData?.items
   if (!items) return
@@ -26,27 +30,20 @@ const onPaste = (e: ClipboardEvent) => {
     if (item.type.indexOf('image') !== -1) {
       const file = item.getAsFile()
       if (file) {
-        selectedFile.value = file
-        previewUrl.value = URL.createObjectURL(file)  // 生成預覽
+        emit('update:previewUrl', URL.createObjectURL(file))  // 生成預覽
         emit('fileSelected', file)
       }
     }
   }
 }
-const selectedFile = ref<File | null>(null)
+
 // 檔案選擇
 const onFileChange = (e: Event) => {
   const target = e.target as HTMLInputElement
   if (target.files && target.files[0]) {
-    selectedFile.value = target.files[0]
-    previewUrl.value = URL.createObjectURL(target.files[0])
-    emit('fileSelected', selectedFile.value)
+    emit('update:previewUrl', URL.createObjectURL(target.files[0]))
+    emit('fileSelected', target.files[0])
   }
-}
-// 上傳按鈕觸發
-const onUploadClick = () => {
-    if (!selectedFile.value) return
-    emit('upload')
 }
 
 </script>
@@ -69,7 +66,7 @@ const onUploadClick = () => {
               </template>
             </div>
             <input type="file" @change="onFileChange"/>
-            <button @click="onUploadClick" :disabled="!selectedFile">上傳圖片</button>
+            <button @click="emit('upload')" :disabled="!props.hasFile">上傳圖片</button>
          </div>
           <!-- 分析中 -->
         <div v-if = "props.isAnalyzing">

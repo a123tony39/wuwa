@@ -1,14 +1,12 @@
 import os
-import io
 import yaml
-import base64
 import easyocr
 from pathlib import Path
 from collections import defaultdict
 from PIL import Image, ImageFont
 
 from parsers.input_processing import get_player_info
-from scoring.score import get_character_zh_and_en_name, get_valid_stats
+from scoring.score import get_character_zh_and_en_name, get_valid_stats_and_role
 
 from render.background import load_background, combine_background_template, prepare_canvas_for_drawing
 from render.top_left_section import render_top_left_section
@@ -109,7 +107,8 @@ def process_image(source_file, output_file, reader):
     
     # 下方區塊(聲骸部分)
     sub_stat_width = 330
-    valid_stats = get_valid_stats(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
+    valid_stats, role = get_valid_stats_and_role(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
+    print("test:", role)
     total_score = render_echo_section(
         canvas = canvas,
         reader = reader, 
@@ -117,7 +116,7 @@ def process_image(source_file, output_file, reader):
         img_path = IMG_PATH,
         stat_font = stat_font, 
         crop_areas = crop_areas,
-        BASE_SCORE = BASE_SCORE,
+        BASE_SCORE = BASE_SCORE[role],
         FLAT_STATS = FLAT_STATS,
         total_stats = total_stats,
         canvas_draw = canvas_draw,
@@ -225,7 +224,7 @@ def process_image_in_memory(source, reader):
     
     # 下方區塊(聲骸部分)
     sub_stat_width = 330
-    valid_stats = get_valid_stats(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
+    valid_stats, role = get_valid_stats_and_role(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
     total_score = render_echo_section(
         canvas = canvas,
         reader = reader, 
@@ -233,7 +232,7 @@ def process_image_in_memory(source, reader):
         img_path = IMG_PATH,
         stat_font = stat_font, 
         crop_areas = crop_areas,
-        BASE_SCORE = BASE_SCORE,
+        BASE_SCORE = BASE_SCORE[role],
         FLAT_STATS = FLAT_STATS,
         total_stats = total_stats,
         canvas_draw = canvas_draw,

@@ -9,7 +9,7 @@ const imgSrc = ref<string | null>(null)
 const isAnalyzing = ref(false)
 const isCardMode = ref(false)
 const isFlipped = ref(false)
-
+const previewUrl = ref<string | null>(null)
 // 上傳圖片
 const upload = async () => {
   if (!selectedFile.value) return
@@ -37,6 +37,7 @@ const reset = () => {
   imgSrc.value = null
   isCardMode.value = false
   isFlipped.value = false
+  previewUrl.value = null
 }
 
 </script>
@@ -48,7 +49,10 @@ const reset = () => {
       <UploadPanel 
         :isAnalyzing = "isAnalyzing"
         :imgSrc = "imgSrc"
+        :previewUrl = "previewUrl"
+        :hasFile="!!selectedFile"
         @fileSelected = "selectedFile = $event"
+        @update:previewUrl = "previewUrl = $event"
         @upload= "upload"
       />
       <CardDisplay

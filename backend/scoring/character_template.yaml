@@ -2,7 +2,16 @@
 # main_attr：角色推薦主詞條
 # dmg_type：角色主要輸出方式
 # role：角色定位
+# 拉海洛
+千咲:
+  en: Chisa
+  main_attr: 攻擊
+  dmg_type: 
+    - 共鳴解放
+  role: 輸出
+  element: 湮滅
 
+# 黎那汐塔
 弗洛洛:
   en: Phrolova
   main_attr: 攻擊
@@ -16,7 +25,7 @@
   main_attr: 攻擊
   dmg_type:
     - 普攻
-  role: 次要輸出
+  role: 輸出
   element: 湮滅
 
 贊妮:
@@ -24,23 +33,15 @@
   main_attr: 攻擊
   dmg_type: 
     - 重擊
-  role: 主要輸出
+  role: 輸出
   element: 衍射
-
-千咲:
-  en: Chisa
-  main_attr: 攻擊
-  dmg_type: 
-    - 共鳴解放
-  role: 次要輸出
-  element: 湮滅
 
 嘉貝莉娜:
   en: Galbrena
   main_attr: 攻擊
   dmg_type: 
     - 重擊
-  role: 主要輸出
+  role: 輸出
   element: 熱熔
 
 尤諾:
@@ -48,7 +49,7 @@
   main_attr: 攻擊
   dmg_type: 
     - 共鳴解放
-  role: 次要輸出
+  role: 輸出
   element: 氣動
 
 卡提希婭:
@@ -57,21 +58,38 @@
   dmg_type: 
     - 普攻
     - 共鳴解放
-  role: 主要輸出
+  role: 輸出
   element: 氣動
-
-椿:
-  en: Camellya
-  main_attr: 攻擊
-  dmg_type:
-    - 普攻
-  role: 主要輸出
-  element: 湮滅
 
 露帕:
   en: Lupa
   main_attr: 攻擊
   dmg_type:
     - 共鳴解放
-  role: 主要輸出
+  role: 輸出
   element: 熱熔
+# 黑海岸
+守岸人:
+  en: Shorekeeper
+  main_attr: 生命
+  dmg_type:
+    - 共鳴解放
+  role: 輔助
+  element: 衍射
+
+椿:
+  en: Camellya
+  main_attr: 攻擊
+  dmg_type:
+    - 普攻
+  role: 輸出
+  element: 湮滅
+
+# 瑝瓏
+今汐:
+  en: Jinhsi
+  main_attr: 攻擊
+  dmg_type:
+    - 共鳴技能
+  role: 輸出
+  element: 衍射

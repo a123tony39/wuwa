@@ -20,7 +20,6 @@ def load_yaml(filename):
     with open(filename, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
-
 def get_character_zh_and_en_name(character_name, character_template):
     if character_name in character_template:
         return [character_name, character_template[character_name]['en']]
@@ -32,9 +31,8 @@ def get_character_zh_and_en_name(character_name, character_template):
         return [best_match, character_template[best_match]['en']]
     
     raise ValueError(f"Unknown character name: {character_name}")
-    
-                            
-def get_valid_stats(character_name, stat_categories, character_templates):
+
+def get_valid_stats_and_role(character_name, stat_categories, character_templates):
     template = character_templates[character_name]
     valid = set()
     # main_attr
@@ -43,10 +41,11 @@ def get_valid_stats(character_name, stat_categories, character_templates):
     for dmg in template["dmg_type"]:
         valid.update(stat_categories["dmg_type"][dmg])
     # role
-    valid.update(stat_categories["role"][template["role"]])
+    role = template["role"]
+    valid.update(stat_categories["role"][role])
     # element
     valid.update(stat_categories["element"][template["element"]])
-    return valid
+    return valid, role
 
 def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
     base = BASE_SCORE.get(stat_name)
@@ -58,6 +57,7 @@ def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
     return score
 
 def get_score(echo, valid_stats, character_name, base_score, stats_expect_bias):
+    print("test2:", base_score)
     breakdown = []
     total_score = 0
     print(f"角色: {character_name} 適用詞條: {valid_stats}")
