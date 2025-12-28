@@ -57,7 +57,7 @@ def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
     return score
 
 def get_score(echo, valid_stats, character_name, base_score, stats_expect_bias):
-    print("test2:", base_score)
+    print("採用base_score:", base_score)
     breakdown = []
     total_score = 0
     print(f"角色: {character_name} 適用詞條: {valid_stats}")

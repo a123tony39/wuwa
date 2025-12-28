@@ -108,7 +108,6 @@ def process_image(source_file, output_file, reader):
     # 下方區塊(聲骸部分)
     sub_stat_width = 330
     valid_stats, role = get_valid_stats_and_role(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
-    print("test:", role)
     total_score = render_echo_section(
         canvas = canvas,
         reader = reader, 
@@ -294,7 +293,9 @@ def main():
         # "../img/input/Lupa.png",
     ]
 
-    ocr_reader = easyocr.Reader(['ch_tra'])   
+    ocr_reader = easyocr.Reader(
+        ['ch_tra', 'en'],
+    )   
     for idx, src_file in enumerate(source_files, start=1):
         filename = os.path.basename(src_file)
         name = os.path.splitext(filename)[0] 
