@@ -7,7 +7,6 @@ from PIL import Image, ImageFont
 
 def render_echo_section(
         canvas,
-        reader, 
         source,
         crop_areas,
         canvas_draw,
@@ -22,10 +21,11 @@ def render_echo_section(
         FLAT_STATS,
         stat_font, 
         img_path,
+        ocr_results,
     ):
     total_score = 0.0
-    for idx, (crop_area, paste_pos) in enumerate(zip(crop_areas, paste_positions)):
-        new_echo = get_new_echo(source, crop_area, reader)
+    for idx, (ocr_result, crop_area, paste_pos) in enumerate(zip(ocr_results, crop_areas, paste_positions)):
+        new_echo = get_new_echo(ocr_result)
         # calculate echo score
         print(f"--------聲骸評分{idx+1}--------")
         echo_score, breakdown = get_score(
@@ -92,10 +92,7 @@ def render_echo_section(
         )
     return total_score
 
-def get_new_echo(source, crop_area, reader):
-    cropped = source.crop(crop_area)
-    cropped_np = np.array(cropped)
-    results = reader.readtext(cropped_np)    
+def get_new_echo(results):
     new_echo = parse_ocr_output(results)
     return new_echo
 

@@ -1,6 +1,5 @@
 import os
 import yaml
-import easyocr
 from pathlib import Path
 from collections import defaultdict
 from PIL import Image, ImageFont
@@ -14,7 +13,7 @@ from render.top_right_section import render_top_right_section, merge_flat_and_pe
 from render.echo_section import render_echo_section
 from render.rank_section import paste_rank
 
-
+from google_ocr import google_ocr
 from memory_profiler import profile
 
 def load_yaml(filename):
@@ -45,7 +44,7 @@ def load_source_img(source_file):
 def load_template_img(template_file):
     return Image.open(template_file).convert("RGBA")
 
-def process_image(source_file, output_file, reader):
+def process_image(source_file, output_file):
 
     img_path = "../img"
     IMG_PATH = Path(img_path)
@@ -79,7 +78,9 @@ def process_image(source_file, output_file, reader):
     
     source = load_source_img(source_file)  
     template = load_template_img(template_file)
-    user_info = get_player_info(source, reader)
+    # google ocr
+    ocr_results = google_ocr(source)
+    user_info = get_player_info(ocr_results[0])
 
     character_zh_name, character_en_name = get_character_zh_and_en_name(
         character_name = user_info["character_name"], 
@@ -110,7 +111,6 @@ def process_image(source_file, output_file, reader):
     valid_stats, role = get_valid_stats_and_role(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
     total_score = render_echo_section(
         canvas = canvas,
-        reader = reader, 
         source = source,
         img_path = IMG_PATH,
         stat_font = stat_font, 
@@ -125,6 +125,7 @@ def process_image(source_file, output_file, reader):
         paste_positions = paste_positions,
         character_zh_name = character_zh_name,
         STATS_EXPECT_BIAS = STATS_EXPECT_BIAS,
+        ocr_results = ocr_results[1:]
     )
     
     # 右上區塊
@@ -163,7 +164,7 @@ def process_image(source_file, output_file, reader):
     canvas.save(output_file)
 
 
-def process_image_in_memory(source, reader):
+def process_image_in_memory(source):
     img_path = "../img"
     IMG_PATH = Path(img_path)
     template_file = IMG_PATH / "new_template.png"
@@ -195,7 +196,9 @@ def process_image_in_memory(source, reader):
     ]
     
     template = load_template_img(template_file)
-    user_info = get_player_info(source, reader)
+    # google ocr
+    ocr_results = google_ocr(source)
+    user_info = get_player_info(ocr_results[0])
 
     character_zh_name, character_en_name = get_character_zh_and_en_name(
         character_name = user_info["character_name"], 
@@ -226,7 +229,6 @@ def process_image_in_memory(source, reader):
     valid_stats, role = get_valid_stats_and_role(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
     total_score = render_echo_section(
         canvas = canvas,
-        reader = reader, 
         source = source,
         img_path = IMG_PATH,
         stat_font = stat_font, 
@@ -241,6 +243,7 @@ def process_image_in_memory(source, reader):
         paste_positions = paste_positions,
         character_zh_name = character_zh_name,
         STATS_EXPECT_BIAS = STATS_EXPECT_BIAS,
+        ocr_results = ocr_results[1:]
     )
     
     # 右上區塊
@@ -293,14 +296,11 @@ def main():
         # "../img/input/Lupa.png",
     ]
 
-    ocr_reader = easyocr.Reader(
-        ['ch_tra', 'en'],
-    )   
     for idx, src_file in enumerate(source_files, start=1):
         filename = os.path.basename(src_file)
         name = os.path.splitext(filename)[0] 
         output_file = f"../img/output/{name}.png"
-        process_image(src_file, output_file, ocr_reader)
+        process_image(src_file, output_file)
         print(f"處理完成: {output_file}")
 
 if __name__ == "__main__":

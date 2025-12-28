@@ -1,5 +1,4 @@
 import os
-import easyocr
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from PIL import Image
 from generate_result import process_image_in_memory
@@ -12,10 +11,6 @@ app = Flask(
      static_folder=FRONTEND_DIST,
     static_url_path="/" 
 ) 
-
-ocr_reader = easyocr.Reader(
-    ['ch_tra', 'en'],
-)
 
 @app.route("/api/health", methods =["GET"])
 def health_check():
@@ -33,7 +28,7 @@ def analysis_echo():
     
     image = Image.open(file.stream)
 
-    result =  process_image_in_memory(image, ocr_reader)
+    result =  process_image_in_memory(image)
 
     output_image = result["image"]
     buf = BytesIO()
