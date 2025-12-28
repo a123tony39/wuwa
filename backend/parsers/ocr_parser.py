@@ -14,14 +14,12 @@ class EchoData:
     sub_stat: List[Stat] = field(default_factory=list)
 
 
-
 def normalize(text):
     VALID_STATS = ["暴擊傷害", "暴擊", "攻擊", "生命", "防禦", "共鳴效率", "普攻傷害加成", "共鳴解放傷害加成", "重擊傷害加成", "共鳴技能傷害加成"]
     for stat in VALID_STATS:
         if stat in text:
             return stat
     return text # value
-
 
 def parse_ocr_output(ocr_result) -> EchoData:
     print("-----------------------------")
@@ -31,8 +29,9 @@ def parse_ocr_output(ocr_result) -> EchoData:
     # get main stat
     for text in ocr_result[:2]:
         text = normalize(text)
+        print(f"文字: {text}")
         texts.append(text)
-    
+        
     # get sub stat
     for text in ocr_result[2:]:
         stat = normalize(text)
@@ -46,7 +45,10 @@ def parse_ocr_output(ocr_result) -> EchoData:
     pairs = [texts[i:i+2] for i in range(0, len(texts), 2)]
     PERCENTABLE = ["生命", "攻擊", "防禦"]
     for idx, (name, value) in enumerate(pairs):
+        print(name, value)
         name = f"{name}%" if '%' in value and name in PERCENTABLE else name 
+        values = re.findall(r'\d+\.?\d*%?', value)
+        value = values.pop()
         val = float(value.strip("%")) if '%' in value else float(value)
         if idx == 0:
             new_echo.main_stat.name = name 
