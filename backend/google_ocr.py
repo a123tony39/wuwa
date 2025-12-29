@@ -4,7 +4,10 @@ import json
 from google.cloud import vision
 from PIL import Image
 
-def google_ocr(img, crop_areas):
+def google_ocr(img, crop_areas, scale=2):
+    # 先處理圖像
+    img_proc = preprocess_image(img, crop_areas, scale=scale)
+
     with open("config.json", "r") as f:
         config = json.load(f)
     api_key = config["GOOGLE_VISION_API_KEY"]
@@ -13,19 +16,24 @@ def google_ocr(img, crop_areas):
     )
 
     buf = io.BytesIO()
-    img.save(buf, format="PNG")
+    img_proc.save(buf, format="PNG")
     content = buf.getvalue()
+    img_vision = vision.Image(content=content)
 
-    img = vision.Image(content=content)
-    response = client.text_detection(image=img)
+    response = client.text_detection(image=img_vision)
     texts = response.text_annotations
 
-    # texts[0] 是整張文字描述，其餘是每個文字或區塊
+    # texts[0] 是整張文字，其餘是每個字或區塊
     all_text_per_area = [[] for _ in crop_areas]
 
-    result = []
+    # 計算每個 crop 在新圖中的水平起始 x
+    area_x_starts = []
+    current_x = 0
+    for x1, y1, x2, y2 in crop_areas:
+        area_x_starts.append(current_x)
+        current_x += int((x2 - x1) * scale)
+
     for text in texts[1:]:  
-        # bounding box
         vertices = text.bounding_poly.vertices
         min_x = min(v.x for v in vertices)
         max_x = max(v.x for v in vertices)
@@ -33,7 +41,10 @@ def google_ocr(img, crop_areas):
         max_y = max(v.y for v in vertices)
 
         for i, (x1, y1, x2, y2) in enumerate(crop_areas):
-            if min_x >= x1 and max_x <= x2 and min_y >= y1 and max_y <= y2:
+            area_start_x = area_x_starts[i]
+            area_end_x = area_start_x + int((x2 - x1) * scale)
+            # 判斷文字是否在 crop 區域
+            if min_x >= area_start_x and max_x <= area_end_x:
                 if i == 0:
                     filtered_text = re.sub(r"[^0-9a-zA-Z\u4e00-\u9fff\s:.\%]", "", text.description)
                 else:
@@ -45,15 +56,15 @@ def google_ocr(img, crop_areas):
                         "y": min_y,
                         "text": filtered_text
                     })
-                break  
+                break
 
-    for i, items in enumerate(all_text_per_area):
+    # 合併文字成行
+    result = []
+    for items in all_text_per_area:
         items.sort(key=lambda x: (x["y"], x["x"]))
-
         lines = []
         current_line = []
         last_y = None
-
         for item in items:
             if last_y is None or abs(item["y"] - last_y) < 15:
                 current_line.append(item)
@@ -61,7 +72,6 @@ def google_ocr(img, crop_areas):
                 lines.append(current_line)
                 current_line = [item]
             last_y = item["y"]
-
         if current_line:
             lines.append(current_line)
 
@@ -71,8 +81,29 @@ def google_ocr(img, crop_areas):
             text = "".join(x["text"] for x in line_items)
             block.append(text)
         result.append(block)
-      
+
     return result
+
+def preprocess_image(img, crop_areas, scale=2):
+    """
+    將每個 crop area 切出放大後，貼回新圖
+    scale: 放大倍數
+    """
+    # 計算新圖大小
+    new_width = sum(int((x2 - x1) * scale) for x1, y1, x2, y2 in crop_areas)
+    new_height = max(int((y2 - y1) * scale) for x1, y1, x2, y2 in crop_areas)
+
+    new_img = Image.new("RGB", (new_width, new_height), color=(255, 255, 255))
+
+    current_x = 0
+    for x1, y1, x2, y2 in crop_areas:
+        crop = img.crop((x1, y1, x2, y2))
+        w, h = crop.size
+        crop = crop.resize((int(w * scale), int(h * scale)), Image.BICUBIC)
+        new_img.paste(crop, (current_x, 0))
+        current_x += crop.width
+
+    return new_img
 
 if __name__ == "__main__":
     img = Image.open("../img/input/Zani.png")

@@ -86,6 +86,7 @@ def process_image(source, debug=False):
     template = load_template_img(template_file)
     # google ocr
     ocr_results = google_ocr(source, ocr_crop_areas)
+    print("OCR_rseult:", ocr_results)
     user_info = get_player_info(ocr_results[0])
 
     character_zh_name, character_en_name = get_character_zh_and_en_name(
@@ -177,9 +178,9 @@ def main():
         #"../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
         # "../img/input/Zani.png",
-        "../img/input/Cantarella.png",
+        # "../img/input/Cantarella.png",
         # "../img/input/Lupa.png",
-        "../img/input/Phrolova.png",
+        "../img/input/Changli.png",
     ]
 
     for _, src_file in enumerate(source_files, start=1):
