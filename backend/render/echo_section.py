@@ -1,4 +1,3 @@
-import numpy as np
 from parsers.ocr_parser import parse_ocr_output
 from scoring.score import get_score
 from .canvas import draw_text, paste_icon, add_border
@@ -8,7 +7,7 @@ from PIL import Image, ImageFont
 def render_echo_section(
         canvas,
         source,
-        crop_areas,
+        echo_avater_positions,
         canvas_draw,
         valid_stats, 
         paste_positions,
@@ -24,7 +23,7 @@ def render_echo_section(
         ocr_results,
     ):
     total_score = 0.0
-    for idx, (ocr_result, crop_area, paste_pos) in enumerate(zip(ocr_results, crop_areas, paste_positions)):
+    for idx, (ocr_result, avatar_pos, paste_pos) in enumerate(zip(ocr_results, echo_avater_positions, paste_positions)):
         new_echo = get_new_echo(ocr_result)
         # calculate echo score
         print(f"--------聲骸評分{idx+1}--------")
@@ -39,7 +38,7 @@ def render_echo_section(
         x, y = paste_pos
         echo_img = paste_echo_img(
             idx = idx,
-            crop_area = crop_area, 
+            avatar_pos = avatar_pos, 
             source = source, 
             x = x,
             y = y,
@@ -96,8 +95,8 @@ def get_new_echo(results):
     new_echo = parse_ocr_output(results)
     return new_echo
 
-def paste_echo_img(idx, crop_area, source, x, y, canvas):
-    cropped_x, cropped_y = crop_area[0], crop_area[1]
+def paste_echo_img(idx, avatar_pos, source, x, y, canvas):
+    cropped_x, cropped_y = avatar_pos
     if idx == 0:
         cropped_x += 10
     echo_img = source.crop((cropped_x, cropped_y, cropped_x + 210, cropped_y + 180))

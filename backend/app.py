@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from PIL import Image
-from generate_result import process_image_in_memory
+from generate_result import process_image
 from io import BytesIO
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
@@ -28,7 +28,7 @@ def analysis_echo():
     
     image = Image.open(file.stream)
 
-    result =  process_image_in_memory(image)
+    result =  process_image(image)
 
     output_image = result["image"]
     buf = BytesIO()
