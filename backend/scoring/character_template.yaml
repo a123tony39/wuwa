@@ -61,6 +61,14 @@
   role: 輸出
   element: 氣動
 
+夏空:
+  en: Ciaccona
+  main_attr: 攻擊
+  dmg_type: 
+    - 普攻
+  role: 輸出
+  element: 氣動
+
 露帕:
   en: Lupa
   main_attr: 攻擊
