@@ -1,12 +1,11 @@
-from PIL import Image, ImageFont
+from PIL import Image
 
 from parsers.ocr_parser import parse_ocr_output
 from domain.score.score import get_score
-from .canvas import draw_text, paste_icon, add_border
-from .stat_img import load_stat_img
+from .core.canvas import draw_text, paste_icon, add_border
 
 from backend_config.paths import IMG_PATH
-from .render_setting import STAT_FONT, RANK_FONT
+from .core.render_setting import STAT_FONT, RANK_FONT
 
 def render_echo_section(
         canvas,
@@ -171,3 +170,10 @@ def draw_echo_sub_stats_score_text(echo_score, start_x, start_y, canvas_draw, su
     for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
         draw_text(canvas_draw, (x+dx, y+dy), text, font=RANK_FONT, fill=stroke)
     draw_text(canvas_draw, (x, y), text=text, font=RANK_FONT, fill = fill)
+
+def load_stat_img(stat_name, valid, STATS_NAME_MAP, is_sub_stat, img_path):
+    folder = "sub_stat" if is_sub_stat else "main_stat"
+    is_valid = "invalid" if stat_name not in valid else "valid"
+    file = img_path / folder / is_valid / f"{STATS_NAME_MAP[stat_name]}.png"
+    img = Image.open(file)
+    return img

@@ -1,5 +1,5 @@
 from PIL import Image, ImageFont
-from .canvas import draw_text, paste_icon, add_border
+from .core.canvas import draw_text, paste_icon, add_border
 from backend_config.paths import IMG_PATH
 
 def render_top_left_section(

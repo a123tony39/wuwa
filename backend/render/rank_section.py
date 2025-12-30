@@ -1,6 +1,6 @@
 from PIL import Image, ImageFont
 from domain.score.score import get_rank
-from .canvas import paste_icon, draw_text
+from .core.canvas import paste_icon, draw_text
 from render.layout_config import UNDER_PANEL_X, UNDER_PANEL_Y
 
 def paste_rank(total_score, canvas, canvas_draw, img_path):

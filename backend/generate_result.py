@@ -12,7 +12,7 @@ from render.top_left_section import render_top_left_section
 from render.top_right_section import render_top_right_section, merge_flat_and_percent_stats
 from render.echo_section import render_echo_section
 from render.rank_section import paste_rank
-from render.render_setting import STAT_FONT, TEMPLATE_FILE, get_background_file
+from render.core.render_setting import STAT_FONT, TEMPLATE_FILE, get_background_file
 from render.layout_config import ECHO_AVATAR_POSITIONS, OCR_CROP_AREAS, PASTE_POSITIONS
 
 from infrastructure.ocr.google_ocr import google_ocr
@@ -125,7 +125,7 @@ def process_image(source, debug=False):
 @profile
 def main():
     source_files = [
-        #"../img/input/Cartethyia.png",
+        # "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
         # "../img/input/Zani.png",
         # "../img/input/Cantarella.png",

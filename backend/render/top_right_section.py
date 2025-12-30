@@ -1,5 +1,5 @@
 from PIL import Image
-from .canvas import paste_icon, draw_text
+from .core.canvas import paste_icon, draw_text
 def render_top_right_section(
         font,
         canvas, 
