@@ -1,9 +1,9 @@
 from PIL import Image, ImageFont
 from .canvas import draw_text, paste_icon, add_border
+from backend_config.paths import IMG_PATH
 
 def render_top_left_section(
         canvas, 
-        img_path,
         user_info,
         canvas_draw, 
         STATS_NAME_MAP, 
@@ -14,9 +14,9 @@ def render_top_left_section(
         CHARACTER_TEMPLATE,
     ):
     render_player_info(canvas, canvas_draw, user_info)
-    paste_character_img(canvas, character_en_name, (character_img_x, character_img_y), img_path)
+    paste_character_img(canvas, character_en_name, (character_img_x, character_img_y), IMG_PATH)
     text_x, text_y = draw_character_text(canvas_draw, character_zh_name, (character_img_x, character_img_y))
-    paste_element_img(canvas, STATS_NAME_MAP, CHARACTER_TEMPLATE, character_zh_name, text_x, text_y, img_path)
+    paste_element_img(canvas, STATS_NAME_MAP, CHARACTER_TEMPLATE, character_zh_name, text_x, text_y, IMG_PATH)
 
 def render_player_info(canvas, canvas_draw, user_info):
     player_name, uid = user_info["player_name"], user_info["uid"]

@@ -1,3 +1,6 @@
+
+FLAT_STATS = {"生命", "攻擊", "防禦"}
+
 class ScoreRules:
     def __init__(
         self,

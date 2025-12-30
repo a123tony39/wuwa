@@ -1,11 +1,12 @@
 from PIL import Image, ImageFont
 from domain.score.score import get_rank
 from .canvas import paste_icon, draw_text
+from render.layout_config import UNDER_PANEL_X, UNDER_PANEL_Y
 
-def paste_rank(total_score, under_panel_x, under_panel_y, canvas, canvas_draw, img_path):
+def paste_rank(total_score, canvas, canvas_draw, img_path):
     rank = get_rank(total_score)
     # rank pic
-    slot_x, slot_y = under_panel_x + 51 + 85, under_panel_y + 33 + 120
+    slot_x, slot_y = UNDER_PANEL_X + 51 + 85, UNDER_PANEL_Y + 33 + 120
     slow_w, slot_h = 180, 180
     print(f"{rank}: {total_score}")
     rank_img = load_rank_pic(rank, img_path)

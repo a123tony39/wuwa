@@ -1,8 +1,12 @@
+from PIL import Image, ImageFont
+
 from parsers.ocr_parser import parse_ocr_output
 from domain.score.score import get_score
 from .canvas import draw_text, paste_icon, add_border
 from .stat_img import load_stat_img
-from PIL import Image, ImageFont
+
+from backend_config.paths import IMG_PATH
+from .render_setting import STAT_FONT, RANK_FONT
 
 def render_echo_section(
         canvas,
@@ -18,8 +22,6 @@ def render_echo_section(
         STATS_NAME_MAP,
         sub_stat_width,
         FLAT_STATS,
-        stat_font, 
-        img_path,
         ocr_results,
     ):
     total_score = 0.0
@@ -56,8 +58,6 @@ def render_echo_section(
             total_stats = total_stats,
             STATS_NAME_MAP = STATS_NAME_MAP,
             FLAT_STATS = FLAT_STATS,
-            font = stat_font,
-            img_path = img_path,
         ) 
         # 聲骸副詞條 paste echo sub stat
         start_x, start_y = paste_pos
@@ -77,8 +77,6 @@ def render_echo_section(
             valid_stats = valid_stats, 
             STATS_NAME_MAP = STATS_NAME_MAP, 
             FLAT_STATS = FLAT_STATS,
-            font = stat_font,
-            img_path = img_path,
         )
         # 此聲骸評分
         draw_echo_sub_stats_score_text(
@@ -105,27 +103,27 @@ def paste_echo_img(idx, avatar_pos, source, x, y, canvas):
     paste_icon(canvas, echo_img, (x + 10, y + 13))
     return echo_img
 
-def process_echo_sub_stats(breakdown, total_stats, start_x, start_y, valid_stats, STATS_NAME_MAP, canvas, canvas_draw, right_edge, y_bias, FLAT_STATS, font, img_path):
+def process_echo_sub_stats(breakdown, total_stats, start_x, start_y, valid_stats, STATS_NAME_MAP, canvas, canvas_draw, right_edge, y_bias, FLAT_STATS):
     for stat_name, stat_value, _ in breakdown: 
         total_stats[stat_name] += stat_value
         y = start_y + y_bias
         # paste img 
-        img = load_stat_img(stat_name, valid_stats, STATS_NAME_MAP, True, img_path)
+        img = load_stat_img(stat_name, valid_stats, STATS_NAME_MAP, True, IMG_PATH)
         region = canvas.crop((start_x, y, start_x + img.width, y + img.height))
         composite = Image.alpha_composite(region, img)
         paste_icon(canvas, composite, (start_x, y))
 
         # paste value
         text = f"{stat_value}%" if stat_name not in FLAT_STATS else f"{stat_value}".rstrip('0').rstrip('.')
-        text_width = canvas_draw.textlength(text, font=font)
+        text_width = canvas_draw.textlength(text, font=STAT_FONT)
         x = right_edge - text_width - 3
         y = y + 12.5
-        draw_text(canvas_draw, (x, y), text=text, font=font, fill = (255, 255, 255))
+        draw_text(canvas_draw, (x, y), text=text, font=STAT_FONT, fill = (255, 255, 255))
         # move y
         y_bias += 50
     return y_bias
 
-def process_echo_main_stat(paste_x, paste_y, canvas, canvas_draw, echo, total_stats,  valid_stats, STATS_NAME_MAP, FLAT_STATS, font, img_path):
+def process_echo_main_stat(paste_x, paste_y, canvas, canvas_draw, echo, total_stats,  valid_stats, STATS_NAME_MAP, FLAT_STATS):
     main_stat_width, main_stat_height = 230, 50
     stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
     
@@ -138,7 +136,7 @@ def process_echo_main_stat(paste_x, paste_y, canvas, canvas_draw, echo, total_st
 
         total_stats[stat_name] += stat_value
         # paste img
-        img = load_stat_img(stat_name, valid_stats, STATS_NAME_MAP, False, img_path)
+        img = load_stat_img(stat_name, valid_stats, STATS_NAME_MAP, False, IMG_PATH)
         img = img.crop((0, 0, main_stat_width, main_stat_height))
         region = canvas.crop((paste_x, paste_y, paste_x + img.width, paste_y + img.height))
         composite = Image.alpha_composite(region, img)
@@ -149,16 +147,15 @@ def process_echo_main_stat(paste_x, paste_y, canvas, canvas_draw, echo, total_st
         text_optical_offset = 12.5
         right_edge = paste_x + main_stat_width
         text = f"{stat_value}%" if stat_name not in FLAT_STATS else f"{stat_value}".rstrip('0').rstrip('.')
-        text_width = canvas_draw.textlength(text, font=font)
+        text_width = canvas_draw.textlength(text, font=STAT_FONT)
         text_x = right_edge - text_width - text_right_edge_gap
         text_y = paste_y + text_optical_offset
-        draw_text(canvas_draw, (text_x, text_y), text=text, font=font, fill = (255, 255, 255))
+        draw_text(canvas_draw, (text_x, text_y), text=text, font=STAT_FONT, fill = (255, 255, 255))
 
 
 def draw_echo_sub_stats_score_text(echo_score, start_x, start_y, canvas_draw, sub_stat_slot_width, y_bias):
     text = f"聲骸評分: {echo_score:.2f}"
-    font = ImageFont.truetype("../ttf/NotoSansTC-SemiBold.ttf", 28)
-    text_width = canvas_draw.textlength(text, font=font)
+    text_width = canvas_draw.textlength(text, font=RANK_FONT)
     x = start_x + (sub_stat_slot_width - text_width)//2
     y = start_y + y_bias + 5
     if echo_score >= 20:
@@ -172,5 +169,5 @@ def draw_echo_sub_stats_score_text(echo_score, start_x, start_y, canvas_draw, su
         stroke = (125, 125, 125)
 
     for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
-        draw_text(canvas_draw, (x+dx, y+dy), text, font=font, fill=stroke)
-    draw_text(canvas_draw, (x, y), text=text, font=font, fill = fill)
+        draw_text(canvas_draw, (x+dx, y+dy), text, font=RANK_FONT, fill=stroke)
+    draw_text(canvas_draw, (x, y), text=text, font=RANK_FONT, fill = fill)
