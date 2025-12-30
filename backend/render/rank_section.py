@@ -1,5 +1,5 @@
 from PIL import Image, ImageFont
-from scoring.score import get_rank
+from domain.score.score import get_rank
 from .canvas import paste_icon, draw_text
 
 def paste_rank(total_score, under_panel_x, under_panel_y, canvas, canvas_draw, img_path):

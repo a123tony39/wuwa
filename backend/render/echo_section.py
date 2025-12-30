@@ -1,5 +1,5 @@
 from parsers.ocr_parser import parse_ocr_output
-from scoring.score import get_score
+from domain.score.score import get_score
 from .canvas import draw_text, paste_icon, add_border
 from .stat_img import load_stat_img
 from PIL import Image, ImageFont

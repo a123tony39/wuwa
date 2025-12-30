@@ -1,11 +1,10 @@
 import os
-import yaml
 from pathlib import Path
 from collections import defaultdict
 from PIL import Image, ImageFont
+from memory_profiler import profile
 
 from parsers.input_processing import get_player_info
-from scoring.score import get_character_zh_and_en_name, get_valid_stats_and_role
 
 from render.background import load_background, combine_background_template, prepare_canvas_for_drawing
 from render.top_left_section import render_top_left_section
@@ -13,12 +12,21 @@ from render.top_right_section import render_top_right_section, merge_flat_and_pe
 from render.echo_section import render_echo_section
 from render.rank_section import paste_rank
 
-from google_ocr import google_ocr
-from memory_profiler import profile
+from infrastructure.ocr.google_ocr import google_ocr
+from infrastructure.config.loader import load_yaml
 
-def load_yaml(filename):
-    with open(filename, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+from domain.score.rules import ScoreRules
+from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats_and_role
+
+def load_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
+    base_score = load_yaml(domain_path / "score" / "base_score.yaml")
+    stats_name_map = load_yaml(domain_path / "stats" / "stats_name_map.yaml")
+    stats_categories = load_yaml(domain_path / "stats" / "stats_categories.yaml")
+    stats_expect_bias = load_yaml(domain_path / "stats" / "stats_expect_bias.yaml") 
+    return ScoreRules(base_score, stats_name_map, stats_categories, stats_expect_bias)
+
+def load_character_template(path = Path("./domain/character/character_template.yaml")):
+    return load_yaml(path)
     
 def stat_sort_key(stat_name: str):
     STAT_GROUP_PRIORITY = {
@@ -50,13 +58,11 @@ def process_image(source, debug=False):
     template_file = IMG_PATH / "new_template.png"
     stat_font = ImageFont.truetype("../ttf/Philosopher-Bold.ttf", 24)
     FLAT_STATS = {"生命", "攻擊", "防禦"}
-
     total_stats = defaultdict(float)
-    BASE_SCORE = load_yaml("./scoring/base_score.yaml")
-    STATS_NAME_MAP = load_yaml("./scoring/stats_name_map.yaml")
-    STATS_CATEGORIES = load_yaml("./scoring/stats_categories.yaml")
-    STATS_EXPECT_BIAS = load_yaml("./scoring/stats_expect_bias.yaml") 
-    CHARACTER_TEMPLATE = load_yaml("./scoring/character_template.yaml")
+
+    rules = load_rules()
+    character_template = load_character_template()
+
     echo_avater_positions = [
         (0, 650),
         (380, 650),
@@ -86,12 +92,11 @@ def process_image(source, debug=False):
     template = load_template_img(template_file)
     # google ocr
     ocr_results = google_ocr(source, ocr_crop_areas)
-    print("OCR_rseult:", ocr_results)
     user_info = get_player_info(ocr_results[0])
 
     character_zh_name, character_en_name = get_character_zh_and_en_name(
         character_name = user_info["character_name"], 
-        character_template = CHARACTER_TEMPLATE
+        character_template = character_template
     )
     background_file =  os.path.join(img_path, f"background/{character_en_name}.png")
     background = load_background(background_file, template.width, template.height)
@@ -105,33 +110,33 @@ def process_image(source, debug=False):
         img_path = IMG_PATH,
         user_info = user_info,
         canvas_draw = canvas_draw, 
-        STATS_NAME_MAP = STATS_NAME_MAP, 
+        STATS_NAME_MAP = rules.stats_name_map, 
         character_img_x = character_img_x,
         character_img_y = character_img_y,
         character_zh_name = character_zh_name,
         character_en_name = character_en_name,
-        CHARACTER_TEMPLATE = CHARACTER_TEMPLATE,
+        CHARACTER_TEMPLATE = character_template,
     )
     
     # 下方區塊(聲骸部分)
     sub_stat_width = 330
-    valid_stats, role = get_valid_stats_and_role(character_zh_name,  STATS_CATEGORIES, CHARACTER_TEMPLATE)
+    valid_stats, role = get_valid_stats_and_role(character_zh_name,  rules.stats_categories, character_template)
     total_score = render_echo_section(
         canvas = canvas,
         source = source,
         img_path = IMG_PATH,
         stat_font = stat_font, 
         echo_avater_positions = echo_avater_positions,
-        BASE_SCORE = BASE_SCORE[role],
         FLAT_STATS = FLAT_STATS,
         total_stats = total_stats,
         canvas_draw = canvas_draw,
         valid_stats = valid_stats, 
-        STATS_NAME_MAP = STATS_NAME_MAP,
         sub_stat_width = sub_stat_width,
         paste_positions = paste_positions,
         character_zh_name = character_zh_name,
-        STATS_EXPECT_BIAS = STATS_EXPECT_BIAS,
+        STATS_NAME_MAP = rules.stats_name_map,
+        BASE_SCORE = rules.get_role_base_score(role),
+        STATS_EXPECT_BIAS = rules.stats_expects_bias,
         ocr_results = ocr_results[1:]
     )
     
@@ -150,7 +155,7 @@ def process_image(source, debug=False):
         FLAT_STATS = FLAT_STATS,
         canvas_draw = canvas_draw, 
         total_stats =  total_stats, 
-        STATS_NAME_MAP = STATS_NAME_MAP,
+        STATS_NAME_MAP = rules.stats_name_map,
         stat_total_width = stat_total_width,
         stat_total_height = stat_total_height,
         stat_total_value_x = stat_total_value_x, 
