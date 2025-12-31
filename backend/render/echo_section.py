@@ -1,37 +1,40 @@
 from PIL import Image
-
+from dataclasses import dataclass
 from parsers.ocr_parser import parse_ocr_output
 from domain.score.score import get_score
 from domain.character.context import CharacterContext
-
+from domain.score.rules import ScoreRules
+from domain.stats.rules import FLAT_STATS
 from .core.canvas import draw_text, paste_icon, add_border
 from .context import RenderContext
 
+SUB_STAT_WIDTH = 330
+
+@dataclass
+class EchoLayout:
+    avatar_positions: dict
+    paste_positions: dict
+    
 def render_echo_section(
         ctx: RenderContext,
         character: CharacterContext,
+        layout: EchoLayout,
+        rules: ScoreRules,
         source,
-        echo_avater_positions,
-        valid_stats, 
-        paste_positions,
-        BASE_SCORE,
-        STATS_EXPECT_BIAS,
         total_stats,
-        sub_stat_width,
-        FLAT_STATS,
         ocr_results,
     ):
     total_score = 0.0
-    for idx, (ocr_result, avatar_pos, paste_pos) in enumerate(zip(ocr_results, echo_avater_positions, paste_positions)):
+    for idx, (ocr_result, avatar_pos, paste_pos) in enumerate(zip(ocr_results, layout.avatar_positions, layout.paste_positions)):
         new_echo = get_new_echo(ocr_result)
         # calculate echo score
         print(f"--------聲骸評分{idx+1}--------")
         echo_score, breakdown = get_score(
             echo = new_echo, 
-            valid_stats = valid_stats, 
+            valid_stats = character.valid_stats, 
             character_name = character.zh_name,
-            base_score = BASE_SCORE,
-            stats_expect_bias = STATS_EXPECT_BIAS
+            base_score = rules.get_role_base_score(character.role),
+            stats_expects_bias = rules.stats_expects_bias,
         )
         total_score += echo_score
         x, y = paste_pos
@@ -49,27 +52,24 @@ def render_echo_section(
             ctx = ctx,
             paste_x = x + img_main_stat_gap + echo_img.width, 
             paste_y = y, 
-            valid_stats = valid_stats,
+            valid_stats = character.valid_stats,
             echo = new_echo, 
             total_stats = total_stats,
-            FLAT_STATS = FLAT_STATS,
         ) 
         # 聲骸副詞條 paste echo sub stat
         start_x, start_y = paste_pos
         start_x += 10
         start_y += 108
         y_bias = 0
-        right_edge = start_x + sub_stat_width
+
         y_bias = process_echo_sub_stats(
             ctx = ctx,
             start_x = start_x,
             start_y = start_y,
             y_bias = y_bias,
-            right_edge = right_edge,
             breakdown = breakdown, 
             total_stats = total_stats, 
-            valid_stats = valid_stats, 
-            FLAT_STATS = FLAT_STATS,
+            valid_stats = character.valid_stats, 
         )
         # 此聲骸評分
         draw_echo_sub_stats_score_text(
@@ -78,7 +78,6 @@ def render_echo_section(
             start_y = start_y,
             y_bias = y_bias,
             echo_score = echo_score,
-            sub_stat_slot_width = sub_stat_width,
         )
     return total_score
 
@@ -96,7 +95,8 @@ def paste_echo_img(idx, avatar_pos, source, x, y, canvas):
     paste_icon(canvas, echo_img, (x + 10, y + 13))
     return echo_img
 
-def process_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, start_y, valid_stats, right_edge, y_bias, FLAT_STATS):
+def process_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, start_y, valid_stats, y_bias):
+    right_edge = start_x + SUB_STAT_WIDTH
     for stat_name, stat_value, _ in breakdown: 
         total_stats[stat_name] += stat_value
         y = start_y + y_bias
@@ -116,7 +116,7 @@ def process_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, s
         y_bias += 50
     return y_bias
 
-def process_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats,  valid_stats, FLAT_STATS):
+def process_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats,  valid_stats):
     main_stat_width, main_stat_height = 230, 50
     stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
     
@@ -146,10 +146,10 @@ def process_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_sta
         draw_text(ctx.canvas_draw, (text_x, text_y), text=text, font=ctx.fonts.stat(24), fill = (255, 255, 255))
 
 
-def draw_echo_sub_stats_score_text(ctx:RenderContext, echo_score, start_x, start_y, sub_stat_slot_width, y_bias):
+def draw_echo_sub_stats_score_text(ctx:RenderContext, echo_score, start_x, start_y, y_bias):
     text = f"聲骸評分: {echo_score:.2f}"
     text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.text(28))
-    x = start_x + (sub_stat_slot_width - text_width)//2
+    x = start_x + (SUB_STAT_WIDTH - text_width)//2
     y = start_y + y_bias + 5
     if echo_score >= 20:
         fill = (220, 80, 80)

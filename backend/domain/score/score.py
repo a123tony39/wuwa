@@ -29,7 +29,7 @@ def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
     score = base * (0.7 + 0.3 * quality_ratio)
     return score
 
-def get_score(echo, valid_stats, character_name, base_score, stats_expect_bias):
+def get_score(echo, valid_stats, character_name, base_score, stats_expects_bias):
     print("採用base_score:", base_score)
     breakdown = []
     total_score = 0
@@ -39,7 +39,7 @@ def get_score(echo, valid_stats, character_name, base_score, stats_expect_bias):
             breakdown.append((stat.name, stat.value, 0))
             continue
         
-        echo_score = calculate_score(stat.name, stat.value, base_score, stats_expect_bias)
+        echo_score = calculate_score(stat.name, stat.value, base_score, stats_expects_bias)
         total_score += echo_score
         breakdown.append((stat.name, stat.value, echo_score))
         print(f"{stat.name} : {stat.value} : {echo_score}")

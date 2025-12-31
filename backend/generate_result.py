@@ -8,20 +8,20 @@ from config.paths import IMG_PATH
 from parsers.input_processing import get_player_info
 
 from render.context import RenderContext, FontSet
-from render.background import load_background, combine_background_template, prepare_canvas_for_drawing
-from render.top_right_section import render_top_right_section, merge_flat_and_percent_stats
-from render.top_left_section import render_top_left_section
-from render.echo_section import render_echo_section
-from render.rank_section import paste_rank
 from render.core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font, get_background_file
 from render.layout_config import ECHO_AVATAR_POSITIONS, OCR_CROP_AREAS, PASTE_POSITIONS
+from render.background import load_background, combine_background_template, prepare_canvas_for_drawing
+from render.top_right_section import render_top_right_section, TopRightLayout
+from render.top_left_section import render_top_left_section
+from render.echo_section import render_echo_section, EchoLayout
+from render.rank_section import paste_rank
 
 from infrastructure.ocr.google_ocr import google_ocr
 from infrastructure.yaml_config.loader import load_yaml
 from infrastructure.image.loader import load_img
 
-from domain.score.rules import ScoreRules, FLAT_STATS
-from domain.stats.stats_rules import stat_sort_key, normalize_stats
+from domain.score.rules import ScoreRules
+from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_percent_stats, FLAT_STATS
 from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats_and_role
 from domain.character.context import CharacterContext
 
@@ -59,7 +59,6 @@ def process_image(source, debug=False):
         valid_stats = valid_stats,
         role = role,
     )
-
     background_file = get_background_file(character_en_name)
     template = load_img(TEMPLATE_FILE)
     background = load_background(background_file, template.width, template.height)
@@ -83,39 +82,36 @@ def process_image(source, debug=False):
     )
     
     # 下方區塊(聲骸部分)
-    sub_stat_width = 330
-    
+    echo_layout = EchoLayout(
+        avatar_positions=ECHO_AVATAR_POSITIONS,
+        paste_positions=PASTE_POSITIONS
+    )
     total_score = render_echo_section(
         ctx = render_ctx,
         character = character_ctx,
+        layout = echo_layout,
+        rules = rules,
         source = source,
-        echo_avater_positions = ECHO_AVATAR_POSITIONS,
-        FLAT_STATS = FLAT_STATS,
         total_stats = total_stats,
-        valid_stats = valid_stats, 
-        sub_stat_width = sub_stat_width,
-        paste_positions = PASTE_POSITIONS,
-        BASE_SCORE = rules.get_role_base_score(role),
-        STATS_EXPECT_BIAS = rules.stats_expects_bias,
         ocr_results = ocr_results[1:]
     )
     
     # 右上區塊
-    top_stat_total_gap = 50
-    stat_total_width, stat_total_height = 500, 70
-    stat_total_value_x, stat_total_value_y = 737, character_img_y + top_stat_total_gap
+    TOP_RIGHT_X = 737
+    TOP_RIGHT_OFFSET_FROM_CHARACTER = 50
     merge_flat_and_percent_stats(total_stats, FLAT_STATS)
     allowed_stats = normalize_stats(valid_stats, FLAT_STATS) | FLAT_STATS
     sorted_allowed_stats = sorted(allowed_stats, key = lambda x : stat_sort_key(x))
 
+    top_right_layout = TopRightLayout(
+        origin_x = TOP_RIGHT_X,
+        origin_y = character_img_y + TOP_RIGHT_OFFSET_FROM_CHARACTER,
+    )
     render_top_right_section(
         ctx = render_ctx,
         FLAT_STATS = FLAT_STATS,
         total_stats =  total_stats, 
-        stat_total_width = stat_total_width,
-        stat_total_height = stat_total_height,
-        stat_total_value_x = stat_total_value_x, 
-        stat_total_value_y = stat_total_value_y, 
+        layout = top_right_layout,
         sorted_allowed_stats = sorted_allowed_stats,
     )
     # 下方區塊(評級部分)
@@ -124,10 +120,7 @@ def process_image(source, debug=False):
         total_score = total_score, 
     )
 
-    if debug:
-        canvas.show()
-    else:
-        return {"text": "圖片處理完成", "image": canvas}
+    return canvas.show() if debug else {"text": "圖片處理完成", "image": canvas}
 
 @profile
 def main():
