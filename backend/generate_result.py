@@ -1,18 +1,19 @@
-import os
+from PIL import Image
 from pathlib import Path
 from collections import defaultdict
-from PIL import Image
 from memory_profiler import profile
 
-from backend_config.paths import IMG_PATH
+from config.paths import IMG_PATH
 
 from parsers.input_processing import get_player_info
+
+from render.context import RenderContext, FontSet
 from render.background import load_background, combine_background_template, prepare_canvas_for_drawing
-from render.top_left_section import render_top_left_section
 from render.top_right_section import render_top_right_section, merge_flat_and_percent_stats
+from render.top_left_section import render_top_left_section
 from render.echo_section import render_echo_section
 from render.rank_section import paste_rank
-from render.core.render_setting import STAT_FONT, TEMPLATE_FILE, get_background_file
+from render.core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font, get_background_file
 from render.layout_config import ECHO_AVATAR_POSITIONS, OCR_CROP_AREAS, PASTE_POSITIONS
 
 from infrastructure.ocr.google_ocr import google_ocr
@@ -22,7 +23,7 @@ from infrastructure.image.loader import load_img
 from domain.score.rules import ScoreRules, FLAT_STATS
 from domain.stats.stats_rules import stat_sort_key, normalize_stats
 from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats_and_role
-
+from domain.character.context import CharacterContext
 
 def load_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
     base_score = load_yaml(domain_path / "score" / "base_score.yaml")
@@ -34,11 +35,14 @@ def load_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
 def load_character_template(path = Path("./domain/character/character_template.yaml")):
     return load_yaml(path)
     
-
 def process_image(source, debug=False):
     total_stats = defaultdict(float)
     rules = load_rules()
     character_template = load_character_template()
+    fonts = FontSet(
+        text = get_text_font,
+        stat = get_stat_font,
+    ) 
     # google ocr
     ocr_results = google_ocr(source, OCR_CROP_AREAS)
     user_info = get_player_info(ocr_results[0])
@@ -47,41 +51,50 @@ def process_image(source, debug=False):
         character_name = user_info["character_name"], 
         character_template = character_template
     )
+    valid_stats, role = get_valid_stats_and_role(character_zh_name, rules.stats_categories, character_template)
+    character_ctx = CharacterContext(
+        zh_name = character_zh_name,
+        en_name = character_en_name,
+        template = character_template,
+        valid_stats = valid_stats,
+        role = role,
+    )
+
     background_file = get_background_file(character_en_name)
     template = load_img(TEMPLATE_FILE)
     background = load_background(background_file, template.width, template.height)
-
     canvas = combine_background_template(background, template)
     canvas_draw = prepare_canvas_for_drawing(canvas)
+    render_ctx = RenderContext(
+        canvas = canvas,
+        canvas_draw = canvas_draw,
+        fonts = fonts,
+        img_path = IMG_PATH,
+        stats_name_map = rules.stats_name_map,
+    )
     # 左上區塊
     character_img_x, character_img_y = 80, 119
     render_top_left_section(
-        canvas = canvas, 
+        ctx = render_ctx,
+        character = character_ctx,
         user_info = user_info,
-        canvas_draw = canvas_draw, 
-        STATS_NAME_MAP = rules.stats_name_map, 
         character_img_x = character_img_x,
         character_img_y = character_img_y,
-        character_zh_name = character_zh_name,
-        character_en_name = character_en_name,
-        CHARACTER_TEMPLATE = character_template,
     )
     
     # 下方區塊(聲骸部分)
     sub_stat_width = 330
-    valid_stats, role = get_valid_stats_and_role(character_zh_name, rules.stats_categories, character_template)
+    
     total_score = render_echo_section(
-        canvas = canvas,
+        ctx = render_ctx,
+        character = character_ctx,
         source = source,
         echo_avater_positions = ECHO_AVATAR_POSITIONS,
         FLAT_STATS = FLAT_STATS,
         total_stats = total_stats,
-        canvas_draw = canvas_draw,
         valid_stats = valid_stats, 
         sub_stat_width = sub_stat_width,
         paste_positions = PASTE_POSITIONS,
-        character_zh_name = character_zh_name,
-        STATS_NAME_MAP = rules.stats_name_map,
         BASE_SCORE = rules.get_role_base_score(role),
         STATS_EXPECT_BIAS = rules.stats_expects_bias,
         ocr_results = ocr_results[1:]
@@ -96,13 +109,9 @@ def process_image(source, debug=False):
     sorted_allowed_stats = sorted(allowed_stats, key = lambda x : stat_sort_key(x))
 
     render_top_right_section(
-        canvas = canvas, 
-        font = STAT_FONT,
-        img_path = IMG_PATH,
+        ctx = render_ctx,
         FLAT_STATS = FLAT_STATS,
-        canvas_draw = canvas_draw, 
         total_stats =  total_stats, 
-        STATS_NAME_MAP = rules.stats_name_map,
         stat_total_width = stat_total_width,
         stat_total_height = stat_total_height,
         stat_total_value_x = stat_total_value_x, 
@@ -111,9 +120,7 @@ def process_image(source, debug=False):
     )
     # 下方區塊(評級部分)
     paste_rank(
-        canvas = canvas, 
-        img_path = IMG_PATH,
-        canvas_draw = canvas_draw,
+        ctx = render_ctx,
         total_score = total_score, 
     )
 

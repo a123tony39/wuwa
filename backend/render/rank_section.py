@@ -1,28 +1,30 @@
-from PIL import Image, ImageFont
+from PIL import Image
 from domain.score.score import get_rank
-from .core.canvas import paste_icon, draw_text
 from render.layout_config import UNDER_PANEL_X, UNDER_PANEL_Y
 
-def paste_rank(total_score, canvas, canvas_draw, img_path):
+from .core.canvas import paste_icon, draw_text
+from .context import RenderContext
+
+def paste_rank(total_score, ctx: RenderContext):
     rank = get_rank(total_score)
     # rank pic
     slot_x, slot_y = UNDER_PANEL_X + 51 + 85, UNDER_PANEL_Y + 33 + 120
     slow_w, slot_h = 180, 180
     print(f"{rank}: {total_score}")
-    rank_img = load_rank_pic(rank, img_path)
+    rank_img = load_rank_pic(rank, ctx.img_path)
     img_w, img_h = rank_img.size
     mid_x = slot_x + (slow_w - img_w) // 2
     mid_y = slot_y + (slot_h - img_h) // 2
-    paste_icon(canvas, rank_img, (mid_x, mid_y))
+    paste_icon(ctx.canvas, rank_img, (mid_x, mid_y))
     # set text and font
     text_zh = f"練度評分:{total_score:.2f}".rstrip('0').rstrip('.')
-    font_zh = ImageFont.truetype("../ttf/NotoSansTC-Bold.ttf", 36)
+    font_zh = ctx.fonts.text(36)
     # compute and align center
-    w_zh = canvas_draw.textlength(text_zh, font=font_zh)
+    w_zh = ctx.canvas_draw.textlength(text_zh, font=font_zh)
     rank_img_center = mid_x + rank_img.width//2
     x = rank_img_center - w_zh//2
     y = mid_y + rank_img.height + 10
-    draw_text(canvas_draw, (x, y), text_zh, font=font_zh, fill=(220, 220, 220))
+    draw_text(ctx.canvas_draw, (x, y), text_zh, font=font_zh, fill=(220, 220, 220))
 
 
 def load_rank_pic(rank, img_path):
