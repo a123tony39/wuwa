@@ -16,7 +16,7 @@ from render.top_left_section import render_top_left_section
 from render.echo_section import render_echo_section, EchoLayout
 from render.rank_section import paste_rank
 
-from infrastructure.ocr.google_ocr import google_ocr
+from infrastructure.ocr.google_ocr import GoogleOCR
 from infrastructure.yaml_config.loader import load_yaml
 from infrastructure.image.loader import load_img
 
@@ -44,7 +44,8 @@ def process_image(source, debug=False):
         stat = get_stat_font,
     ) 
     # google ocr
-    ocr_results = google_ocr(source, OCR_CROP_AREAS)
+    ocr_engine = GoogleOCR("config.json")
+    ocr_results = ocr_engine.ocr(source, OCR_CROP_AREAS)
     user_info = get_player_info(ocr_results[0])
 
     character_zh_name, character_en_name = get_character_zh_and_en_name(
