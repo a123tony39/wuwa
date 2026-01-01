@@ -14,34 +14,48 @@ class EchoData:
     sub_stat: List[Stat] = field(default_factory=list)
 
 
-VALID_STATS = ["暴擊傷害", "暴擊", "攻擊", "生命", "防禦", "共鳴效率", "普攻傷害加成", "共鳴解放傷害加成", "重擊傷害加成", "共鳴技能傷害加成"]
 def normalize(text):
+    VALID_STATS = ["暴擊傷害", "暴擊", "攻擊", "生命", "防禦", "共鳴效率", "普攻傷害加成", "共鳴解放傷害加成", "重擊傷害加成", "共鳴技能傷害加成"]
     for stat in VALID_STATS:
         if stat in text:
             return stat
-    return text
+    return text # value
 
-PERCENTABLE = ["生命", "攻擊", "防禦"]
 def parse_ocr_output(ocr_result) -> EchoData:
     print("-----------------------------")
     new_echo = EchoData()
     texts = []
-    for _, text, prob in ocr_result:
+
+    # get main stat
+    for text in ocr_result[:2]:
         text = normalize(text)
-        print(f"文字: {text}, 信心指數: {prob:.2f}")
+        print(f"文字: {text}")
         texts.append(text)
+        
+    # get sub stat
+    for text in ocr_result[2:]:
+        stat = normalize(text)
+        name = stat
+        value = text[len(stat):]
+        print(f"文字: {text}")
+        print(f"文字: {value}")
+        texts.append(stat)
+        texts.append(value)
 
     pairs = [texts[i:i+2] for i in range(0, len(texts), 2)]
-    
+    PERCENTABLE = ["生命", "攻擊", "防禦"]
     for idx, (name, value) in enumerate(pairs):
+        print(name, value)
+        name = f"{name}%" if '%' in value and name in PERCENTABLE else name 
+        values = re.findall(r'\d+\.?\d*%?', value)
+        value = values.pop()
+        val = float(value.strip("%")) if '%' in value else float(value)
         if idx == 0:
-            new_echo.main_stat.name = f"{name}%" if '%' in value and name in PERCENTABLE else name 
-            numbers = re.findall(r'\d+\.?\d*%?', value)
-            value = numbers.pop()
-            new_echo.main_stat.value = float(value.strip("%")) if '%' in value else float(value)
+            new_echo.main_stat.name = name 
+            new_echo.main_stat.value = val
         elif idx == 1:
-            new_echo.static_stat.name = f"{name}%" if '%' in value and name in PERCENTABLE else name 
-            new_echo.static_stat.value = float(value.strip("%")) if '%' in value else float(value)
+            new_echo.static_stat.name = name
+            new_echo.static_stat.value = val
         else:
-            new_echo.sub_stat.append(Stat(name=f"{name}%" if '%' in value and name in PERCENTABLE else name, value=float(value.strip("%")) if '%' in value else float(value)))
+            new_echo.sub_stat.append(Stat(name=name, value=val))
     return new_echo
