@@ -1,22 +1,6 @@
-stats_range = {
-    "生命": (320, 580),
-    "生命%": (6.4, 11.6),
-    "攻擊": (30, 60),
-    "攻擊%": (6.4, 11.6),
-    "防禦": (40, 60),
-    "防禦%": (8.1, 15),
-    "暴擊" : (6.3, 10.5),
-    "暴擊傷害" : (12.6, 21),
-    "普攻傷害加成": (6.4, 11.6),
-    "重擊傷害加成": (6.4, 11.6),
-    "共鳴技能傷害加成": (6.4, 11.6),
-    "共鳴解放傷害加成": (6.4, 11.6),
-    "共鳴效率": (6.8, 12.4),
-}
-
-def calculate_score(stat_name, stat_value, BASE_SCORE, STATS_EXPECT_BIAS):
-    base = BASE_SCORE.get(stat_name)
-    info = STATS_EXPECT_BIAS.get(stat_name)
+def calculate_echo_score(stat_name, stat_value, base_score, stats_expects_bias):
+    base = base_score.get(stat_name)
+    info = stats_expects_bias.get(stat_name)
     min, max = info['min'], info['max']
     bias, expect = info['bias'], info['expect']
     quality_ratio = bias + (stat_value - expect) / (max - min)
@@ -33,7 +17,7 @@ def get_score(echo, valid_stats, character_name, base_score, stats_expects_bias)
             breakdown.append((stat.name, stat.value, 0))
             continue
         
-        echo_score = calculate_score(stat.name, stat.value, base_score, stats_expects_bias)
+        echo_score = calculate_echo_score(stat.name, stat.value, base_score, stats_expects_bias)
         total_score += echo_score
         breakdown.append((stat.name, stat.value, echo_score))
         print(f"{stat.name} : {stat.value} : {echo_score}")
@@ -42,17 +26,6 @@ def get_score(echo, valid_stats, character_name, base_score, stats_expects_bias)
     if total_score <= 13:
         print("建議加強此聲骸")
     return total_score, breakdown
-
-    
-def get_stat_tier(stat_name, value, config):
-    tiers = config.get(stat_name)
-    if not tiers:
-        return None
-    for tier, info in tiers.items():
-        low, high = info['range']
-        if low <= value <= high:
-            return tier
-    return None
 
 def get_rank(score):
     if score >= 95:

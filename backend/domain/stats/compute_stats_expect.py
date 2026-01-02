@@ -1,6 +1,5 @@
 from infrastructure.yaml_config.yaml import load_yaml, write_yaml
 
-
 def compute_stat_expect(data):
     result = {}
     for stat, tiers in data.items():

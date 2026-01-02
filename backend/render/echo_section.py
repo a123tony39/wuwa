@@ -1,6 +1,6 @@
 from PIL import Image
 from dataclasses import dataclass
-from parsers.ocr_parser import parse_ocr_output
+from domain.echo.ocr_parser import parse_ocr_output
 from domain.score.score import get_score
 from domain.character.context import CharacterContext
 from domain.score.rules import ScoreRules
