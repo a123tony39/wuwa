@@ -1,5 +1,5 @@
 from domain.character.get_character_info import get_valid_stats_and_role
-from infrastructure.yaml_config.loader import load_yaml
+from infrastructure.yaml_config.yaml import load_yaml
 
 stats_categories = load_yaml("./domain/stats/stats_categories.yaml")
 def test_phorlova():
