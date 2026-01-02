@@ -11,17 +11,17 @@ def get_character_zh_and_en_name(character_name, character_template):
     
     raise ValueError(f"Unknown character name: {character_name}")
 
-def get_valid_stats_and_role(character_name, stat_categories, character_templates):
+def get_valid_stats_and_role(character_name, stats_categories, character_templates):
     template = character_templates[character_name]
     valid = set()
     # main_attr
-    valid.update(stat_categories["main_attr"][template["main_attr"]])
+    valid.update(stats_categories["main_attr"][template["main_attr"]])
     # dmg_type
     for dmg in template["dmg_type"]:
-        valid.update(stat_categories["dmg_type"][dmg])
+        valid.update(stats_categories["dmg_type"][dmg])
     # role
     role = template["role"]
-    valid.update(stat_categories["role"][role])
+    valid.update(stats_categories["role"][role])
     # element
-    valid.update(stat_categories["element"][template["element"]])
+    valid.update(stats_categories["element"][template["element"]])
     return valid, role

@@ -74,12 +74,10 @@ def get_stat_tier(stat_name, value, config):
     tiers = config.get(stat_name)
     if not tiers:
         return None
-
     for tier, info in tiers.items():
         low, high = info['range']
         if low <= value <= high:
             return tier
-    
     return None
 
 def get_rank(score):
