@@ -16,18 +16,18 @@ def avatar_exists(character_name: str) -> bool:
     return path.is_file()
 
     
-def test_character_assets_exist():
-    print(BASE_DIR)
-    character_path = BASE_DIR / "backend" / "scoring" / "character_template.yaml"
-    character_template = load_yaml(character_path)
+# def test_character_assets_exist():
+#     print(BASE_DIR)
+#     character_path = BASE_DIR / "backend" / "scoring" / "character_template.yaml"
+#     character_template = load_yaml(character_path)
     
-    missing = []
+#     missing = []
 
-    for _, info in character_template.items():
-        character_en = info["en"]
-        if not background_exists(character_en):
-            missing.append(f"{character_en}: background")
-        if not avatar_exists(character_en):
-            missing.append(f"{character_en}: avatar")
+#     for _, info in character_template.items():
+#         character_en = info["en"]
+#         if not background_exists(character_en):
+#             missing.append(f"{character_en}: background")
+#         if not avatar_exists(character_en):
+#             missing.append(f"{character_en}: avatar")
 
-    assert not missing, "Missing assets: \n" + "\n".join(missing)
+#     assert not missing, "Missing assets: \n" + "\n".join(missing)

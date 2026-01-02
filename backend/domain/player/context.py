@@ -1,3 +1,11 @@
+from dataclasses import dataclass
+
+@dataclass
+class PlayerInfo:
+    player_name: str
+    character_name: str
+    uid: str
+
 def get_player_info(info):
     character_name, player_name, uid = None, None, None
     for text in info:
@@ -12,8 +20,8 @@ def get_player_info(info):
             if colon_pos != -1:
                 uid = text[colon_pos+1:].strip()
 
-    return {
-        "player_name": player_name, 
-        "character_name": character_name, 
-        "uid": uid,
-    }
+    return PlayerInfo(
+        player_name = player_name, 
+        character_name = character_name, 
+        uid = uid,
+    )

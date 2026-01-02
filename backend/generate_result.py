@@ -5,8 +5,6 @@ from memory_profiler import profile
 
 from config.paths import IMG_PATH
 
-from parsers.input_processing import get_player_info
-
 from render.context import RenderContext, FontSet
 from render.core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font, get_background_file
 from render.layout_config import ECHO_AVATAR_POSITIONS, OCR_CROP_AREAS, PASTE_POSITIONS
@@ -24,8 +22,9 @@ from domain.score.rules import ScoreRules
 from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_percent_stats, FLAT_STATS
 from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats_and_role
 from domain.character.context import CharacterContext
+from domain.player.context import get_player_info
 
-def load_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
+def load_score_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
     base_score = load_yaml(domain_path / "score" / "base_score.yaml")
     stats_name_map = load_yaml(domain_path / "stats" / "stats_name_map.yaml")
     stats_categories = load_yaml(domain_path / "stats" / "stats_categories.yaml")
@@ -36,23 +35,24 @@ def load_character_template(path = Path("./domain/character/character_template.y
     return load_yaml(path)
     
 def process_image(source, debug=False):
+    # do ocr
+    ocr_engine = GoogleOCR("config.json")
+    ocr_results = ocr_engine.ocr(source, OCR_CROP_AREAS)
+
+    # 初始化
     total_stats = defaultdict(float)
-    rules = load_rules()
+    score_rules = load_score_rules()
     character_template = load_character_template()
     fonts = FontSet(
         text = get_text_font,
         stat = get_stat_font,
     ) 
-    # google ocr
-    ocr_engine = GoogleOCR("config.json")
-    ocr_results = ocr_engine.ocr(source, OCR_CROP_AREAS)
-    user_info = get_player_info(ocr_results[0])
-
+    player_info = get_player_info(ocr_results.player_block)
     character_zh_name, character_en_name = get_character_zh_and_en_name(
-        character_name = user_info["character_name"], 
+        character_name = player_info.character_name, 
         character_template = character_template
     )
-    valid_stats, role = get_valid_stats_and_role(character_zh_name, rules.stats_categories, character_template)
+    valid_stats, role = get_valid_stats_and_role(character_zh_name, score_rules.stats_categories, character_template)
     character_ctx = CharacterContext(
         zh_name = character_zh_name,
         en_name = character_en_name,
@@ -70,18 +70,17 @@ def process_image(source, debug=False):
         canvas_draw = canvas_draw,
         fonts = fonts,
         img_path = IMG_PATH,
-        stats_name_map = rules.stats_name_map,
+        stats_name_map = score_rules.stats_name_map,
     )
     # 左上區塊
     character_img_x, character_img_y = 80, 119
     render_top_left_section(
         ctx = render_ctx,
         character = character_ctx,
-        user_info = user_info,
+        player_info = player_info,
         character_img_x = character_img_x,
         character_img_y = character_img_y,
     )
-    
     # 下方區塊(聲骸部分)
     echo_layout = EchoLayout(
         avatar_positions=ECHO_AVATAR_POSITIONS,
@@ -91,12 +90,11 @@ def process_image(source, debug=False):
         ctx = render_ctx,
         character = character_ctx,
         layout = echo_layout,
-        rules = rules,
+        rules = score_rules,
         source = source,
         total_stats = total_stats,
-        ocr_results = ocr_results[1:]
+        ocr_results = ocr_results.echo_block
     )
-    
     # 右上區塊
     TOP_RIGHT_X = 737
     TOP_RIGHT_OFFSET_FROM_CHARACTER = 50
@@ -111,7 +109,7 @@ def process_image(source, debug=False):
     render_top_right_section(
         ctx = render_ctx,
         FLAT_STATS = FLAT_STATS,
-        total_stats =  total_stats, 
+        total_stats = total_stats, 
         layout = top_right_layout,
         sorted_allowed_stats = sorted_allowed_stats,
     )
@@ -133,11 +131,9 @@ def main():
         # "../img/input/Lupa.png",
         "../img/input/Changli.png",
     ]
-
     for _, src_file in enumerate(source_files, start=1):
         src = Image.open(src_file)
         process_image(src, debug=True)
-
 
 if __name__ == "__main__":
     main()

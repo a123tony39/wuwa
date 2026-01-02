@@ -1,8 +1,14 @@
 import io
 import re
 import json
-from google.cloud import vision
 from PIL import Image
+from google.cloud import vision
+from dataclasses import dataclass
+
+@dataclass
+class OCRResult:
+    player_block: list[str]
+    echo_block: list[str]
 
 class GoogleOCR:
     def __init__(self, api_key_file = "config.json"):
@@ -112,4 +118,7 @@ class GoogleOCR:
                 block.append(text)
             result.append(block)
 
-        return result
+        return OCRResult(
+            player_block = result[0],
+            echo_block = result[1:]
+        )
