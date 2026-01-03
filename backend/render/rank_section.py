@@ -8,7 +8,7 @@ from .context import RenderContext
 def paste_rank(total_score, ctx: RenderContext):
     rank = get_rank(total_score)
     # rank pic
-    slot_x, slot_y = UNDER_PANEL_X + 51 + 85, UNDER_PANEL_Y + 33 + 120
+    slot_x, slot_y = UNDER_PANEL_X + 85, UNDER_PANEL_Y + 120
     slow_w, slot_h = 180, 180
     print(f"{rank}: {total_score}")
     rank_img = load_rank_pic(rank, ctx.img_path)

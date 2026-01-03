@@ -38,6 +38,8 @@ def render_echo_section(
         )
         total_score += echo_score
         x, y = paste_pos
+        padding_y = 8 # 主詞條與頂端間距
+        y += padding_y
         echo_img = paste_echo_img(
             idx = idx,
             avatar_pos = avatar_pos, 
@@ -57,9 +59,10 @@ def render_echo_section(
             total_stats = total_stats,
         ) 
         # 聲骸副詞條 paste echo sub stat
-        start_x, start_y = paste_pos
-        start_x += 10
-        start_y += 108
+        padding_x = 10
+        padding_y = 108 # 副詞條與主詞條的間距
+        start_x = x + padding_x
+        start_y = y + padding_y
         y_bias = 0
 
         y_bias = process_echo_sub_stats(
