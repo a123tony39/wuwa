@@ -23,8 +23,6 @@ def render_top_right_section(
     cnt = 0
     cursor_y = layout.origin_y
     for stat_name in sorted_allowed_stats:
-        values = total_stats.get(stat_name, 0)
-        print(f"{stat_name}:{values}")
         # paste img
         color = "white" if cnt % 2 == 0 else "gray"
         path = ctx.img_path / f"total_stat/{color}" / f"{ctx.stats_name_map[stat_name]}.png"
@@ -33,7 +31,11 @@ def render_top_right_section(
         composite = Image.alpha_composite(region, img)
         paste_icon(ctx.canvas, composite, (layout.origin_x, cursor_y))
         # paste value
-        text = f"{values:.1f}%" if stat_name not in FLAT_STATS else f"{values[0]}".rstrip('0').rstrip('.')  + " / " + f"{values[1]:.1f}%"
+        values = total_stats.get(stat_name, 0)
+        print(f"{stat_name}:{values}")
+        # 暴擊 10.5% 
+        # 攻擊 150 / 11.6%
+        text =  set_text(stat_name, values, FLAT_STATS)
         text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.stat(24))
         text_x = layout.origin_x + STAT_ROW_WIDTH - text_width - TEXT_PADDING_RIGHT
         text_y = cursor_y + TEXT_Y_OFFSET
@@ -42,3 +44,15 @@ def render_top_right_section(
         cursor_y += STAT_ROW_HEIGHT
         cnt += 1
 
+def set_text(stat_name, values, FLAT_STATS):
+    if stat_name in FLAT_STATS:
+        if isinstance(values, (list, tuple)) and len(values) >= 2:
+            flat_str = str(values[0]).rstrip('0').rstrip('.') or '0'  # 防止 0 變空
+            percent_str = f"{values[1]:.1f}%"
+            text = flat_str + " / " + percent_str
+        else:
+            text = str(values)
+    else:
+        text = f"{values:.1f}%"
+    
+    return text
