@@ -98,7 +98,7 @@ def process_image(source, debug=False):
     # 右上區塊
     TOP_RIGHT_X = 737
     TOP_RIGHT_OFFSET_FROM_CHARACTER = 50
-    merge_flat_and_percent_stats(total_stats, FLAT_STATS)
+    total_stats = merge_flat_and_percent_stats(total_stats, FLAT_STATS)
     allowed_stats = normalize_stats(valid_stats, FLAT_STATS) | FLAT_STATS
     sorted_allowed_stats = sorted(allowed_stats, key = lambda x : stat_sort_key(x))
 
