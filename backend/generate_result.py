@@ -124,12 +124,13 @@ def process_image(source, debug=False):
 @profile
 def main():
     source_files = [
-        # "../img/input/Cartethyia.png",
+        "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
         # "../img/input/Zani.png",
+        # "../img/input/Phrolova.png",
         # "../img/input/Cantarella.png",
         # "../img/input/Lupa.png",
-        "../img/input/Changli.png",
+        # "../img/input/Changli.png",
     ]
     for _, src_file in enumerate(source_files, start=1):
         src = Image.open(src_file)

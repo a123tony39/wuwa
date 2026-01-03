@@ -17,15 +17,12 @@ def normalize_stats(valid_stats, flat_stats):
     flat_percent = {f"{s}%" for s in flat_stats}
     return valid_stats - flat_percent
 
-def merge_flat_and_percent_stats(total_stats, flat_stats):
-    merged = dict(total_stats)
 
-    for base_stat in flat_stats:
-        if base_stat in merged and f"{base_stat}%" in merged:
-            merged[base_stat] = [
-                merged[base_stat],
-                merged[f"{base_stat}%"]
-            ]
-            merged.pop(f"{base_stat}%")
-    
+def merge_flat_and_percent_stats(total_stats, FLAT_STATS):
+    merged = dict(total_stats)  
+    for base_stat in FLAT_STATS:
+        flat_val = merged.get(base_stat, 0)
+        percent_val = merged.get(f"{base_stat}%", 0)
+        merged[base_stat] = [flat_val, percent_val]
+        merged.pop(f"{base_stat}%", None)
     return merged
