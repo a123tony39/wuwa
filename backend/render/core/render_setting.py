@@ -1,7 +1,7 @@
 from PIL import ImageFont
 from config.paths import IMG_PATH
 
-TEMPLATE_FILE = IMG_PATH / "new_template.png"
+TEMPLATE_FILE = IMG_PATH / "template.png"
 
 def get_text_font(size: int):
     return ImageFont.truetype("../ttf/NotoSansTC-SemiBold.ttf", size)

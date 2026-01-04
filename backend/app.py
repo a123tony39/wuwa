@@ -28,7 +28,7 @@ def analysis_echo():
     
     image = Image.open(file.stream)
 
-    result =  process_image(image)
+    result = process_image(image)
 
     output_image = result["image"]
     buf = BytesIO()

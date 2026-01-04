@@ -1,4 +1,4 @@
-from domain.player.context import get_player_info
+from domain.player.player_info import get_player_info
 
 def test_get_player_info_normal():
     info = ["卡提希婭", "玩家名稱:Testuseer01", "特徵碼:80006666"]

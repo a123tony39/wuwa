@@ -22,25 +22,14 @@ from domain.score.rules import ScoreRules
 from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_percent_stats, FLAT_STATS
 from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats_and_role
 from domain.character.context import CharacterContext
-from domain.player.context import get_player_info
+from domain.player.player_info import get_player_info
 
-def load_score_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
-    base_score = load_yaml(domain_path / "score" / "base_score.yaml")
-    stats_name_map = load_yaml(domain_path / "stats" / "stats_name_map.yaml")
-    stats_categories = load_yaml(domain_path / "stats" / "stats_categories.yaml")
-    stats_expect_bias = load_yaml(domain_path / "stats" / "stats_expect_bias.yaml") 
-    return ScoreRules(base_score, stats_name_map, stats_categories, stats_expect_bias)
-
-def load_character_template(path = Path("./domain/character/character_template.yaml")):
-    return load_yaml(path)
-    
 def process_image(source, debug=False):
-    # do ocr
+    # ocr
     ocr_engine = GoogleOCR("config.json")
     ocr_results = ocr_engine.ocr(source, OCR_CROP_AREAS)
 
-    # 初始化
-    total_stats = defaultdict(float)
+    # canvas及context參數初始化
     score_rules = load_score_rules()
     character_template = load_character_template()
     fonts = FontSet(
@@ -72,7 +61,7 @@ def process_image(source, debug=False):
         img_path = IMG_PATH,
         stats_name_map = score_rules.stats_name_map,
     )
-    # 左上區塊
+    # 左上區塊渲染
     character_img_x, character_img_y = 80, 119
     render_top_left_section(
         ctx = render_ctx,
@@ -81,11 +70,13 @@ def process_image(source, debug=False):
         character_img_x = character_img_x,
         character_img_y = character_img_y,
     )
-    # 下方區塊(聲骸部分)
+    # 下方區塊渲染
+    ## 聲骸部分
     echo_layout = EchoLayout(
         avatar_positions=ECHO_AVATAR_POSITIONS,
         paste_positions=PASTE_POSITIONS
     )
+    total_stats = defaultdict(float)
     total_score = render_echo_section(
         ctx = render_ctx,
         character = character_ctx,
@@ -95,7 +86,14 @@ def process_image(source, debug=False):
         total_stats = total_stats,
         ocr_results = ocr_results.echo_block
     )
-    # 右上區塊
+    # 下方區塊渲染
+    ## 評級部分
+    paste_rank(
+        ctx = render_ctx,
+        total_score = total_score, 
+    )
+
+    # 右上區塊渲染
     TOP_RIGHT_X = 737
     TOP_RIGHT_OFFSET_FROM_CHARACTER = 50
     total_stats = merge_flat_and_percent_stats(total_stats, FLAT_STATS)
@@ -113,14 +111,20 @@ def process_image(source, debug=False):
         layout = top_right_layout,
         sorted_allowed_stats = sorted_allowed_stats,
     )
-    # 下方區塊(評級部分)
-    paste_rank(
-        ctx = render_ctx,
-        total_score = total_score, 
-    )
 
+    # 回傳結果
     return canvas.show() if debug else {"text": "圖片處理完成", "image": canvas}
 
+def load_score_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
+    base_score = load_yaml(domain_path / "score" / "base_score.yaml")
+    stats_name_map = load_yaml(domain_path / "stats" / "stats_name_map.yaml")
+    stats_categories = load_yaml(domain_path / "stats" / "stats_categories.yaml")
+    stats_expect_bias = load_yaml(domain_path / "stats" / "stats_expect_bias.yaml") 
+    return ScoreRules(base_score, stats_name_map, stats_categories, stats_expect_bias)
+
+def load_character_template(path = Path("./domain/character/character_template.yaml")):
+    return load_yaml(path)
+    
 @profile
 def main():
     source_files = [

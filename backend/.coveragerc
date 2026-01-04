@@ -1,0 +1,4 @@
+[run]
+omit =
+    domain/**/context.py
+    domain/**/__init__.py
