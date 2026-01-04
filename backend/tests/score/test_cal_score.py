@@ -1,7 +1,5 @@
-import pytest
 from domain.score.score import get_score
-from domain.echo.ocr_parser import EchoData, Stat
-from infrastructure.yaml_config.yaml import load_yaml
+from domain.echo.ocr_parser import EchoData
 
 def test_empty_get_score():
     echo = EchoData(sub_stat=[])

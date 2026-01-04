@@ -15,8 +15,8 @@ from render.echo_section import render_echo_section, EchoLayout
 from render.rank_section import paste_rank
 
 from infrastructure.ocr.google_ocr import GoogleOCR
-from infrastructure.yaml_config.yaml import load_yaml
-from infrastructure.image.loader import load_img
+from infrastructure.yaml_io import load_yaml
+from infrastructure.image_loader import load_img
 
 from domain.score.rules import ScoreRules
 from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_percent_stats, FLAT_STATS

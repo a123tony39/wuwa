@@ -1,4 +1,4 @@
-from infrastructure.yaml_config.yaml import load_yaml, write_yaml
+from infrastructure.yaml_io import load_yaml, write_yaml
 
 def compute_stat_expect(data):
     result = {}
