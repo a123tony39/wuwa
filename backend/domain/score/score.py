@@ -21,10 +21,7 @@ def get_score(echo, valid_stats, character_name, base_score, stats_expects_bias)
         total_score += echo_score
         breakdown.append((stat.name, stat.value, echo_score))
         print(f"{stat.name} : {stat.value} : {echo_score}")
-
-    print(f"Total : {total_score}")
-    if total_score <= 13:
-        print("建議加強此聲骸")
+        
     return total_score, breakdown
 
 def get_rank(score):

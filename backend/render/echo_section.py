@@ -8,6 +8,11 @@ from domain.stats.rules import FLAT_STATS
 from .core.canvas import draw_text, paste_icon, add_border
 from .context import RenderContext
 
+ECHO_SCORE_LEVELS = {
+    "PERFECT": 20,
+    "GOOD": 15,
+}
+
 SUB_STAT_WIDTH = 330
 
 @dataclass
@@ -25,6 +30,7 @@ def render_echo_section(
         ocr_results,
     ):
     total_score = 0.0
+    echo_results = []
     for idx, (ocr_result, avatar_pos, paste_pos) in enumerate(zip(ocr_results, layout.avatar_positions, layout.paste_positions)):
         new_echo = get_new_echo(ocr_result)
         # calculate echo score
@@ -36,7 +42,10 @@ def render_echo_section(
             base_score = rules.get_role_base_score(character.role),
             stats_expects_bias = rules.stats_expects_bias,
         )
+        add_echo_result(echo_results, idx, echo_score)
+       
         total_score += echo_score
+        # 聲骸頭像 paste echo img
         x, y = paste_pos
         padding_y = 8 # 主詞條與頂端間距
         y += padding_y
@@ -82,7 +91,7 @@ def render_echo_section(
             y_bias = y_bias,
             echo_score = echo_score,
         )
-    return total_score
+    return total_score, echo_results
 
 def get_new_echo(results):
     new_echo = parse_ocr_output(results)
@@ -148,16 +157,29 @@ def process_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_sta
         text_y = paste_y + text_optical_offset
         draw_text(ctx.canvas_draw, (text_x, text_y), text=text, font=ctx.fonts.stat(24), fill = (255, 255, 255))
 
+def add_echo_result(echo_results, idx, echo_score):
+    if echo_score >= ECHO_SCORE_LEVELS["PERFECT"]:
+        message = "完美的聲骸!"
+    elif echo_score >= ECHO_SCORE_LEVELS["GOOD"]:
+        message = "表現出色"
+    else:
+        message = "建議加強此聲骸"
+    
+    echo_results.append({
+        "name": f"聲骸{idx+1}",
+        "score": echo_score,
+        "message": message,
+    })
 
 def draw_echo_sub_stats_score_text(ctx:RenderContext, echo_score, start_x, start_y, y_bias):
     text = f"聲骸評分: {echo_score:.2f}"
     text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.text(28))
     x = start_x + (SUB_STAT_WIDTH - text_width)//2
     y = start_y + y_bias + 5
-    if echo_score >= 20:
+    if echo_score >= ECHO_SCORE_LEVELS["PERFECT"]:
         fill = (220, 80, 80)
         stroke = (150, 30, 30, 120)
-    elif echo_score >= 15:
+    elif echo_score >= ECHO_SCORE_LEVELS["GOOD"]:
         fill = (225, 185, 110) 
         stroke = (120, 95, 40)
     else:

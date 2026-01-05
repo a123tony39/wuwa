@@ -1,12 +1,11 @@
 from PIL import Image
-from domain.score.score import get_rank
+
 from render.layout_config import UNDER_PANEL_X, UNDER_PANEL_Y
 
 from .core.canvas import paste_icon, draw_text
 from .context import RenderContext
 
-def paste_rank(total_score, ctx: RenderContext):
-    rank = get_rank(total_score)
+def paste_rank(total_score, rank, ctx: RenderContext):
     # rank pic
     slot_x, slot_y = UNDER_PANEL_X + 85, UNDER_PANEL_Y + 120
     slow_w, slot_h = 180, 180
@@ -25,7 +24,7 @@ def paste_rank(total_score, ctx: RenderContext):
     x = rank_img_center - w_zh//2
     y = mid_y + rank_img.height + 10
     draw_text(ctx.canvas_draw, (x, y), text_zh, font=font_zh, fill=(220, 220, 220))
-
+    return rank
 
 def load_rank_pic(rank, img_path):
     ss_score_file = img_path / "score/SS_score.png"

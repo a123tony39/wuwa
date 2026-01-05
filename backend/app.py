@@ -1,4 +1,5 @@
 import os
+import base64
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from PIL import Image
 from generate_result import process_image
@@ -27,20 +28,14 @@ def analysis_echo():
     file = request.files['file']
     
     image = Image.open(file.stream)
-
     result = process_image(image)
-
     output_image = result["image"]
-    buf = BytesIO()
-    output_image.save(buf, format = "PNG")
-    buf.seek(0)
-
-    return send_file(
-        buf,
-        mimetype = "image/png",
-        as_attachment = False,
-        download_name = "result.png",
-    )
+    img_base64 = img_to_b64(output_image)
+    return jsonify({
+        "message": "圖片處理完成",
+        "image_base64": f"{img_base64}",
+        "result": result['result'],
+    })
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
@@ -49,6 +44,13 @@ def serve_frontend(path):
     if path and os.path.exists(full_path):
         return send_from_directory(app.static_folder, path)
     return send_from_directory(app.static_folder, "index.html")
+
+def img_to_b64(image):
+    buf = BytesIO()
+    image.save(buf, format="PNG")
+    buf.seek(0)
+    img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    return img_base64
 
 if __name__ == "__main__":
     app.run(

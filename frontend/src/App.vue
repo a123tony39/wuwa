@@ -3,13 +3,15 @@ import { ref } from 'vue'
 import AppHeader from './components/AppHeader.vue'
 import UploadPanel from './components/UploadPanel.vue'
 import CardDisplay from './components/CardDisplay.vue'
-
+import RuleExplanation from './components/RuleExplanation.vue'
+import ResultExplanation from './components/ResultExplanation.vue'
 const selectedFile = ref<File | null>(null)
 const imgSrc = ref<string | null>(null)
 const isAnalyzing = ref(false)
 const isCardMode = ref(false)
 const isFlipped = ref(false)
 const previewUrl = ref<string | null>(null)
+const analysisResult = ref<any>(null)
 // 上傳圖片
 const upload = async () => {
   if (!selectedFile.value) return
@@ -22,8 +24,9 @@ const upload = async () => {
       method: "POST",
       body: formData
     })
-    const blob = await res.blob()
-    imgSrc.value = URL.createObjectURL(blob)
+    const data = await res.json()
+    imgSrc.value = "data:image/png;base64," + data.image_base64
+    analysisResult.value = data.result
   } catch(err) {
     console.error(err)
     alert("分析失敗")
@@ -41,28 +44,41 @@ const reset = () => {
 }
 
 </script>
-
 <template>
   <AppHeader title = "聲骸分析工具" subtitle = "上傳圖片，自動分析並產出結果圖" />
   <main class="page">
-    <section class="workspace">
-      <UploadPanel 
-        :isAnalyzing = "isAnalyzing"
-        :imgSrc = "imgSrc"
-        :previewUrl = "previewUrl"
-        :hasFile="!!selectedFile"
-        @fileSelected = "selectedFile = $event"
-        @update:previewUrl = "previewUrl = $event"
-        @upload= "upload"
-      />
-      <CardDisplay
-        :imgSrc="imgSrc"
-        :isCardMode="isCardMode"
-        :isFlipped="isFlipped"
-        @update:isCardMode="isCardMode = $event"
-        @update:isFlipped="isFlipped = $event"
-        @reset="reset"
-      />
+    <section class="layout">
+      <!-- 左：規則說明 -->
+      <aside class="side left">
+        <RuleExplanation />
+      </aside>
+      <section class="workspace">
+        <UploadPanel 
+          :isAnalyzing = "isAnalyzing"
+          :imgSrc = "imgSrc"
+          :previewUrl = "previewUrl"
+          :hasFile="!!selectedFile"
+          @fileSelected = "selectedFile = $event"
+          @update:previewUrl = "previewUrl = $event"
+          @upload= "upload"
+        />
+        <CardDisplay
+          :imgSrc="imgSrc"
+          :isCardMode="isCardMode"
+          :isFlipped="isFlipped"
+          @update:isCardMode="isCardMode = $event"
+          @update:isFlipped="isFlipped = $event"
+          @reset="reset"
+        />
+      </section>
+      <!-- 右：結果說明 -->
+      <aside class="side right">
+        <ResultExplanation
+          :imgSrc="imgSrc"
+          :isAnalyzing="isAnalyzing"
+          :result="analysisResult"
+        />
+      </aside>
     </section>
   </main>
   <div v-if="imgSrc" class="actions">
@@ -76,6 +92,22 @@ const reset = () => {
 
 
 <style scoped>
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+.side {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .page {
   display: flex;
   flex-direction: column;

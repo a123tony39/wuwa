@@ -68,10 +68,6 @@ const onFileChange = (e: Event) => {
             <input type="file" @change="onFileChange"/>
             <button @click="emit('upload')" :disabled="!props.hasFile">上傳圖片</button>
          </div>
-          <!-- 分析中 -->
-        <div v-if = "props.isAnalyzing">
-            <p class="loading">分析中... 請稍後</p>
-        </div>
     </div>
 </template>
 

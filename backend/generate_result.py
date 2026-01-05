@@ -18,6 +18,7 @@ from infrastructure.ocr.google_ocr import GoogleOCR
 from infrastructure.yaml_io import load_yaml
 from infrastructure.image_loader import load_img
 
+from domain.score.score import get_rank
 from domain.score.rules import ScoreRules
 from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_percent_stats, FLAT_STATS
 from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats_and_role
@@ -77,7 +78,7 @@ def process_image(source, debug=False):
         paste_positions=PASTE_POSITIONS
     )
     total_stats = defaultdict(float)
-    total_score = render_echo_section(
+    total_score, echo_results = render_echo_section(
         ctx = render_ctx,
         character = character_ctx,
         layout = echo_layout,
@@ -88,8 +89,10 @@ def process_image(source, debug=False):
     )
     # 下方區塊渲染
     ## 評級部分
+    rank = get_rank(total_score)
     paste_rank(
         ctx = render_ctx,
+        rank = rank,
         total_score = total_score, 
     )
 
@@ -113,7 +116,15 @@ def process_image(source, debug=False):
     )
 
     # 回傳結果
-    return canvas.show() if debug else {"text": "圖片處理完成", "image": canvas}
+    return canvas.show() if debug else {
+        "text": "圖片處理完成", 
+        "image": canvas, 
+        "result": {
+            "rank": rank,
+            "score": total_score,
+            "echo_results": echo_results,
+        }
+    }
 
 def load_score_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
     base_score = load_yaml(domain_path / "score" / "base_score.yaml")
