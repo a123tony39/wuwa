@@ -35,6 +35,7 @@
 #     - 冷凝
 #     - 導電
 
+# 拉海洛
 千咲:
   en: Chisa
   main_attr: 攻擊
@@ -42,6 +43,14 @@
     - 共鳴解放
   role: 輸出
   element: 湮滅
+
+琳奈:
+  en: Lynae
+  main_attr: 攻擊
+  dmg_type: 
+    - 普攻
+  role: 輸出
+  element: 衍射
 
 # 黎那汐塔
 弗洛洛:
