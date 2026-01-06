@@ -39,7 +39,7 @@ def render_echo_section(
             echo = new_echo, 
             valid_stats = character.valid_stats, 
             character_name = character.zh_name,
-            base_score = rules.get_role_base_score(character.role),
+            base_score = character.base_score,
             stats_expects_bias = rules.stats_expects_bias,
         )
         add_echo_result(echo_results, idx, echo_score)

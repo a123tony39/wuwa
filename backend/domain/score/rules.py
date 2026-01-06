@@ -10,6 +10,3 @@ class ScoreRules:
         self.stats_name_map = stats_name_map
         self.stats_categories = stats_categories
         self.stats_expects_bias = stats_expects_bias
-    
-    def get_role_base_score(self, role: str):
-        return self.base_score[role]

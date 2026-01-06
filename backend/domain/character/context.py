@@ -6,4 +6,4 @@ class CharacterContext:
     en_name: str
     template: dict
     valid_stats: set
-    role: str
+    base_score: dict

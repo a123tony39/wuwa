@@ -21,7 +21,7 @@ from infrastructure.image_loader import load_img
 from domain.score.score import get_rank
 from domain.score.rules import ScoreRules
 from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_percent_stats, FLAT_STATS
-from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats_and_role
+from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats, get_base_score
 from domain.character.context import CharacterContext
 from domain.player.player_info import get_player_info
 
@@ -42,13 +42,14 @@ def process_image(source, debug=False):
         character_name = player_info.character_name, 
         character_template = character_template
     )
-    valid_stats, role = get_valid_stats_and_role(character_zh_name, score_rules.stats_categories, character_template)
+    valid_stats = get_valid_stats(character_zh_name, score_rules.stats_categories, character_template)
+    base_score = get_base_score(character_zh_name, character_template, score_rules.base_score)
     character_ctx = CharacterContext(
         zh_name = character_zh_name,
         en_name = character_en_name,
         template = character_template,
         valid_stats = valid_stats,
-        role = role,
+        base_score = base_score,
     )
     background_file = get_background_file(character_en_name)
     template = load_img(TEMPLATE_FILE)
@@ -142,8 +143,8 @@ def main():
         # "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
         # "../img/input/Zani.png",
-        # "../img/input/Phrolova.png",
-        "../img/input/Cantarella.png",
+        "../img/input/Phrolova.png",
+        # "../img/input/Cantarella.png",
         # "../img/input/Lupa.png",
         # "../img/input/Changli.png",
     ]
