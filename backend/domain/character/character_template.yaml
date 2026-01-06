@@ -160,6 +160,14 @@
   base_score_rule: 輸出
   element: 氣動
 
+珂莱塔:
+  en: Carlotta
+  main_attr: 攻擊
+  dmg_type: 
+    - 共鳴技能
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 冷凝
 
 # 黑海岸
 守岸人:
