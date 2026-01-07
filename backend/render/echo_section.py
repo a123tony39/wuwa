@@ -1,17 +1,12 @@
 from PIL import Image
 from dataclasses import dataclass
 from domain.echo.ocr_parser import parse_ocr_output
-from domain.score.score import get_score
+from domain.score.score import get_score, ECHO_SCORE_LEVELS
 from domain.character.context import CharacterContext
 from domain.score.rules import ScoreRules
 from domain.stats.rules import FLAT_STATS
 from .core.canvas import draw_text, paste_icon, add_border
 from .context import RenderContext
-
-ECHO_SCORE_LEVELS = {
-    "PERFECT": 20,
-    "GOOD": 15,
-}
 
 SUB_STAT_WIDTH = 330
 
@@ -40,7 +35,7 @@ def render_echo_section(
             valid_stats = character.valid_stats, 
             character_name = character.zh_name,
             base_score = character.base_score,
-            stats_expects_bias = rules.stats_expects_bias,
+            stats_tier_range = rules.stats_tier_range,
         )
         add_echo_result(echo_results, idx, echo_score)
        

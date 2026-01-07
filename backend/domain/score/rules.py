@@ -4,9 +4,9 @@ class ScoreRules:
         base_score: dict,
         stats_name_map: dict,
         stats_categories: dict,
-        stats_expects_bias: dict,
+        stats_tier_range: dict,
     ):
         self.base_score = base_score
         self.stats_name_map = stats_name_map
         self.stats_categories = stats_categories
-        self.stats_expects_bias = stats_expects_bias
+        self.stats_tier_range = stats_tier_range

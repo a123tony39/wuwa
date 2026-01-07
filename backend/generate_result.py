@@ -131,8 +131,8 @@ def load_score_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
     base_score = load_yaml(domain_path / "score" / "base_score.yaml")
     stats_name_map = load_yaml(domain_path / "stats" / "stats_name_map.yaml")
     stats_categories = load_yaml(domain_path / "stats" / "stats_categories.yaml")
-    stats_expect_bias = load_yaml(domain_path / "stats" / "stats_expect_bias.yaml") 
-    return ScoreRules(base_score, stats_name_map, stats_categories, stats_expect_bias)
+    stats_tier_range = load_yaml(domain_path / "stats" / "stats_tier_range.yaml") 
+    return ScoreRules(base_score, stats_name_map, stats_categories, stats_tier_range)
 
 def load_character_template(path = Path("./domain/character/character_template.yaml")):
     return load_yaml(path)
@@ -143,8 +143,8 @@ def main():
         # "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
         # "../img/input/Zani.png",
-        "../img/input/Phrolova.png",
-        # "../img/input/Cantarella.png",
+        # "../img/input/Phrolova.png",
+        "../img/input/Cantarella.png",
         # "../img/input/Lupa.png",
         # "../img/input/Changli.png",
     ]
