@@ -5,13 +5,6 @@ ECHO_SCORE_LEVELS = {
     "GOOD": 10,
 }
 
-def calculate_stat_score(stat_name, stat_value, base_score, stats_tier_range):
-    max_contribution = base_score.get(stat_name)
-    info = stats_tier_range.get(stat_name)
-    quality_ratio = compute_discrete_cdf(stat_table = info, value = stat_value)
-    score = max_contribution * (0.7 + 0.3 * quality_ratio)
-    return score
-
 def get_score(echo, valid_stats, character_name, base_score, stats_tier_range):
     print("採用base_score:", base_score)
     breakdown = []
@@ -30,6 +23,13 @@ def get_score(echo, valid_stats, character_name, base_score, stats_tier_range):
     score_ceiling = base_score["分數上限"]
     echo_completion = (echo_score / score_ceiling) * 20
     return echo_completion, breakdown
+
+def calculate_stat_score(stat_name, stat_value, base_score, stats_tier_range):
+    max_contribution = base_score.get(stat_name)
+    info = stats_tier_range.get(stat_name)
+    quality_ratio = compute_discrete_cdf(stat_table = info, value = stat_value)
+    score = max_contribution * (0.7 + 0.3 * quality_ratio)
+    return score
 
 def get_rank(score):
     if score >= 80:

@@ -16,7 +16,7 @@ def paste_rank(total_score, rank, ctx: RenderContext):
     mid_y = slot_y + (slot_h - img_h) // 2
     paste_icon(ctx.canvas, rank_img, (mid_x, mid_y))
     # set text and font
-    text_zh = f"練度評分:{total_score:.2f}".rstrip('0').rstrip('.')
+    text_zh = f"練度評分: {total_score:.2f}".rstrip('0').rstrip('.')
     font_zh = ctx.fonts.text(36)
     # compute and align center
     w_zh = ctx.canvas_draw.textlength(text_zh, font=font_zh)
