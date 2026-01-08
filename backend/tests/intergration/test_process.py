@@ -18,7 +18,7 @@ class FakeOCRResults:
 def test_process_image():
     # Fake OCR 回傳物件
     fake_ocr_results = FakeOCRResults()
-    # patch GoogleOCR.ocr 或 process_image 內呼叫 OCR 的地方
+    # patch GoogleOCR.ocr
     with patch("generate_result.GoogleOCR.ocr", return_value=fake_ocr_results):
         dummy_img = Image.new("RGB", (100, 100), color="white")
         result = process_image(dummy_img)
