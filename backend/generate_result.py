@@ -15,7 +15,7 @@ from render.echo_section import render_echo_section, EchoLayout
 from render.rank_section import paste_rank
 
 from infrastructure.ocr.google_ocr import GoogleOCR
-from infrastructure.yaml_io import load_yaml
+from infrastructure.yaml_io import load_yaml, write_yaml
 from infrastructure.image_loader import load_img
 
 from domain.score.score import get_rank
@@ -29,7 +29,6 @@ def process_image(source, debug=False):
     # ocr
     ocr_engine = GoogleOCR("config.json")
     ocr_results = ocr_engine.ocr(source, OCR_CROP_AREAS)
-
     # canvas及context參數初始化
     score_rules = load_score_rules()
     character_template = load_character_template()
@@ -143,8 +142,8 @@ def main():
         # "../img/input/Cartethyia.png",
         # "../img/input/Chisa.png",
         # "../img/input/Zani.png",
-        # "../img/input/Phrolova.png",
-        "../img/input/Cantarella.png",
+        "../img/input/Phrolova.png",
+        # "../img/input/Cantarella.png",
         # "../img/input/Lupa.png",
         # "../img/input/Changli.png",
     ]
