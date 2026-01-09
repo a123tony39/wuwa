@@ -2,3 +2,4 @@
 omit =
     domain/**/context.py
     domain/**/__init__.py
+    domain/score/rules.py

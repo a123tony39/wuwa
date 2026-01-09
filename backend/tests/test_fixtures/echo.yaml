@@ -1,0 +1,17 @@
+main_stat:
+  name: 攻擊%
+  value: 18.0
+static_stat:
+  name: 生命
+  value: 2280.0
+sub_stat:
+- name: 暴擊
+  value: 7.5
+- name: 防禦%
+  value: 8.1
+- name: 攻擊%
+  value: 7.9
+- name: 暴擊傷害
+  value: 12.6
+- name: 攻擊
+  value: 40.0

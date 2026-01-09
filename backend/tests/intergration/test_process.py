@@ -1,19 +1,15 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from generate_result import process_image
+from infrastructure.yaml_io import load_yaml
 from PIL import Image
 
 class FakeOCRResults:
     def __init__(self):
-        self.player_block = ["弗洛洛", "LV.90", "玩家名稱:Testuser01", "特徵碼:800634045"]
-        self.echo_block = [
-            ["暴擊傷害", "44%", "攻擊150", "暴擊10.5%", "攻擊8.6%", "暴擊傷害19.8%", "攻擊50", "防禦60"],
-            ["湮滅傷害加成", "30%", "攻擊100", "暴擊傷害18.6%", "生命320", "共鳴技能傷害加成7.9%", "攻擊60", "暴擊7.5%"],
-            ["湮滅傷害加成", "30%", "攻擊100", "攻擊11.6%", "防禦10%", "普攻傷害加成8.6%", "暴擊8.1%", "暴擊傷害18.6%"],
-            ["攻擊", "滿18%", "生命2280", "暴擊傷害17.4%", "共鳴技能傷害加成8.6%", "普攻傷害加成10.1%", "攻擊7.9%", "暴擊6.3%"],
-            ["攻擊", "18%", "生命2280", "暴擊7.5%", "防禦8.1%", "攻擊7.9%", "暴擊傷害12.6%", "攻擊40"]
-        ]
-
+        test_ocr_results = load_yaml("./tests/test_fixtures/ocr_result.yaml")
+        self.player_block = test_ocr_results['player_block']
+        self.echo_block = test_ocr_results['echo_block']
+        
 @pytest.mark.integration
 def test_process_image():
     # Fake OCR 回傳物件
