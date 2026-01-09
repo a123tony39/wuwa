@@ -1,140 +1,37 @@
 from PIL import Image
-from pathlib import Path
-from collections import defaultdict
 from memory_profiler import profile
-
-from config.paths import IMG_PATH
-
-from render.context import RenderContext, FontSet
-from render.core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font, get_background_file
-from render.layout_config import ECHO_AVATAR_POSITIONS, OCR_CROP_AREAS, PASTE_POSITIONS
-from render.background import load_background, combine_background_template, prepare_canvas_for_drawing
-from render.top_right_section import render_top_right_section, TopRightLayout
-from render.top_left_section import render_top_left_section
-from render.echo_section import render_echo_section, EchoLayout
 from render.rank_section import paste_rank
-
-from infrastructure.ocr.google_ocr import GoogleOCR
-from infrastructure.yaml_io import load_yaml
-from infrastructure.image_loader import load_img
-
 from domain.score.score import get_rank
-from domain.score.rules import ScoreRules
-from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_percent_stats, FLAT_STATS
-from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats, get_base_score
-from domain.character.context import CharacterContext
-from domain.player.player_info import get_player_info
+from application.builders.ocr import run_ocr
+from application.builders.character import build_character_context
+from application.builders.render import build_render_context, render_top_left_block, render_echo_block, render_top_right_block
 
 def process_image(source, debug=False):
     # ocr
-    ocr_engine = GoogleOCR("config.json")
-    ocr_results = ocr_engine.ocr(source, OCR_CROP_AREAS)
+    ocr_results = run_ocr(source)
     # canvas及context參數初始化
-    score_rules = load_score_rules()
-    character_template = load_character_template()
-    fonts = FontSet(
-        text = get_text_font,
-        stat = get_stat_font,
-    ) 
-    player_info = get_player_info(ocr_results.player_block)
-    character_zh_name, character_en_name = get_character_zh_and_en_name(
-        character_name = player_info.character_name, 
-        character_template = character_template
-    )
-    valid_stats = get_valid_stats(character_zh_name, score_rules.stats_categories, character_template)
-    base_score = get_base_score(character_zh_name, character_template, score_rules.base_score)
-    character_ctx = CharacterContext(
-        zh_name = character_zh_name,
-        en_name = character_en_name,
-        template = character_template,
-        valid_stats = valid_stats,
-        base_score = base_score,
-    )
-    background_file = get_background_file(character_en_name)
-    template = load_img(TEMPLATE_FILE)
-    background = load_background(background_file, template.width, template.height)
-    canvas = combine_background_template(background, template)
-    canvas_draw = prepare_canvas_for_drawing(canvas)
-    render_ctx = RenderContext(
-        canvas = canvas,
-        canvas_draw = canvas_draw,
-        fonts = fonts,
-        img_path = IMG_PATH,
-        stats_name_map = score_rules.stats_name_map,
-    )
+    character_ctx, score_rules, player_info = build_character_context(ocr_results)
+    render_ctx = build_render_context(character_ctx, score_rules)
     # 左上區塊渲染
-    character_img_x, character_img_y = 80, 119
-    render_top_left_section(
-        ctx = render_ctx,
-        character = character_ctx,
-        player_info = player_info,
-        character_img_x = character_img_x,
-        character_img_y = character_img_y,
-    )
-    # 下方區塊渲染
-    ## 聲骸部分
-    echo_layout = EchoLayout(
-        avatar_positions=ECHO_AVATAR_POSITIONS,
-        paste_positions=PASTE_POSITIONS
-    )
-    total_stats = defaultdict(float)
-    total_score, echo_results = render_echo_section(
-        ctx = render_ctx,
-        character = character_ctx,
-        layout = echo_layout,
-        rules = score_rules,
-        source = source,
-        total_stats = total_stats,
-        ocr_results = ocr_results.echo_block
-    )
-    # 下方區塊渲染
-    ## 評級部分
+    render_top_left_block(ctx = render_ctx, character = character_ctx, player_info = player_info)
+    # 下方聲骸區塊渲染
+    total_score, echo_results, total_stats = render_echo_block(render_ctx, character_ctx, score_rules, ocr_results, source)
+    # 下方評級區塊渲染
     rank = get_rank(total_score)
-    paste_rank(
-        ctx = render_ctx,
-        rank = rank,
-        total_score = total_score, 
-    )
-
+    paste_rank(ctx = render_ctx, rank = rank, total_score = total_score)
     # 右上區塊渲染
-    TOP_RIGHT_X = 737
-    TOP_RIGHT_OFFSET_FROM_CHARACTER = 50
-    total_stats = merge_flat_and_percent_stats(total_stats, FLAT_STATS)
-    allowed_stats = normalize_stats(valid_stats, FLAT_STATS) | FLAT_STATS
-    sorted_allowed_stats = sorted(allowed_stats, key = lambda x : stat_sort_key(x))
-
-    top_right_layout = TopRightLayout(
-        origin_x = TOP_RIGHT_X,
-        origin_y = character_img_y + TOP_RIGHT_OFFSET_FROM_CHARACTER,
-    )
-    render_top_right_section(
-        ctx = render_ctx,
-        FLAT_STATS = FLAT_STATS,
-        total_stats = total_stats, 
-        layout = top_right_layout,
-        sorted_allowed_stats = sorted_allowed_stats,
-    )
+    render_top_right_block(character_ctx, render_ctx, total_stats)
 
     # 回傳結果
-    return canvas.show() if debug else {
+    return render_ctx.canvas.show() if debug else {
         "text": "圖片處理完成", 
-        "image": canvas, 
+        "image": render_ctx.canvas, 
         "result": {
             "rank": rank,
             "score": total_score,
             "echo_results": echo_results,
         }
     }
-
-def load_score_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
-    base_score = load_yaml(domain_path / "score" / "base_score.yaml")
-    stats_name_map = load_yaml(domain_path / "stats" / "stats_name_map.yaml")
-    stats_categories = load_yaml(domain_path / "stats" / "stats_categories.yaml")
-    stats_tier_range = load_yaml(domain_path / "stats" / "stats_tier_range.yaml") 
-    return ScoreRules(base_score, stats_name_map, stats_categories, stats_tier_range)
-
-def load_character_template(path = Path("./domain/character/character_template.yaml")):
-    return load_yaml(path)
     
 @profile
 def main():
