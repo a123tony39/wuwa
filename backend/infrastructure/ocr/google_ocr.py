@@ -3,14 +3,10 @@ import re
 import json
 from PIL import Image
 from google.cloud import vision
-from dataclasses import dataclass
+from domain.ocr.port import OCRService
+from domain.ocr.ocr_result import OCRResult
 
-@dataclass
-class OCRResult:
-    player_block: list[str]
-    echo_block: list[list[str]] 
-
-class GoogleOCR:
+class GoogleOCR(OCRService):
     def __init__(self, api_key_file = "config.json"):
         with open(api_key_file, "r") as f:
             config = json.load(f)
@@ -18,29 +14,8 @@ class GoogleOCR:
         self.client = vision.ImageAnnotatorClient(
             client_options={"api_key": self.api_key}
         )
-    
-    def preprocess_image(self, img, crop_areas, scale=2):
-        """
-        將每個 crop area 切出放大後，貼回新圖
-        scale: 放大倍數
-        """
-        # 計算新圖大小
-        new_width = sum(int((x2 - x1) * scale) for x1, y1, x2, y2 in crop_areas)
-        new_height = max(int((y2 - y1) * scale) for x1, y1, x2, y2 in crop_areas)
 
-        new_img = Image.new("RGB", (new_width, new_height), color=(255, 255, 255))
-
-        current_x = 0
-        for x1, y1, x2, y2 in crop_areas:
-            crop = img.crop((x1, y1, x2, y2))
-            w, h = crop.size
-            crop = crop.resize((int(w * scale), int(h * scale)), Image.BICUBIC)
-            new_img.paste(crop, (current_x, 0))
-            current_x += crop.width
-
-        return new_img
-        
-    def ocr(self, img, crop_areas, scale=2):
+    def recognize(self, img, crop_areas, scale=2):
         # 先處理圖像
         img_proc = self.preprocess_image(img, crop_areas, scale=scale)
 
@@ -122,3 +97,25 @@ class GoogleOCR:
             player_block = result[0],
             echo_block = result[1:]
         )
+    
+    def preprocess_image(self, img, crop_areas, scale=2):
+        """
+        將每個 crop area 切出放大後，貼回新圖
+        scale: 放大倍數
+        """
+        # 計算新圖大小
+        new_width = sum(int((x2 - x1) * scale) for x1, y1, x2, y2 in crop_areas)
+        new_height = max(int((y2 - y1) * scale) for x1, y1, x2, y2 in crop_areas)
+
+        new_img = Image.new("RGB", (new_width, new_height), color=(255, 255, 255))
+
+        current_x = 0
+        for x1, y1, x2, y2 in crop_areas:
+            crop = img.crop((x1, y1, x2, y2))
+            w, h = crop.size
+            crop = crop.resize((int(w * scale), int(h * scale)), Image.BICUBIC)
+            new_img.paste(crop, (current_x, 0))
+            current_x += crop.width
+
+        return new_img
+        

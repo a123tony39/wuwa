@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify, send_file, send_from_directory
 from PIL import Image
 from generate_result import process_image
 from io import BytesIO
+from infrastructure.ocr.google_ocr import GoogleOCR
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
 FRONTEND_DIST = os.path.join(BASE_DIR, "..", "frontend", "dist")
@@ -12,6 +13,7 @@ app = Flask(
     static_folder=FRONTEND_DIST,
     static_url_path="/" 
 ) 
+ocr_service = GoogleOCR("config.json")
 
 @app.route("/api/health", methods =["GET"])
 def health_check():
@@ -28,7 +30,7 @@ def analysis_echo():
     file = request.files['file']
     
     image = Image.open(file.stream)
-    result = process_image(image)
+    result = process_image(image, ocr_service)
     output_image = result["image"]
     img_base64 = img_to_b64(output_image)
     return jsonify({

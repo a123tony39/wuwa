@@ -5,11 +5,12 @@ from domain.score.score import get_rank
 from application.builders.ocr import run_ocr
 from application.builders.character import build_character_context
 from application.builders.render import build_render_context, render_top_left_block, render_echo_block, render_top_right_block
+from infrastructure.ocr.google_ocr import GoogleOCR
 
-def process_image(source, debug=False):
+def process_image(source, ocr_service, debug=False):
     # ocr
-    ocr_results = run_ocr(source)
-    # canvas及context參數初始化
+    ocr_results = run_ocr(ocr_service, source)
+    # character及canvas參數初始化
     character_ctx, score_rules, player_info = build_character_context(ocr_results)
     render_ctx = build_render_context(character_ctx, score_rules)
     # 左上區塊渲染
@@ -44,9 +45,10 @@ def main():
         # "../img/input/Lupa.png",
         # "../img/input/Changli.png",
     ]
+    ocr_service = GoogleOCR("config.json")
     for _, src_file in enumerate(source_files, start=1):
         src = Image.open(src_file)
-        process_image(src, debug=True)
+        process_image(src, ocr_service, debug=True)
 
 if __name__ == "__main__":
     main()

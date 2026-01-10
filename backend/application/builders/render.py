@@ -14,8 +14,6 @@ from render.top_right_section import render_top_right_section, TopRightLayout
 
 from infrastructure.image_loader import load_img
 
-CHARACTER_IMG_X, CHARACTER_IMG_Y = 80, 119
-
 def build_render_context(character_ctx, score_rules) -> RenderContext:
     fonts = FontSet(
         text = get_text_font,
@@ -35,7 +33,7 @@ def build_render_context(character_ctx, score_rules) -> RenderContext:
     )
     return render_ctx
 
-
+CHARACTER_IMG_X, CHARACTER_IMG_Y = 80, 119
 def render_top_left_block(ctx, character, player_info):
     render_top_left_section(
         ctx = ctx,
@@ -66,7 +64,6 @@ def render_echo_block(render_ctx, character_ctx, score_rules, ocr_results, sourc
 
 TOP_RIGHT_X = 737
 TOP_RIGHT_OFFSET_FROM_CHARACTER = 50
-
 def render_top_right_block(character_ctx, render_ctx, total_stats):
     total_stats = merge_flat_and_percent_stats(total_stats, FLAT_STATS)
     allowed_stats = normalize_stats(character_ctx.valid_stats, FLAT_STATS) | FLAT_STATS
