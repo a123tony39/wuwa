@@ -13,38 +13,11 @@ class EchoData:
     static_stat: Stat = field(default_factory=Stat)
     sub_stat: List[Stat] = field(default_factory=list)
 
-
-def normalize(text):
-    VALID_STATS = ["暴擊傷害", "暴擊", "攻擊", "生命", "防禦", "共鳴效率", "普攻傷害加成", "共鳴解放傷害加成", "重擊傷害加成", "共鳴技能傷害加成"]
-    for stat in VALID_STATS:
-        if stat in text:
-            return stat
-    return text # value
-
 PERCENTABLE = ["生命", "攻擊", "防禦"]
-def parse_ocr_output(ocr_result) -> EchoData:
-    print("-----------------------------")
+def get_echo_info(ocr_result) -> EchoData:
     new_echo = EchoData()
-    texts = []
-
-    # get main stat
-    for text in ocr_result[:2]:
-        text = normalize(text)
-        print(f"文字: {text}")
-        texts.append(text)
-        
-    # get sub stat
-    for text in ocr_result[2:]:
-        stat = normalize(text)
-        name = stat
-        value = text[len(stat):]
-        print(f"文字: {stat}")
-        print(f"文字: {value}")
-        texts.append(stat)
-        texts.append(value)
-
-    pairs = [texts[i:i+2] for i in range(0, len(texts), 2)]
-    for idx, (name, value) in enumerate(pairs):
+    stats = parse_ocr_result(ocr_result)
+    for idx, (name, value) in enumerate(stats):
         print(name, value)
         name, value = parse_stat_pair(name, value, PERCENTABLE)
         if idx == 0:
@@ -57,6 +30,33 @@ def parse_ocr_output(ocr_result) -> EchoData:
             new_echo.sub_stat.append(Stat(name=name, value=value))
     return new_echo
 
+def normalize(text):
+    VALID_STATS = ["暴擊傷害", "暴擊", "攻擊", "生命", "防禦", "共鳴效率", "普攻傷害加成", "共鳴解放傷害加成", "重擊傷害加成", "共鳴技能傷害加成"]
+    for stat in VALID_STATS:
+        if stat in text:
+            return stat
+    return text # value
+
+def parse_ocr_result(ocr_result):
+    texts = []
+
+    # get main stat
+    for text in ocr_result[:2]:
+        text = normalize(text)
+        print(f"文字: {text}")
+        texts.append(text)
+        
+    # get sub stat
+    for text in ocr_result[2:]:
+        stat_name = normalize(text)
+        stat_value = text[len(stat_name):]
+        print(f"文字: {stat_name}")
+        print(f"文字: {stat_value}")
+        texts.append(stat_name)
+        texts.append(stat_value)
+
+    stats = [texts[i:i+2] for i in range(0, len(texts), 2)]
+    return stats
 
 def parse_stat_pair(name, value, percentable):
     if '%' in value and name in percentable:

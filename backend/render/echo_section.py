@@ -1,13 +1,15 @@
 from PIL import Image
 from dataclasses import dataclass
-from domain.echo.ocr_parser import parse_ocr_output
-from domain.score.score import get_score, ECHO_SCORE_LEVELS
+from domain.echo.ocr_parser import get_echo_info
+from domain.score.score import ECHO_SCORE_LEVELS
 from domain.character.context import CharacterContext
 from domain.score.rules import ScoreRules
+from domain.score.score import compute_echo_score
 from domain.stats.rules import FLAT_STATS
 from .core.canvas import draw_text, paste_icon, add_border
 from .context import RenderContext
 
+MAIN_STAT_WIDTH, MAIN_STAT_HEIGHT = 230, 50
 SUB_STAT_WIDTH = 330
 
 @dataclass
@@ -27,16 +29,10 @@ def render_echo_section(
     total_score = 0.0
     echo_results = []
     for idx, (ocr_result, avatar_pos, paste_pos) in enumerate(zip(ocr_results, layout.avatar_positions, layout.paste_positions)):
-        new_echo = get_new_echo(ocr_result)
-        # calculate echo score
         print(f"--------聲骸評分{idx+1}--------")
-        echo_score, breakdown = get_score(
-            echo = new_echo, 
-            valid_stats = character.valid_stats, 
-            character_name = character.zh_name,
-            base_score = character.base_score,
-            stats_tier_range = rules.stats_tier_range,
-        )
+        echo = get_echo_info(ocr_result)
+        # calculate echo score
+        echo_score, breakdown = compute_echo_score(echo, character, rules)
         add_echo_result(echo_results, idx, echo_score)
        
         total_score += echo_score
@@ -54,12 +50,12 @@ def render_echo_section(
         )
         # 聲骸主詞條 paste echo main stat
         img_main_stat_gap = 20
-        process_echo_main_stat(
+        paste_echo_main_stat(
             ctx = ctx,
             paste_x = x + img_main_stat_gap + echo_img.width, 
             paste_y = y, 
             valid_stats = character.valid_stats,
-            echo = new_echo, 
+            echo = echo, 
             total_stats = total_stats,
         ) 
         # 聲骸副詞條 paste echo sub stat
@@ -69,7 +65,7 @@ def render_echo_section(
         start_y = y + padding_y
         y_bias = 0
 
-        y_bias = process_echo_sub_stats(
+        y_bias = paste_echo_sub_stats(
             ctx = ctx,
             start_x = start_x,
             start_y = start_y,
@@ -88,10 +84,6 @@ def render_echo_section(
         )
     return total_score, echo_results
 
-def get_new_echo(results):
-    new_echo = parse_ocr_output(results)
-    return new_echo
-
 def paste_echo_img(idx, avatar_pos, source, x, y, canvas):
     cropped_x, cropped_y = avatar_pos
     if idx == 0:
@@ -102,7 +94,7 @@ def paste_echo_img(idx, avatar_pos, source, x, y, canvas):
     paste_icon(canvas, echo_img, (x + 10, y + 13))
     return echo_img
 
-def process_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, start_y, valid_stats, y_bias):
+def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, start_y, valid_stats, y_bias):
     right_edge = start_x + SUB_STAT_WIDTH
     for stat_name, stat_value, _ in breakdown: 
         total_stats[stat_name] += stat_value
@@ -123,10 +115,8 @@ def process_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, s
         y_bias += 50
     return y_bias
 
-def process_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats,  valid_stats):
-    main_stat_width, main_stat_height = 230, 50
+def paste_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats,  valid_stats):
     stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
-    
     for i in range(2):
         if i == 0:
             stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
@@ -137,7 +127,7 @@ def process_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_sta
         total_stats[stat_name] += stat_value
         # paste img
         img = load_stat_img(ctx, stat_name, valid_stats, False)
-        img = img.crop((0, 0, main_stat_width, main_stat_height))
+        img = img.crop((0, 0, MAIN_STAT_WIDTH, MAIN_STAT_HEIGHT))
         region = ctx.canvas.crop((paste_x, paste_y, paste_x + img.width, paste_y + img.height))
         composite = Image.alpha_composite(region, img)
         paste_icon(ctx.canvas, composite, (paste_x, paste_y))
@@ -145,7 +135,7 @@ def process_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_sta
         # paste value
         text_right_edge_gap = 3
         text_optical_offset = 12.5
-        right_edge = paste_x + main_stat_width
+        right_edge = paste_x + MAIN_STAT_WIDTH
         text = f"{stat_value}%" if stat_name not in FLAT_STATS else f"{stat_value}".rstrip('0').rstrip('.')
         text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.stat(24))
         text_x = right_edge - text_width - text_right_edge_gap

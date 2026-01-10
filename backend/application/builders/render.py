@@ -6,8 +6,8 @@ from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_pe
 
 from render.context import RenderContext, FontSet
 from render.core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font, get_background_file
-from render.background import load_background, combine_background_template, prepare_canvas_for_drawing
-from render.layout_config import ECHO_AVATAR_POSITIONS, PASTE_POSITIONS
+from render.core.background import load_background, combine_background_template, prepare_canvas_for_drawing
+from render.layout.config import ECHO_AVATAR_POSITIONS, PASTE_POSITIONS
 from render.top_left_section import render_top_left_section
 from render.echo_section import render_echo_section, EchoLayout
 from render.top_right_section import render_top_right_section, TopRightLayout

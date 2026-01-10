@@ -1,9 +1,21 @@
+from domain.character.context import CharacterContext
+from domain.score.rules import ScoreRules
 from domain.stats.cal_cdf import compute_discrete_cdf
+from domain.echo.ocr_parser import EchoData
 
 ECHO_SCORE_LEVELS = {
     "PERFECT": 15,
     "GOOD": 10,
 }
+def compute_echo_score(echo: EchoData, character:CharacterContext, rules: ScoreRules):
+    echo_score, breakdown = get_score(
+            echo = echo, 
+            valid_stats = character.valid_stats, 
+            character_name = character.zh_name,
+            base_score = character.base_score,
+            stats_tier_range = rules.stats_tier_range,
+        )
+    return echo_score, breakdown
 
 def get_score(echo, valid_stats, character_name, base_score, stats_tier_range):
     print("採用base_score:", base_score)

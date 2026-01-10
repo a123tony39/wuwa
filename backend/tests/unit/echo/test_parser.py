@@ -1,4 +1,4 @@
-from domain.echo.ocr_parser import parse_ocr_output, parse_stat_pair, PERCENTABLE
+from domain.echo.ocr_parser import get_echo_info, parse_stat_pair, PERCENTABLE
 
 def test_parse_ocr_output_basic():
     """
@@ -25,7 +25,7 @@ def test_parse_ocr_output_basic():
         "攻擊:11.6%",
     ]
 
-    echo = parse_ocr_output(ocr)
+    echo = get_echo_info(ocr)
 
     assert echo.main_stat.name == "暴擊"
     assert echo.main_stat.value == 22

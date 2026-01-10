@@ -1,6 +1,6 @@
+from typing import Callable
 from dataclasses import dataclass
 from PIL import Image, ImageDraw, ImageFont
-from typing import Callable
 
 @dataclass
 class FontSet:

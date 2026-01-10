@@ -1,9 +1,7 @@
 from PIL import Image
-
-from render.layout_config import UNDER_PANEL_X, UNDER_PANEL_Y
-
-from .core.canvas import paste_icon, draw_text
 from .context import RenderContext
+from .core.canvas import paste_icon, draw_text
+from render.layout.config import UNDER_PANEL_X, UNDER_PANEL_Y
 
 def paste_rank(total_score, rank, ctx: RenderContext):
     # rank pic

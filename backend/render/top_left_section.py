@@ -1,8 +1,9 @@
 from PIL import Image
-from .core.canvas import draw_text, paste_icon, add_border
+
 from .context import RenderContext
-from domain.character.context import CharacterContext
+from .core.canvas import draw_text, paste_icon, add_border
 from domain.player.context import PlayerInfo
+from domain.character.context import CharacterContext
 
 def render_top_left_section(
         ctx: RenderContext,
