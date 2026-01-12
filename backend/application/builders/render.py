@@ -6,17 +6,18 @@ from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_pe
 
 from render.context import build_render_context
 from render.top_left_section import render_top_left_section
-from render.echo_section import render_echo_section, EchoLayout
-from render.top_right_section import render_top_right_section, TopRightLayout
+from render.echo_section import render_echo_section
+from render.top_right_section import render_top_right_section
 from render.rank_section import paste_rank
-from config.layout import ECHO_AVATAR_POSITIONS, PASTE_POSITIONS, CHARACTER_IMG_POSITION, TOP_RIGHT_X, TOP_RIGHT_OFFSET_FROM_CHARACTER, UNDER_PANEL_POSITION
+from config.layout import ECHO_LAYOUT, CHARACTER_IMG_POSITION, TOP_RIGHT_LAYOUT, UNDER_PANEL_POSITION
 
 class RenderAgent:
-    def __init__(self, character_ctx, score_rules, source):
+    def __init__(self, character_ctx, score_rules, source, background_image):
         self.character_ctx = character_ctx
         self.score_rules = score_rules
         self.source = source
-        self.render_ctx = build_render_context(self.character_ctx, self.score_rules)
+        self.background_image = background_image
+        self.render_ctx = build_render_context(self.character_ctx, self.score_rules, self.background_image)
 
     def render_top_left(self, player_info):
         render_top_left_section(
@@ -27,16 +28,11 @@ class RenderAgent:
         )
 
     def render_echo(self, ocr_results):
-        layout = EchoLayout(
-            avatar_positions = ECHO_AVATAR_POSITIONS,
-            paste_positions = PASTE_POSITIONS,
-        )
-
         self.total_stats = defaultdict(float)
         self.total_score, self.echo_results = render_echo_section(
             ctx = self.render_ctx,
             character = self.character_ctx,
-            layout = layout,
+            layout = ECHO_LAYOUT,
             rules = self.score_rules,
             source = self.source,
             total_stats = self.total_stats,
@@ -48,15 +44,11 @@ class RenderAgent:
         allowed_stats = normalize_stats(self.character_ctx.valid_stats, FLAT_STATS) | FLAT_STATS
         sorted_allowed_stats = sorted(allowed_stats, key = lambda x : stat_sort_key(x))
 
-        top_right_layout = TopRightLayout(
-            origin_x = TOP_RIGHT_X,
-            origin_y = CHARACTER_IMG_POSITION[1] + TOP_RIGHT_OFFSET_FROM_CHARACTER,
-        )
         render_top_right_section(
             ctx = self.render_ctx,
             FLAT_STATS = FLAT_STATS,
             total_stats = self.total_stats, 
-            layout = top_right_layout,
+            layout = TOP_RIGHT_LAYOUT,
             sorted_allowed_stats = sorted_allowed_stats,
         )
 

@@ -31,7 +31,12 @@ def analysis_echo():
     file = request.files['file']
     
     image = Image.open(file.stream)
-    result = process_image(image, ocr_service)
+    background_file = request.files.get('background')
+    if background_file:
+        background_image = Image.open(background_file.stream).convert("RGBA")
+    else:
+        background_image = None
+    result = process_image(source = image, ocr_service = ocr_service, background_image=background_image)
     output_image = result["image"]
     img_base64 = img_to_b64(output_image)
     return jsonify({

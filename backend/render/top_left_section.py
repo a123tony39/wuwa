@@ -1,5 +1,4 @@
 from PIL import Image
-
 from .context import RenderContext
 from .core.canvas import draw_text, paste_icon, add_border
 from domain.player.context import PlayerInfo

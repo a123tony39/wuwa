@@ -1,13 +1,14 @@
 from PIL import Image
 from memory_profiler import profile
 
-from config.layout import OCR_CROP_AREAS
+
 from application.builders.character import prepare_character_analysis_context
 from application.builders.render import RenderAgent
 from application.builders.responsor import build_response
 from infrastructure.ocr.google_ocr import GoogleOCR
+from infrastructure.ocr.crop_area import OCR_CROP_AREAS
 
-def process_image(source, ocr_service, debug=False):
+def process_image(source, ocr_service, background_image=None, debug=False):
     # ocr
     ocr_results = ocr_service.recognize(source, OCR_CROP_AREAS)
     # character及canvas參數初始化
@@ -17,6 +18,7 @@ def process_image(source, ocr_service, debug=False):
         source = source,
         score_rules = prepare_data.score_rules,
         character_ctx = prepare_data.character,
+        background_image = background_image,
     )
     # 渲染
     agent.render_top_left(prepare_data.player_info)

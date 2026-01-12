@@ -114,6 +114,15 @@
   base_score_rule: 輸出
   element: 衍射
 
+菲比:
+  en: Phoebe
+  main_attr: 攻擊
+  dmg_type: 
+    - 重擊
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 衍射
+
 布蘭特:
   en: Brant
   main_attr: 攻擊
@@ -189,6 +198,24 @@
   element: 湮滅
 
 # 瑝瓏
+相里要:
+  en: Xiangli_Yao
+  main_attr: 攻擊
+  dmg_type:
+    - 共鳴解放
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 導電
+
+折枝:
+  en: Zhezhi
+  main_attr: 攻擊
+  dmg_type:
+    - 普攻
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 冷凝
+
 今汐:
   en: Jinhsi
   main_attr: 攻擊
@@ -206,3 +233,21 @@
   valid_stat_rule: 輸出
   base_score_rule: 輸出
   element: 熱熔
+
+吟霖:
+  en: Yinlin
+  main_attr: 攻擊
+  dmg_type:
+    - 共鳴技能
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 導電
+
+忌炎:
+  en: Jiyan
+  main_attr: 攻擊
+  dmg_type:
+    - 重擊
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 氣動

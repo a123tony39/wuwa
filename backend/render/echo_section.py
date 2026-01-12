@@ -14,8 +14,8 @@ SUB_STAT_WIDTH = 330
 
 @dataclass
 class EchoLayout:
-    avatar_positions: dict
-    paste_positions: dict
+    avatar_positions: list[tuple]
+    paste_positions: list[tuple]
     
 def render_echo_section(
         ctx: RenderContext,
