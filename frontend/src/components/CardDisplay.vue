@@ -108,7 +108,7 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-
+  
   <img
     v-else-if="imgSrc && !isCardMode"
     :src="imgSrc"

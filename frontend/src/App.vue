@@ -6,6 +6,7 @@ import CardDisplay from './components/CardDisplay.vue'
 import RuleExplanation from './components/RuleExplanation.vue'
 import ResultExplanation from './components/ResultExplanation.vue'
 const selectedFile = ref<File | null>(null)
+const backgroundFile = ref<File | null>(null)    // 背景圖片
 const imgSrc = ref<string | null>(null)
 const isAnalyzing = ref(false)
 const isCardMode = ref(false)
@@ -13,6 +14,11 @@ const isFlipped = ref(false)
 const previewUrl = ref<string | null>(null)
 const analysisResult = ref<any>(null)
 // 上傳圖片
+const onBackgroundChange = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0] ?? null  // undefined 轉成 null
+  backgroundFile.value = file
+}
 const upload = async () => {
   if (!selectedFile.value) return
   isAnalyzing.value = true
@@ -20,6 +26,9 @@ const upload = async () => {
   try {
     const formData = new FormData()
     formData.append('file', selectedFile.value)
+    if (backgroundFile.value) {
+      formData.append('background', backgroundFile.value)  // 新增背景檔案
+    }
     const res = await fetch("/api/process", {
       method: "POST",
       body: formData
@@ -62,6 +71,16 @@ const reset = () => {
           @update:previewUrl = "previewUrl = $event"
           @upload= "upload"
         />
+        <!-- 新增背景上傳 -->
+        <div v-if = "!isAnalyzing && !imgSrc" class = "background-upload">
+          <label>上傳背景圖片:</label>
+          <input 
+            type="file" 
+            accept="image/png, image/jpeg" 
+            @change="onBackgroundChange"
+          />
+        </div>
+        
         <CardDisplay
           :imgSrc="imgSrc"
           :isCardMode="isCardMode"
@@ -87,14 +106,12 @@ const reset = () => {
     </a>
     <button @click="reset">再來一次</button>
   </div>
-
 </template>
-
 
 <style scoped>
 .layout {
   display: grid;
-  grid-template-columns: 280px 1fr 320px;
+  grid-template-columns: 1fr auto 1fr;
   gap: 24px;
   max-width: 1400px;
   margin: 0 auto;
@@ -118,6 +135,7 @@ const reset = () => {
   display:flex; 
   flex-direction:column; 
   align-items:center; 
+  justify-content: center;
 }
 button { 
   padding:10px 16px; 
