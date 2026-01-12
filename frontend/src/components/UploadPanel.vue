@@ -66,7 +66,7 @@ const onFileChange = (e: Event) => {
               </template>
             </div>
             <input type="file" @change="onFileChange"/>
-            <button @click="emit('upload')" :disabled="!props.hasFile">上傳圖片</button>
+            <button @click="emit('upload')" :disabled="!props.hasFile">開始分析</button>
          </div>
     </div>
 </template>

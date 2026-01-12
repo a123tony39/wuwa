@@ -72,15 +72,28 @@ const reset = () => {
           @upload= "upload"
         />
         <!-- 新增背景上傳 -->
-        <div v-if = "!isAnalyzing && !imgSrc" class = "background-upload">
-          <label>上傳背景圖片:</label>
-          <input 
-            type="file" 
-            accept="image/png, image/jpeg" 
-            @change="onBackgroundChange"
-          />
-        </div>
-        
+        <div
+          v-if="!isAnalyzing && !imgSrc"
+          class="optional-setting"
+        >
+          <label class="optional-title">
+            進階設定（可選）
+          </label>
+
+          <label class="bg-upload">
+            自訂背景圖片
+            <input
+              type="file"
+              accept="image/png, image/jpeg"
+              @change="onBackgroundChange"
+              hidden
+            />
+          </label>
+
+          <span v-if="backgroundFile" class="file-hint">
+            已選擇：{{ backgroundFile.name }}
+          </span>
+        </div>      
         <CardDisplay
           :imgSrc="imgSrc"
           :isCardMode="isCardMode"
@@ -154,5 +167,39 @@ button {
   justify-content: center;
 }
 
+.optional-setting {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #f6f7f8;
+  width: 100%;
+  max-width: 420px;
+  font-size: 13px;
+}
 
+.optional-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #555;
+}
+.bg-upload {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px dashed #bbb;
+  cursor: pointer;
+  color: #333;
+}
+
+.bg-upload:hover {
+  background: #eee;
+}
+
+.file-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+}
 </style>
