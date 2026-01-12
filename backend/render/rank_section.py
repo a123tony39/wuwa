@@ -1,11 +1,11 @@
 from PIL import Image
+from pathlib import Path
 from .context import RenderContext
 from .core.canvas import paste_icon, draw_text
-from render.layout.config import UNDER_PANEL_X, UNDER_PANEL_Y
 
-def paste_rank(total_score, rank, ctx: RenderContext):
+def paste_rank(total_score: float, rank: str, ctx: RenderContext, panel_position: tuple):
     # rank pic
-    slot_x, slot_y = UNDER_PANEL_X + 85, UNDER_PANEL_Y + 120
+    slot_x, slot_y = panel_position[0] + 85, panel_position[1] + 120
     slow_w, slot_h = 180, 180
     print(f"{rank}: {total_score}")
     rank_img = load_rank_pic(rank, ctx.img_path)
@@ -24,7 +24,7 @@ def paste_rank(total_score, rank, ctx: RenderContext):
     draw_text(ctx.canvas_draw, (x, y), text_zh, font=font_zh, fill=(220, 220, 220))
     return rank
 
-def load_rank_pic(rank, img_path):
+def load_rank_pic(rank: str, img_path: Path):
     ss_score_file = img_path / "score/SS_score.png"
     s_score_file = img_path / "score/S_score.png"
     a_score_file = img_path / "score/A_score.png"

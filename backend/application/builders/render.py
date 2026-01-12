@@ -1,82 +1,73 @@
 
 from collections import defaultdict
-from config.paths import IMG_PATH
 
+from domain.score.score import get_rank
 from domain.stats.rules import stat_sort_key, normalize_stats, merge_flat_and_percent_stats, FLAT_STATS
 
-from render.context import RenderContext, FontSet
-from render.core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font, get_background_file
-from render.core.background import load_background, combine_background_template, prepare_canvas_for_drawing
-from render.layout.config import ECHO_AVATAR_POSITIONS, PASTE_POSITIONS
+from render.context import build_render_context
 from render.top_left_section import render_top_left_section
 from render.echo_section import render_echo_section, EchoLayout
 from render.top_right_section import render_top_right_section, TopRightLayout
+from render.rank_section import paste_rank
+from config.layout import ECHO_AVATAR_POSITIONS, PASTE_POSITIONS, CHARACTER_IMG_POSITION, TOP_RIGHT_X, TOP_RIGHT_OFFSET_FROM_CHARACTER, UNDER_PANEL_POSITION
 
-from infrastructure.image_loader import load_img
+class RenderAgent:
+    def __init__(self, character_ctx, score_rules, source):
+        self.character_ctx = character_ctx
+        self.score_rules = score_rules
+        self.source = source
+        self.render_ctx = build_render_context(self.character_ctx, self.score_rules)
 
-def build_render_context(character_ctx, score_rules) -> RenderContext:
-    fonts = FontSet(
-        text = get_text_font,
-        stat = get_stat_font,
-    ) 
-    background_file = get_background_file(character_ctx.en_name)
-    template = load_img(TEMPLATE_FILE)
-    background = load_background(background_file, template.width, template.height)
-    canvas = combine_background_template(background, template)
-    canvas_draw = prepare_canvas_for_drawing(canvas)
-    render_ctx = RenderContext(
-        canvas = canvas,
-        canvas_draw = canvas_draw,
-        fonts = fonts,
-        img_path = IMG_PATH,
-        stats_name_map = score_rules.stats_name_map,
-    )
-    return render_ctx
+    def render_top_left(self, player_info):
+        render_top_left_section(
+            ctx = self.render_ctx,
+            character = self.character_ctx,
+            player_info = player_info,
+            character_img_position = CHARACTER_IMG_POSITION,
+        )
 
-CHARACTER_IMG_X, CHARACTER_IMG_Y = 80, 119
-def render_top_left_block(ctx, character, player_info):
-    render_top_left_section(
-        ctx = ctx,
-        character = character,
-        player_info = player_info,
-        character_img_x = CHARACTER_IMG_X,
-        character_img_y = CHARACTER_IMG_Y,
-    )
+    def render_echo(self, ocr_results):
+        layout = EchoLayout(
+            avatar_positions = ECHO_AVATAR_POSITIONS,
+            paste_positions = PASTE_POSITIONS,
+        )
 
-def render_echo_block(render_ctx, character_ctx, score_rules, ocr_results, source):
-    layout = EchoLayout(
-        avatar_positions=ECHO_AVATAR_POSITIONS,
-        paste_positions=PASTE_POSITIONS,
-    )
+        self.total_stats = defaultdict(float)
+        self.total_score, self.echo_results = render_echo_section(
+            ctx = self.render_ctx,
+            character = self.character_ctx,
+            layout = layout,
+            rules = self.score_rules,
+            source = self.source,
+            total_stats = self.total_stats,
+            ocr_results = ocr_results.echo_block,
+        )
 
-    total_stats = defaultdict(float)
-    total_score, echo_results = render_echo_section(
-        ctx=render_ctx,
-        character=character_ctx,
-        layout=layout,
-        rules=score_rules,
-        source=source,
-        total_stats=total_stats,
-        ocr_results=ocr_results.echo_block,
-    )
+    def render_top_right(self):
+        self.total_stats = merge_flat_and_percent_stats(self.total_stats, FLAT_STATS)
+        allowed_stats = normalize_stats(self.character_ctx.valid_stats, FLAT_STATS) | FLAT_STATS
+        sorted_allowed_stats = sorted(allowed_stats, key = lambda x : stat_sort_key(x))
 
-    return total_score, echo_results, total_stats
+        top_right_layout = TopRightLayout(
+            origin_x = TOP_RIGHT_X,
+            origin_y = CHARACTER_IMG_POSITION[1] + TOP_RIGHT_OFFSET_FROM_CHARACTER,
+        )
+        render_top_right_section(
+            ctx = self.render_ctx,
+            FLAT_STATS = FLAT_STATS,
+            total_stats = self.total_stats, 
+            layout = top_right_layout,
+            sorted_allowed_stats = sorted_allowed_stats,
+        )
 
-TOP_RIGHT_X = 737
-TOP_RIGHT_OFFSET_FROM_CHARACTER = 50
-def render_top_right_block(character_ctx, render_ctx, total_stats):
-    total_stats = merge_flat_and_percent_stats(total_stats, FLAT_STATS)
-    allowed_stats = normalize_stats(character_ctx.valid_stats, FLAT_STATS) | FLAT_STATS
-    sorted_allowed_stats = sorted(allowed_stats, key = lambda x : stat_sort_key(x))
-
-    top_right_layout = TopRightLayout(
-        origin_x = TOP_RIGHT_X,
-        origin_y = CHARACTER_IMG_Y + TOP_RIGHT_OFFSET_FROM_CHARACTER,
-    )
-    render_top_right_section(
-        ctx = render_ctx,
-        FLAT_STATS = FLAT_STATS,
-        total_stats = total_stats, 
-        layout = top_right_layout,
-        sorted_allowed_stats = sorted_allowed_stats,
-    )
+    def render_rank(self):
+        self.rank = get_rank(self.total_score)
+        paste_rank(
+            ctx = self.render_ctx,
+            rank = self.rank, 
+            total_score = self.total_score,
+            panel_position = UNDER_PANEL_POSITION,
+        )
+    
+    def get_canvas(self):
+        return self.render_ctx.canvas

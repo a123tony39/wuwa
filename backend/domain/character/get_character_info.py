@@ -1,4 +1,7 @@
 import difflib
+from pathlib import Path
+from infrastructure.yaml_io import load_yaml
+
 def get_character_zh_and_en_name(character_name, character_template):
     if character_name in character_template:
         return [character_name, character_template[character_name]['en']]
@@ -29,3 +32,6 @@ def get_valid_stats(character_name, stats_categories, character_templates):
 def get_base_score(character_name, character_templates, score_template):
     base_score_rule = character_templates[character_name]['base_score_rule']
     return score_template[base_score_rule]
+
+def load_character_template(path = Path("./domain/character/character_template.yaml")):
+    return load_yaml(path)

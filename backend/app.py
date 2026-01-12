@@ -1,19 +1,20 @@
 import os
 import base64
-from flask import Flask, request, jsonify, send_file, send_from_directory
 from PIL import Image
-from generate_result import process_image
 from io import BytesIO
+from flask import Flask, request, jsonify, send_from_directory
+from generate_result import process_image
 from infrastructure.ocr.google_ocr import GoogleOCR
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
 FRONTEND_DIST = os.path.join(BASE_DIR, "..", "frontend", "dist")
+ocr_service = GoogleOCR("config.json")
 app = Flask(
     __name__, 
     static_folder=FRONTEND_DIST,
     static_url_path="/" 
 ) 
-ocr_service = GoogleOCR("config.json")
+
 
 @app.route("/api/health", methods =["GET"])
 def health_check():

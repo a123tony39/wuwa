@@ -1,38 +1,36 @@
 from PIL import Image
 from memory_profiler import profile
-from render.rank_section import paste_rank
-from domain.score.score import get_rank
-from application.builders.ocr import run_ocr
-from application.builders.character import build_character_context
-from application.builders.render import build_render_context, render_top_left_block, render_echo_block, render_top_right_block
+
+from config.layout import OCR_CROP_AREAS
+from application.builders.character import prepare_character_analysis_context
+from application.builders.render import RenderAgent
+from application.builders.responsor import build_response
 from infrastructure.ocr.google_ocr import GoogleOCR
 
 def process_image(source, ocr_service, debug=False):
     # ocr
-    ocr_results = run_ocr(ocr_service, source)
+    ocr_results = ocr_service.recognize(source, OCR_CROP_AREAS)
     # character及canvas參數初始化
-    character_ctx, score_rules, player_info = build_character_context(ocr_results)
-    render_ctx = build_render_context(character_ctx, score_rules)
-    # 左上區塊渲染
-    render_top_left_block(ctx = render_ctx, character = character_ctx, player_info = player_info)
-    # 下方聲骸區塊渲染
-    total_score, echo_results, total_stats = render_echo_block(render_ctx, character_ctx, score_rules, ocr_results, source)
-    # 下方評級區塊渲染
-    rank = get_rank(total_score)
-    paste_rank(ctx = render_ctx, rank = rank, total_score = total_score)
-    # 右上區塊渲染
-    render_top_right_block(character_ctx, render_ctx, total_stats)
-
+    prepare_data = prepare_character_analysis_context(ocr_results)
+    # RenderAgent 初始化
+    agent = RenderAgent(
+        source = source,
+        score_rules = prepare_data.score_rules,
+        character_ctx = prepare_data.character,
+    )
+    # 渲染
+    agent.render_top_left(prepare_data.player_info)
+    agent.render_echo(ocr_results)
+    agent.render_rank()
+    agent.render_top_right()
     # 回傳結果
-    return render_ctx.canvas.show() if debug else {
-        "text": "圖片處理完成", 
-        "image": render_ctx.canvas, 
-        "result": {
-            "rank": rank,
-            "score": total_score,
-            "echo_results": echo_results,
-        }
-    }
+    return build_response(
+        debug = debug,
+        canvas = agent.get_canvas(),
+        rank = agent.rank,
+        score = agent.total_score,
+        echo_results = agent.echo_results,
+    )
     
 @profile
 def main():

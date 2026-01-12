@@ -9,12 +9,11 @@ def render_top_left_section(
         ctx: RenderContext,
         character: CharacterContext,
         player_info: PlayerInfo,
-        character_img_x,
-        character_img_y,
+        character_img_position,
     ):
     render_player_info(ctx, player_info)
-    paste_character_img(ctx, character, (character_img_x, character_img_y))
-    text_x, text_y = draw_character_text(ctx, character, (character_img_x, character_img_y))
+    paste_character_img(ctx, character, character_img_position)
+    text_x, text_y = draw_character_text(ctx, character, character_img_position)
     paste_element_img(ctx, character, text_x, text_y)
 
 def render_player_info(ctx: RenderContext, player_info: PlayerInfo):
