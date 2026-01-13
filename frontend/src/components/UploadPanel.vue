@@ -1,5 +1,5 @@
 <script setup lang = "ts">
-import { ref, onMounted, onUnmounted } from "vue"
+import { ref } from "vue"
 const props = defineProps<{
     isAnalyzing: boolean
     imgSrc: string | null
@@ -13,13 +13,6 @@ const emit = defineEmits<{
 
 }>()
 const fileInputRef = ref<HTMLInputElement | null>(null)
-onMounted(() => {
-  window.addEventListener('paste', onPaste)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('paste', onPaste)
-})
 
 const onPaste = (e: ClipboardEvent) => {
   const items = e.clipboardData?.items

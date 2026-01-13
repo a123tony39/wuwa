@@ -16,10 +16,10 @@ const props = defineProps<{
 <style scoped>
 .header { 
   text-align: center; 
-  margin-bottom: 16px;
-  font-size: larger;
+  font-size: 14px;
+  border-bottom: 2px solid #E5E7EB;
 }
 .header p{
-  font-size: large;
+  font-size: 14px;
 }
 </style>

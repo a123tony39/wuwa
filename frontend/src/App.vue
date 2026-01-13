@@ -5,6 +5,7 @@ import UploadPanel from './components/UploadPanel.vue'
 import CardDisplay from './components/CardDisplay.vue'
 import RuleExplanation from './components/RuleExplanation.vue'
 import ResultExplanation from './components/ResultExplanation.vue'
+import BackgroundUploader from './components/BackgroundUploader.vue'
 const selectedFile = ref<File | null>(null)
 const backgroundFile = ref<File | null>(null)    // 背景圖片
 const imgSrc = ref<string | null>(null)
@@ -14,11 +15,7 @@ const isFlipped = ref(false)
 const previewUrl = ref<string | null>(null)
 const analysisResult = ref<any>(null)
 // 上傳圖片
-const onBackgroundChange = (event: Event) => {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0] ?? null  // undefined 轉成 null
-  backgroundFile.value = file
-}
+
 const upload = async () => {
   if (!selectedFile.value) return
   isAnalyzing.value = true
@@ -72,28 +69,12 @@ const reset = () => {
           @upload= "upload"
         />
         <!-- 新增背景上傳 -->
-        <div
+        <BackgroundUploader
           v-if="!isAnalyzing && !imgSrc"
-          class="optional-setting"
-        >
-          <label class="optional-title">
-            進階設定（可選）
-          </label>
-
-          <label class="bg-upload">
-            自訂背景圖片
-            <input
-              type="file"
-              accept="image/png, image/jpeg"
-              @change="onBackgroundChange"
-              hidden
-            />
-          </label>
-
-          <span v-if="backgroundFile" class="file-hint">
-            已選擇：{{ backgroundFile.name }}
-          </span>
-        </div>      
+          :backgroundFile = "backgroundFile"
+          @update:BackgroundFile = "backgroundFile = $event"
+        />
+          
         <CardDisplay
           :imgSrc="imgSrc"
           :isCardMode="isCardMode"
@@ -128,13 +109,13 @@ const reset = () => {
   gap: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 12px 12px;
 }
 .side {
-  background: #fafafa;
-  border-radius: 12px;
+  background: #d6dae25b;
+  border-radius: 16px;
   padding: 20px;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -167,39 +148,4 @@ button {
   justify-content: center;
 }
 
-.optional-setting {
-  margin-top: 12px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: #f6f7f8;
-  width: 100%;
-  max-width: 420px;
-  font-size: 13px;
-}
-
-.optional-title {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #555;
-}
-.bg-upload {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px dashed #bbb;
-  cursor: pointer;
-  color: #333;
-}
-
-.bg-upload:hover {
-  background: #eee;
-}
-
-.file-hint {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  color: #666;
-}
 </style>
