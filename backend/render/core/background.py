@@ -1,7 +1,8 @@
 import os
 from PIL import Image, ImageDraw
 from render.core.render_setting import get_background_file
-def load_background(character_ctx, template_size, background_image=None):
+def load_background(character_ctx, template_size=(1340, 2159), background_image=None):
+    # 讀圖
     if background_image is None:
         default_file = "../img/background/default.png"
         background_file = get_background_file(character_ctx.en_name)
@@ -10,9 +11,27 @@ def load_background(character_ctx, template_size, background_image=None):
         background = Image.open(background_file).convert("RGBA")
     else:
         background = background_image
-    background = background.resize(template_size, resample = Image.LANCZOS)
+
+    target_w, target_h = template_size
+    img_w, img_h = background.size
+
+    # 計算縮放比例 (cover 效果)
+    scale = max(target_w / img_w, target_h / img_h)
+    new_w = int(img_w * scale)
+    new_h = int(img_h * scale)
+    background = background.resize((new_w, new_h), resample=Image.LANCZOS)
+
+    # 中心裁切
+    left = (new_w - target_w) // 2
+    top = (new_h - target_h) // 2
+    right = left + target_w
+    bottom = top + target_h
+    background = background.crop((left, top, right, bottom))
+
+    # 半透明覆蓋層
     overlay = Image.new("RGBA", background.size, (0, 0, 0, 150))
     background = Image.alpha_composite(background, overlay)
+
     return background
 
 def combine_background_template(background, template):
