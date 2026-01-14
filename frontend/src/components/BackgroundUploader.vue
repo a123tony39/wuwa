@@ -38,8 +38,10 @@ const setBackground = (file: File | null) => {
 
 <template>
   <div class="optional-setting">
-    <label class="optional-title">背景圖片 (可選)</label>
-
+    <label class="optional-title">背景圖片 (可選) </label>
+    <span class="file-tip">
+      若要自己裁剪，建議裁成 1340×2159 直版
+    </span>
     <!-- 貼圖區域，只能貼上 -->
     <div class="paste-box" tabindex="0" @paste="onPaste">
       <template v-if="previewUrl">
@@ -131,5 +133,12 @@ const setBackground = (file: File | null) => {
   margin-top: 6px;
   font-size: 12px;
   color: #666;
+}
+
+.file-tip {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
 }
 </style>
