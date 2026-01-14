@@ -18,8 +18,10 @@ const props = defineProps<{
   text-align: center; 
   font-size: 14px;
   border-bottom: 2px solid #E5E7EB;
+  gap: 6px;
 }
+
 .header p{
-  font-size: 14px;
+  font-size: 16px;
 }
 </style>

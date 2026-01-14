@@ -88,7 +88,7 @@ const setBackground = (file: File | null) => {
 /* 貼圖區域，只貼上 */
 .paste-box {
   width: 250px;
-  height: 150px;
+  height: 80px;
   border: 2px dashed #bbb;
   border-radius: 8px;
   background-color: #fafafa;

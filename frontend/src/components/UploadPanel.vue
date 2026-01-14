@@ -123,7 +123,7 @@ button:disabled {
   width: auto;
   height: auto;
   min-width: 250px;
-  min-height: 180px;
+  min-height: 150px;
   max-width: 600px;
   max-height: 400px;
   border: 2px dashed #bbb;
