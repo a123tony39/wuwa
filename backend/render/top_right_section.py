@@ -3,15 +3,13 @@ from dataclasses import dataclass
 from .core.canvas import paste_icon, draw_text
 from .context import RenderContext
 
-STAT_ROW_WIDTH = 500
-STAT_ROW_HEIGHT = 70
-TEXT_PADDING_RIGHT = 10
-TEXT_Y_OFFSET = 17.5
-
 @dataclass
 class TopRightLayout:
     origin_x: int
     origin_y: int
+    stat_row_size: tuple
+    text_right_padding: int
+    line_gap: float
 
 def render_top_right_section(
         ctx: RenderContext,
@@ -22,6 +20,7 @@ def render_top_right_section(
     ):
     cnt = 0
     cursor_y = layout.origin_y
+    stat_row_width, stat_row_height = layout.stat_row_size[0], layout.stat_row_size[1]
     for stat_name in sorted_allowed_stats:
         # paste img
         color = "white" if cnt % 2 == 0 else "gray"
@@ -37,11 +36,11 @@ def render_top_right_section(
         # 攻擊 150 / 11.6%
         text =  set_text(stat_name, values, FLAT_STATS)
         text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.stat(24))
-        text_x = layout.origin_x + STAT_ROW_WIDTH - text_width - TEXT_PADDING_RIGHT
-        text_y = cursor_y + TEXT_Y_OFFSET
+        text_x = layout.origin_x + stat_row_width - text_width - layout.text_right_padding
+        text_y = cursor_y + layout.line_gap
         draw_text(ctx.canvas_draw, (text_x, text_y), text=text, font=ctx.fonts.stat(24),  fill = (255, 255, 255))
         # add cnt & move y
-        cursor_y += STAT_ROW_HEIGHT
+        cursor_y += stat_row_height
         cnt += 1
 
 def set_text(stat_name, values, FLAT_STATS):

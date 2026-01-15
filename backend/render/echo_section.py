@@ -9,13 +9,12 @@ from domain.stats.rules import FLAT_STATS
 from .core.canvas import draw_text, paste_icon, add_border
 from .context import RenderContext
 
-MAIN_STAT_WIDTH, MAIN_STAT_HEIGHT = 230, 50
-SUB_STAT_WIDTH = 330
-
 @dataclass
 class EchoLayout:
     avatar_positions: list[tuple]
     paste_positions: list[tuple]
+    main_stat_size: tuple
+    sub_stat_width: int
     
 def render_echo_section(
         ctx: RenderContext,
@@ -57,6 +56,7 @@ def render_echo_section(
             valid_stats = character.valid_stats,
             echo = echo, 
             total_stats = total_stats,
+            main_stat_size = layout.main_stat_size
         ) 
         # 聲骸副詞條 paste echo sub stat
         padding_x = 10
@@ -73,6 +73,7 @@ def render_echo_section(
             breakdown = breakdown, 
             total_stats = total_stats, 
             valid_stats = character.valid_stats, 
+            sub_stat_width = layout.sub_stat_width
         )
         # 此聲骸評分
         draw_echo_sub_stats_score_text(
@@ -81,6 +82,7 @@ def render_echo_section(
             start_y = start_y,
             y_bias = y_bias,
             echo_score = echo_score,
+            sub_stat_width = layout.sub_stat_width,
         )
     return total_score, echo_results
 
@@ -94,8 +96,8 @@ def paste_echo_img(idx, avatar_pos, source, x, y, canvas):
     paste_icon(canvas, echo_img, (x + 10, y + 13))
     return echo_img
 
-def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, start_y, valid_stats, y_bias):
-    right_edge = start_x + SUB_STAT_WIDTH
+def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, start_y, valid_stats, y_bias, sub_stat_width):
+    right_edge = start_x + sub_stat_width
     for stat_name, stat_value, _ in breakdown: 
         total_stats[stat_name] += stat_value
         y = start_y + y_bias
@@ -115,8 +117,9 @@ def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, sta
         y_bias += 50
     return y_bias
 
-def paste_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats,  valid_stats):
+def paste_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats,  valid_stats, main_stat_size):
     stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
+    main_stat_width, main_stat_height = main_stat_size
     for i in range(2):
         if i == 0:
             stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
@@ -127,7 +130,7 @@ def paste_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats
         total_stats[stat_name] += stat_value
         # paste img
         img = load_stat_img(ctx, stat_name, valid_stats, False)
-        img = img.crop((0, 0, MAIN_STAT_WIDTH, MAIN_STAT_HEIGHT))
+        img = img.crop((0, 0, main_stat_width, main_stat_height))
         region = ctx.canvas.crop((paste_x, paste_y, paste_x + img.width, paste_y + img.height))
         composite = Image.alpha_composite(region, img)
         paste_icon(ctx.canvas, composite, (paste_x, paste_y))
@@ -135,7 +138,7 @@ def paste_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats
         # paste value
         text_right_edge_gap = 3
         text_optical_offset = 12.5
-        right_edge = paste_x + MAIN_STAT_WIDTH
+        right_edge = paste_x + main_stat_width
         text = f"{stat_value}%" if stat_name not in FLAT_STATS else f"{stat_value}".rstrip('0').rstrip('.')
         text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.stat(24))
         text_x = right_edge - text_width - text_right_edge_gap
@@ -156,10 +159,10 @@ def add_echo_result(echo_results, idx, echo_score):
         "message": message,
     })
 
-def draw_echo_sub_stats_score_text(ctx:RenderContext, echo_score, start_x, start_y, y_bias):
+def draw_echo_sub_stats_score_text(ctx:RenderContext, echo_score, start_x, start_y, y_bias, sub_stat_width):
     text = f"聲骸評分: {echo_score:.2f}"
     text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.text(28))
-    x = start_x + (SUB_STAT_WIDTH - text_width)//2
+    x = start_x + (sub_stat_width - text_width)//2
     y = start_y + y_bias + 5
     if echo_score >= ECHO_SCORE_LEVELS["PERFECT"]:
         fill = (220, 80, 80)
