@@ -50,6 +50,16 @@
   base_score_rule: 輸出
   element: 衍射
 
+莫寧:
+  en: Mornye
+  main_attr: 防禦
+  dmg_type: 
+    - 普攻
+    - 重擊
+  valid_stat_rule: 輔助
+  base_score_rule: 輔助
+  element: 熱熔
+
 # 黎那汐塔
 嘉貝莉娜:
   en: Galbrena
