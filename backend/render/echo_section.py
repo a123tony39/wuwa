@@ -2,18 +2,23 @@ from PIL import Image
 from dataclasses import dataclass
 from domain.echo.ocr_parser import get_echo_info
 from domain.score.score import ECHO_SCORE_LEVELS
-from domain.character.context import CharacterContext
 from domain.score.rules import ScoreRules
 from domain.score.score import compute_echo_score
 from domain.stats.rules import FLAT_STATS
+from domain.character.context import CharacterContext
 from .core.canvas import draw_text, paste_icon, add_border
 from .context import RenderContext
 
+@dataclass(frozen=True)
+class main_stat_frame_size:
+    width: int
+    height: int
+    
 @dataclass
 class EchoLayout:
     avatar_positions: list[tuple]
-    paste_positions: list[tuple]
-    main_stat_size: tuple
+    stat_positions: list[tuple]
+    main_stat_frame_size: main_stat_frame_size
     sub_stat_width: int
     
 def render_echo_section(
@@ -27,7 +32,7 @@ def render_echo_section(
     ):
     total_score = 0.0
     echo_results = []
-    for idx, (ocr_result, avatar_pos, paste_pos) in enumerate(zip(ocr_results, layout.avatar_positions, layout.paste_positions)):
+    for idx, (ocr_result, avatar_pos, stat_pos) in enumerate(zip(ocr_results, layout.avatar_positions, layout.stat_positions)):
         print(f"--------聲骸評分{idx+1}--------")
         echo = get_echo_info(ocr_result)
         # calculate echo score
@@ -36,7 +41,7 @@ def render_echo_section(
        
         total_score += echo_score
         # 聲骸頭像 paste echo img
-        x, y = paste_pos
+        x, y = stat_pos
         padding_y = 8 # 主詞條與頂端間距
         y += padding_y
         echo_img = paste_echo_img(
@@ -56,7 +61,7 @@ def render_echo_section(
             valid_stats = character.valid_stats,
             echo = echo, 
             total_stats = total_stats,
-            main_stat_size = layout.main_stat_size
+            main_stat_size = layout.main_stat_frame_size
         ) 
         # 聲骸副詞條 paste echo sub stat
         padding_x = 10
@@ -119,7 +124,7 @@ def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, sta
 
 def paste_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats,  valid_stats, main_stat_size):
     stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
-    main_stat_width, main_stat_height = main_stat_size
+    main_stat_width, main_stat_height = main_stat_size.width,  main_stat_size.height
     for i in range(2):
         if i == 0:
             stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
