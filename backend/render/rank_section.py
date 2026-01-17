@@ -4,24 +4,19 @@ from .context import RenderContext
 from .core.canvas import paste_icon, draw_text
 
 def paste_rank(total_score: float, rank: str, ctx: RenderContext, panel_position: tuple):
-    # rank pic
+    # rank img
     slot_x, slot_y = panel_position[0] + 85, panel_position[1] + 120
-    slow_w, slot_h = 180, 180
+    slot_w, slot_h = 180, 180
     print(f"{rank}: {total_score}")
     rank_img = load_rank_pic(rank, ctx.img_path)
-    img_w, img_h = rank_img.size
-    mid_x = slot_x + (slow_w - img_w) // 2
-    mid_y = slot_y + (slot_h - img_h) // 2
-    paste_icon(ctx.canvas, rank_img, (mid_x, mid_y))
+    img_paste_pos = cal_img_centered_paste_pos(rank_img, (slot_x, slot_y), (slot_w, slot_h))
+    paste_icon(ctx.canvas, rank_img, img_paste_pos)
     # set text and font
     text_zh = f"練度評分: {total_score:.2f}".rstrip('0').rstrip('.')
     font_zh = ctx.fonts.text(36)
     # compute and align center
-    w_zh = ctx.canvas_draw.textlength(text_zh, font=font_zh)
-    rank_img_center = mid_x + rank_img.width//2
-    x = rank_img_center - w_zh//2
-    y = mid_y + rank_img.height + 10
-    draw_text(ctx.canvas_draw, (x, y), text_zh, font=font_zh, fill=(220, 220, 220))
+    text_paste_pos = cal_text_centered_paste_pos(ctx, text_zh, font_zh, img_paste_pos, rank_img.size)
+    draw_text(ctx.canvas_draw, text_paste_pos, text_zh, font=font_zh, fill=(220, 220, 220))
     return rank
 
 def load_rank_pic(rank: str, img_path: Path):
@@ -42,3 +37,18 @@ def load_rank_pic(rank: str, img_path: Path):
         return Image.open(rank_images[rank])
     else:
         raise ValueError(f"{rank} is not valid ranking")
+    
+def cal_img_centered_paste_pos(img, slot_pos, slot_size):
+    slot_x, slot_y = slot_pos
+    slot_w, slot_h = slot_size
+    img_w, img_h = img.size
+    paste_x = slot_x + (slot_w - img_w) // 2
+    paste_y = slot_y + (slot_h - img_h) // 2
+    return (paste_x, paste_y)
+
+def cal_text_centered_paste_pos(ctx, text_zh, font_zh, img_paste_pos, img_size):
+    w_zh = ctx.canvas_draw.textlength(text_zh, font=font_zh)
+    rank_img_center = img_paste_pos[0] + img_size[0]//2
+    x = rank_img_center - w_zh//2
+    y = img_paste_pos[1] + img_size[1] + 10
+    return (x, y)

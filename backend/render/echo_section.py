@@ -38,7 +38,7 @@ def render_echo_section(
         # calculate echo score
         echo_score, breakdown = compute_echo_score(echo, character, rules)
         add_echo_result(echo_results, idx, echo_score)
-       
+               
         total_score += echo_score
         # 聲骸頭像 paste echo img
         x, y = stat_pos

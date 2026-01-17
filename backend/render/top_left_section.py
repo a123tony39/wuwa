@@ -12,8 +12,8 @@ def render_top_left_section(
     ):
     render_player_info(ctx, player_info)
     paste_character_img(ctx, character, character_img_position)
-    text_x, text_y = draw_character_text(ctx, character, character_img_position)
-    paste_element_img(ctx, character, text_x, text_y)
+    text_pos = draw_character_text(ctx, character, character_img_position)
+    paste_element_img(ctx, character, text_pos)
 
 def render_player_info(ctx: RenderContext, player_info: PlayerInfo):
     text = f"玩家名稱: {player_info.player_name}\nUID: {player_info.uid}"
@@ -44,9 +44,10 @@ def draw_character_text(ctx: RenderContext, character: CharacterContext, pos):
     text_x = pos[0] + (character_img_width - text_width)//2
     text_y = pos[1] + character_img_height + 10
     draw_text(ctx.canvas_draw, (text_x, text_y), text = text, font = ctx.fonts.text(36), fill = (210, 210, 210))
-    return text_x, text_y
+    return (text_x, text_y)
 
-def paste_element_img(ctx: RenderContext, character: CharacterContext, text_x, text_y):
+def paste_element_img(ctx: RenderContext, character: CharacterContext, text_pos):
+    text_x, text_y = text_pos
     element_file = ctx.img_path / "element" / f"{ctx.stats_name_map[character.template[character.zh_name]['element']]}.png"
     img = Image.open(element_file)
     paste_icon(ctx.canvas, img, (int(text_x - img.width), text_y))
