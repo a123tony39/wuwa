@@ -2,21 +2,27 @@ from PIL import Image
 from pathlib import Path
 from .context import RenderContext
 from .core.canvas import paste_icon, draw_text
+from dataclasses import dataclass
 
-def paste_rank(total_score: float, rank: str, ctx: RenderContext, panel_position: tuple):
+@dataclass
+class RankLayout:
+    slot_origin: tuple
+    slot_size: tuple
+    font_size: int
+    text_color: tuple
+
+def paste_rank(total_score: float, rank: str, ctx: RenderContext, layout: RankLayout):
     # rank img
-    slot_x, slot_y = panel_position[0] + 85, panel_position[1] + 120
-    slot_w, slot_h = 180, 180
     print(f"{rank}: {total_score}")
     rank_img = load_rank_pic(rank, ctx.img_path)
-    img_paste_pos = cal_img_centered_paste_pos(rank_img, (slot_x, slot_y), (slot_w, slot_h))
+    img_paste_pos = cal_img_centered_paste_pos(rank_img, layout.slot_origin, layout.slot_size)
     paste_icon(ctx.canvas, rank_img, img_paste_pos)
     # set text and font
     text_zh = f"練度評分: {total_score:.2f}".rstrip('0').rstrip('.')
-    font_zh = ctx.fonts.text(36)
+    font_zh = ctx.fonts.text(layout.font_size)
     # compute and align center
     text_paste_pos = cal_text_centered_paste_pos(ctx, text_zh, font_zh, img_paste_pos, rank_img.size)
-    draw_text(ctx.canvas_draw, text_paste_pos, text_zh, font=font_zh, fill=(220, 220, 220))
+    draw_text(ctx.canvas_draw, text_paste_pos, text_zh, font=font_zh, fill=layout.text_color)
     return rank
 
 def load_rank_pic(rank: str, img_path: Path):

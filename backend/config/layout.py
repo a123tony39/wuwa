@@ -1,6 +1,6 @@
 from render.echo_section import EchoLayout, main_stat_frame_size
 from render.top_right_section import TopRightLayout, stat_frame_size
-
+from render.rank_section import RankLayout
 # === base positions ===
 CHARACTER_IMG_POSITION = (80, 119)
 UNDER_PANEL_POSITION = (145, 1079)
@@ -35,4 +35,11 @@ ECHO_LAYOUT = EchoLayout(
     ],
     main_stat_frame_size = main_stat_frame_size(230, 50),
     sub_stat_width = 330
+)
+# === rank section ===
+RANKLAYOUT = RankLayout(
+    slot_origin = (UNDER_PANEL_POSITION[0] + 85, UNDER_PANEL_POSITION[1] + 120),
+    slot_size = (180, 180),
+    font_size = 36,
+    text_color = (220, 220, 220),
 )

@@ -9,7 +9,7 @@ from render.top_left_section import render_top_left_section
 from render.echo_section import render_echo_section
 from render.top_right_section import render_top_right_section
 from render.rank_section import paste_rank
-from config.layout import ECHO_LAYOUT, CHARACTER_IMG_POSITION, TOP_RIGHT_LAYOUT, UNDER_PANEL_POSITION
+from config.layout import ECHO_LAYOUT, CHARACTER_IMG_POSITION, TOP_RIGHT_LAYOUT, RANKLAYOUT
 
 class RenderAgent:
     def __init__(self, character_ctx, score_rules, source, background_image):
@@ -58,7 +58,7 @@ class RenderAgent:
             ctx = self.render_ctx,
             rank = self.rank, 
             total_score = self.total_score,
-            panel_position = UNDER_PANEL_POSITION,
+            layout=RANKLAYOUT,
         )
     
     def get_canvas(self):
