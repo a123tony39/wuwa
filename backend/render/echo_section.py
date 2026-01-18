@@ -19,7 +19,11 @@ class EchoLayout:
     avatar_positions: list[tuple]
     stat_positions: list[tuple]
     main_stat_frame_size: main_stat_frame_size
-    sub_stat_width: int
+    sub_stat_column_width: int
+    main_stat_top_offset: int
+    avatar_main_stat_gap: int
+    sub_stat_offset_from_main_stat: int
+    sub_stat_x_offset_from_panel_origin: int
     
 def render_echo_section(
         ctx: RenderContext,
@@ -42,7 +46,7 @@ def render_echo_section(
         total_score += echo_score
         # 聲骸頭像 paste echo img
         x, y = stat_pos
-        padding_y = 8 # 主詞條與頂端間距
+        padding_y = layout.main_stat_top_offset
         y += padding_y
         echo_img = paste_echo_img(
             idx = idx,
@@ -53,10 +57,9 @@ def render_echo_section(
             canvas = ctx.canvas,
         )
         # 聲骸主詞條 paste echo main stat
-        img_main_stat_gap = 20
         paste_echo_main_stat(
             ctx = ctx,
-            paste_x = x + img_main_stat_gap + echo_img.width, 
+            paste_x = x + layout.avatar_main_stat_gap + echo_img.width, 
             paste_y = y, 
             valid_stats = character.valid_stats,
             echo = echo, 
@@ -64,10 +67,8 @@ def render_echo_section(
             main_stat_size = layout.main_stat_frame_size
         ) 
         # 聲骸副詞條 paste echo sub stat
-        padding_x = 10
-        padding_y = 108 # 副詞條與主詞條的間距
-        start_x = x + padding_x
-        start_y = y + padding_y
+        start_x = x + layout.sub_stat_x_offset_from_panel_origin
+        start_y = y + layout.sub_stat_offset_from_main_stat
         y_bias = 0
 
         y_bias = paste_echo_sub_stats(
@@ -78,7 +79,7 @@ def render_echo_section(
             breakdown = breakdown, 
             total_stats = total_stats, 
             valid_stats = character.valid_stats, 
-            sub_stat_width = layout.sub_stat_width
+            sub_stat_width = layout.sub_stat_column_width
         )
         # 此聲骸評分
         draw_echo_sub_stats_score_text(
@@ -87,7 +88,7 @@ def render_echo_section(
             start_y = start_y,
             y_bias = y_bias,
             echo_score = echo_score,
-            sub_stat_width = layout.sub_stat_width,
+            sub_stat_width = layout.sub_stat_column_width
         )
     return total_score, echo_results
 
