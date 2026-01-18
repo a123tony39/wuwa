@@ -11,21 +11,33 @@ from .context import RenderContext
 from .core.canvas import draw_text, paste_icon, add_border
 
 @dataclass(frozen=True)
-class main_stat_frame_size:
+class AvatarSize:
+    width: int
+    height: int
+
+@dataclass(frozen=True)
+class MainStatFrameSize:
     width: int
     height: int
     
 @dataclass
 class EchoLayout:
+    avatar_size: AvatarSize
     avatar_positions: list[tuple]
-    stat_positions: list[tuple]
-    main_stat_frame_size: main_stat_frame_size
-    sub_stat_frame_width: int
-    main_stat_top_offset: int
     avatar_main_stat_gap: int
+    stat_positions: list[tuple]
+    main_stat_frame_size: MainStatFrameSize
+    main_stat_top_offset: int
+    sub_stat_frame_width: int
     sub_stat_offset_from_main_stat: int
     sub_stat_x_offset_from_panel_origin: int
-    
+
+@dataclass
+class EchoResult:
+    name: str
+    score: float
+    message: str
+
 def render_echo_section(
     ctx: RenderContext,
     character: CharacterContext,
@@ -34,7 +46,7 @@ def render_echo_section(
     source: Image.Image,
     total_stats: Dict[str, float],
     ocr_results: OCRResult,
-):
+) -> tuple[float, list[EchoResult]]:
     total_score = 0.0
     echo_results = []
     for idx, (ocr_result, avatar_pos, stat_pos) in enumerate(zip(ocr_results, layout.avatar_positions, layout.stat_positions)):
@@ -49,7 +61,8 @@ def render_echo_section(
         x, y = stat_pos
         padding_y = layout.main_stat_top_offset
         y += padding_y
-        echo_img = paste_echo_img(
+        paste_echo_img(
+            avatar_size = layout.avatar_size,
             avatar_pos = avatar_pos, 
             source = source, 
             paste_pos = (x, y),
@@ -58,7 +71,7 @@ def render_echo_section(
         # 聲骸主詞條 paste echo main stat
         paste_echo_main_stat(
             ctx = ctx,
-            paste_pos = (x + layout.avatar_main_stat_gap + echo_img.width, y), 
+            paste_pos = (x + layout.avatar_main_stat_gap + layout.avatar_size.width, y), 
             valid_stats = character.valid_stats,
             echo = echo, 
             total_stats = total_stats,
@@ -67,27 +80,29 @@ def render_echo_section(
         # 聲骸副詞條 paste echo sub stat
         start_x = x + layout.sub_stat_x_offset_from_panel_origin
         start_y = y + layout.sub_stat_offset_from_main_stat
-        y_bias = 0
-        y_bias = paste_echo_sub_stats(
+        sub_stat_last_offset = paste_echo_sub_stats(
             ctx = ctx,
             start_pos = (start_x, start_y),
-            y_bias = y_bias,
             breakdown = breakdown, 
             total_stats = total_stats, 
             valid_stats = character.valid_stats, 
             sub_stat_width = layout.sub_stat_frame_width
         )
-        # 此聲骸評分
+        # 單一聲骸評分
+        text = f"聲骸評分: {echo_score:.2f}"
+        text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.text(28))
+        x = start_x + (layout.sub_stat_frame_width - text_width)//2
+        y = start_y + sub_stat_last_offset + 5
         draw_echo_sub_stats_score_text(
             ctx,
-            start_pos = (start_x, start_y),
-            y_bias = y_bias,
-            echo_score = echo_score,
-            sub_stat_width = layout.sub_stat_frame_width
+            text = text,
+            paste_pos = (x, y),
+            echo_score = echo_score
         )
     return total_score, echo_results
 
 def paste_echo_img(
+    avatar_size: AvatarSize,
     avatar_pos: tuple, 
     paste_pos: tuple, 
     source: Image.Image, 
@@ -97,29 +112,27 @@ def paste_echo_img(
     ICON_OPTICAL_X_OFFSET = 10
     ICON_OPTICAL_Y_OFFSET = 13
     source_echo_img_size = (210, 180)
-    target_echo_img_size = (90, 100)
     cropped_x, cropped_y = avatar_pos
     echo_img = source.crop((cropped_x, cropped_y, cropped_x + source_echo_img_size[0], cropped_y + source_echo_img_size[1]))
-    echo_img.thumbnail(target_echo_img_size)
+    echo_img.thumbnail((avatar_size.width, avatar_size.height))
     add_border(echo_img, color=(255, 255, 255, 160), width=1)
     paste_icon(canvas, echo_img, (x + ICON_OPTICAL_X_OFFSET, y + ICON_OPTICAL_Y_OFFSET))
-    return echo_img
-
+  
 def paste_echo_sub_stats(
     ctx: RenderContext, 
     breakdown: list[tuple], 
     total_stats: Dict[str, float], 
     start_pos: tuple, 
     valid_stats: Set[str], 
-    y_bias: int, 
     sub_stat_width: int
 ):
+    offset = 0
     TEXT_OPTICAL_Y_OFFSET = 12.5
     start_x, start_y = start_pos
     right_edge = start_x + sub_stat_width
     for stat_name, stat_value, _ in breakdown: 
         total_stats[stat_name] += stat_value
-        y = start_y + y_bias
+        y = start_y + offset
         # paste img 
         img = load_stat_img(ctx, stat_name, valid_stats, True)
         region = ctx.canvas.crop((start_x, y, start_x + img.width, y + img.height))
@@ -133,8 +146,8 @@ def paste_echo_sub_stats(
         y = y + TEXT_OPTICAL_Y_OFFSET
         draw_text(ctx.canvas_draw, (x, y), text=text, font=ctx.fonts.stat(24), fill = (255, 255, 255))
         # move y
-        y_bias += 50
-    return y_bias
+        offset += 50
+    return offset
 
 def paste_echo_main_stat(
     ctx: RenderContext, 
@@ -180,18 +193,16 @@ def add_echo_result(echo_results: list, idx: int, echo_score: float):
     else:
         message = "建議加強此聲骸"
     
-    echo_results.append({
-        "name": f"聲骸{idx+1}",
-        "score": echo_score,
-        "message": message,
-    })
+    echo_results.append(
+        EchoResult(
+            name = f"聲骸{idx+1}",
+            score =  echo_score,
+            message = message,
+        )
+    )
 
-def draw_echo_sub_stats_score_text(ctx: RenderContext, echo_score: float, start_pos: tuple, y_bias: int, sub_stat_width: int):
-    start_x, start_y = start_pos
-    text = f"聲骸評分: {echo_score:.2f}"
-    text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.text(28))
-    x = start_x + (sub_stat_width - text_width)//2
-    y = start_y + y_bias + 5
+def draw_echo_sub_stats_score_text(ctx: RenderContext, echo_score: float, paste_pos: tuple, text: str):
+    x, y = paste_pos
     if echo_score >= ECHO_SCORE_LEVELS["PERFECT"]:
         fill = (220, 80, 80)
         stroke = (150, 30, 30, 120)
