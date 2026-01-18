@@ -1,8 +1,8 @@
 from PIL import Image
 from pathlib import Path
+from dataclasses import dataclass
 from .context import RenderContext
 from .core.canvas import paste_icon, draw_text
-from dataclasses import dataclass
 
 @dataclass
 class RankLayout:

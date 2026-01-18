@@ -1,13 +1,12 @@
 from PIL import Image
 from dataclasses import dataclass
 from domain.echo.ocr_parser import get_echo_info
-from domain.score.score import ECHO_SCORE_LEVELS
+from domain.score.score import ECHO_SCORE_LEVELS, compute_echo_score
 from domain.score.rules import ScoreRules
-from domain.score.score import compute_echo_score
 from domain.stats.rules import FLAT_STATS
 from domain.character.context import CharacterContext
-from .core.canvas import draw_text, paste_icon, add_border
 from .context import RenderContext
+from .core.canvas import draw_text, paste_icon, add_border
 
 @dataclass(frozen=True)
 class main_stat_frame_size:
@@ -19,7 +18,7 @@ class EchoLayout:
     avatar_positions: list[tuple]
     stat_positions: list[tuple]
     main_stat_frame_size: main_stat_frame_size
-    sub_stat_column_width: int
+    sub_stat_frame_width: int
     main_stat_top_offset: int
     avatar_main_stat_gap: int
     sub_stat_offset_from_main_stat: int
@@ -79,7 +78,7 @@ def render_echo_section(
             breakdown = breakdown, 
             total_stats = total_stats, 
             valid_stats = character.valid_stats, 
-            sub_stat_width = layout.sub_stat_column_width
+            sub_stat_width = layout.sub_stat_frame_width
         )
         # 此聲骸評分
         draw_echo_sub_stats_score_text(
@@ -88,21 +87,25 @@ def render_echo_section(
             start_y = start_y,
             y_bias = y_bias,
             echo_score = echo_score,
-            sub_stat_width = layout.sub_stat_column_width
+            sub_stat_width = layout.sub_stat_frame_width
         )
     return total_score, echo_results
 
 def paste_echo_img(idx, avatar_pos, source, x, y, canvas):
+    ICON_OPTICAL_X_OFFSET = 10
+    ICON_OPTICAL_Y_OFFSET = 13
+    echo_img_size = (210, 180)
     cropped_x, cropped_y = avatar_pos
     if idx == 0:
         cropped_x += 10
-    echo_img = source.crop((cropped_x, cropped_y, cropped_x + 210, cropped_y + 180))
+    echo_img = source.crop((cropped_x, cropped_y, cropped_x + echo_img_size[0], cropped_y + echo_img_size[1]))
     echo_img.thumbnail((90, 100))
     add_border(echo_img, color=(255, 255, 255, 160), width=1)
-    paste_icon(canvas, echo_img, (x + 10, y + 13))
+    paste_icon(canvas, echo_img, (x + ICON_OPTICAL_X_OFFSET, y + ICON_OPTICAL_Y_OFFSET))
     return echo_img
 
 def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, start_y, valid_stats, y_bias, sub_stat_width):
+    TEXT_OPTICAL_Y_OFFSET = 12.5
     right_edge = start_x + sub_stat_width
     for stat_name, stat_value, _ in breakdown: 
         total_stats[stat_name] += stat_value
@@ -117,7 +120,7 @@ def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, sta
         text = f"{stat_value}%" if stat_name not in FLAT_STATS else f"{stat_value}".rstrip('0').rstrip('.')
         text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.stat(24))
         x = right_edge - text_width - 3
-        y = y + 12.5
+        y = y + TEXT_OPTICAL_Y_OFFSET
         draw_text(ctx.canvas_draw, (x, y), text=text, font=ctx.fonts.stat(24), fill = (255, 255, 255))
         # move y
         y_bias += 50

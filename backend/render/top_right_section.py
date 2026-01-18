@@ -1,7 +1,7 @@
 from PIL import Image
 from dataclasses import dataclass
-from .core.canvas import paste_icon, draw_text
 from .context import RenderContext
+from .core.canvas import paste_icon, draw_text
 
 @dataclass(frozen=True)
 class stat_frame_size:

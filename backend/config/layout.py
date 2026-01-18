@@ -32,7 +32,7 @@ ECHO_LAYOUT = EchoLayout(
         (UNDER_PANEL_POSITION[0] + ECHO_FRAME_WIDTH * 2, UNDER_PANEL_POSITION[1] + ECHO_FRAME_HEIGHT),
     ],
     main_stat_frame_size = main_stat_frame_size(230, 50),
-    sub_stat_column_width = 330,
+    sub_stat_frame_width = 330,
     main_stat_top_offset = 8, 
     avatar_main_stat_gap = 20,
     sub_stat_offset_from_main_stat = 108, 
