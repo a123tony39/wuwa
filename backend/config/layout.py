@@ -18,7 +18,7 @@ ECHO_FRAME_HEIGHT = 420
 
 ECHO_LAYOUT = EchoLayout(
     avatar_positions=[
-        (0, 650),
+        (10, 650),
         (380, 650),
         (760, 650),
         (1140, 650),

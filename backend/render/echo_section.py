@@ -1,9 +1,11 @@
 from PIL import Image
+from typing import Dict, Set
 from dataclasses import dataclass
-from domain.echo.ocr_parser import get_echo_info
+from domain.echo.ocr_parser import get_echo_info, EchoData
 from domain.score.score import ECHO_SCORE_LEVELS, compute_echo_score
 from domain.score.rules import ScoreRules
 from domain.stats.rules import FLAT_STATS
+from domain.ocr.ocr_result import OCRResult
 from domain.character.context import CharacterContext
 from .context import RenderContext
 from .core.canvas import draw_text, paste_icon, add_border
@@ -25,14 +27,14 @@ class EchoLayout:
     sub_stat_x_offset_from_panel_origin: int
     
 def render_echo_section(
-        ctx: RenderContext,
-        character: CharacterContext,
-        layout: EchoLayout,
-        rules: ScoreRules,
-        source,
-        total_stats,
-        ocr_results,
-    ):
+    ctx: RenderContext,
+    character: CharacterContext,
+    layout: EchoLayout,
+    rules: ScoreRules,
+    source: Image.Image,
+    total_stats: Dict[str, float],
+    ocr_results: OCRResult,
+):
     total_score = 0.0
     echo_results = []
     for idx, (ocr_result, avatar_pos, stat_pos) in enumerate(zip(ocr_results, layout.avatar_positions, layout.stat_positions)):
@@ -48,18 +50,15 @@ def render_echo_section(
         padding_y = layout.main_stat_top_offset
         y += padding_y
         echo_img = paste_echo_img(
-            idx = idx,
             avatar_pos = avatar_pos, 
             source = source, 
-            x = x,
-            y = y,
+            paste_pos = (x, y),
             canvas = ctx.canvas,
         )
         # 聲骸主詞條 paste echo main stat
         paste_echo_main_stat(
             ctx = ctx,
-            paste_x = x + layout.avatar_main_stat_gap + echo_img.width, 
-            paste_y = y, 
+            paste_pos = (x + layout.avatar_main_stat_gap + echo_img.width, y), 
             valid_stats = character.valid_stats,
             echo = echo, 
             total_stats = total_stats,
@@ -69,11 +68,9 @@ def render_echo_section(
         start_x = x + layout.sub_stat_x_offset_from_panel_origin
         start_y = y + layout.sub_stat_offset_from_main_stat
         y_bias = 0
-
         y_bias = paste_echo_sub_stats(
             ctx = ctx,
-            start_x = start_x,
-            start_y = start_y,
+            start_pos = (start_x, start_y),
             y_bias = y_bias,
             breakdown = breakdown, 
             total_stats = total_stats, 
@@ -83,29 +80,42 @@ def render_echo_section(
         # 此聲骸評分
         draw_echo_sub_stats_score_text(
             ctx,
-            start_x = start_x,
-            start_y = start_y,
+            start_pos = (start_x, start_y),
             y_bias = y_bias,
             echo_score = echo_score,
             sub_stat_width = layout.sub_stat_frame_width
         )
     return total_score, echo_results
 
-def paste_echo_img(idx, avatar_pos, source, x, y, canvas):
+def paste_echo_img(
+    avatar_pos: tuple, 
+    paste_pos: tuple, 
+    source: Image.Image, 
+    canvas: Image.Image
+):
+    x, y = paste_pos
     ICON_OPTICAL_X_OFFSET = 10
     ICON_OPTICAL_Y_OFFSET = 13
-    echo_img_size = (210, 180)
+    source_echo_img_size = (210, 180)
+    target_echo_img_size = (90, 100)
     cropped_x, cropped_y = avatar_pos
-    if idx == 0:
-        cropped_x += 10
-    echo_img = source.crop((cropped_x, cropped_y, cropped_x + echo_img_size[0], cropped_y + echo_img_size[1]))
-    echo_img.thumbnail((90, 100))
+    echo_img = source.crop((cropped_x, cropped_y, cropped_x + source_echo_img_size[0], cropped_y + source_echo_img_size[1]))
+    echo_img.thumbnail(target_echo_img_size)
     add_border(echo_img, color=(255, 255, 255, 160), width=1)
     paste_icon(canvas, echo_img, (x + ICON_OPTICAL_X_OFFSET, y + ICON_OPTICAL_Y_OFFSET))
     return echo_img
 
-def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, start_y, valid_stats, y_bias, sub_stat_width):
+def paste_echo_sub_stats(
+    ctx: RenderContext, 
+    breakdown: list[tuple], 
+    total_stats: Dict[str, float], 
+    start_pos: tuple, 
+    valid_stats: Set[str], 
+    y_bias: int, 
+    sub_stat_width: int
+):
     TEXT_OPTICAL_Y_OFFSET = 12.5
+    start_x, start_y = start_pos
     right_edge = start_x + sub_stat_width
     for stat_name, stat_value, _ in breakdown: 
         total_stats[stat_name] += stat_value
@@ -126,7 +136,15 @@ def paste_echo_sub_stats(ctx:RenderContext, breakdown, total_stats, start_x, sta
         y_bias += 50
     return y_bias
 
-def paste_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats,  valid_stats, main_stat_size):
+def paste_echo_main_stat(
+    ctx: RenderContext, 
+    paste_pos: tuple,
+    echo: EchoData, 
+    total_stats: Dict[str, float],  
+    valid_stats: Set[str], 
+    main_stat_size: tuple,
+):
+    paste_x, paste_y = paste_pos
     stat_name, stat_value = echo.main_stat.name, echo.main_stat.value
     main_stat_width, main_stat_height = main_stat_size.width,  main_stat_size.height
     for i in range(2):
@@ -154,7 +172,7 @@ def paste_echo_main_stat(ctx: RenderContext, paste_x, paste_y, echo, total_stats
         text_y = paste_y + text_optical_offset
         draw_text(ctx.canvas_draw, (text_x, text_y), text=text, font=ctx.fonts.stat(24), fill = (255, 255, 255))
 
-def add_echo_result(echo_results, idx, echo_score):
+def add_echo_result(echo_results: list, idx: int, echo_score: float):
     if echo_score >= ECHO_SCORE_LEVELS["PERFECT"]:
         message = "完美的聲骸!"
     elif echo_score >= ECHO_SCORE_LEVELS["GOOD"]:
@@ -168,7 +186,8 @@ def add_echo_result(echo_results, idx, echo_score):
         "message": message,
     })
 
-def draw_echo_sub_stats_score_text(ctx:RenderContext, echo_score, start_x, start_y, y_bias, sub_stat_width):
+def draw_echo_sub_stats_score_text(ctx: RenderContext, echo_score: float, start_pos: tuple, y_bias: int, sub_stat_width: int):
+    start_x, start_y = start_pos
     text = f"聲骸評分: {echo_score:.2f}"
     text_width = ctx.canvas_draw.textlength(text, font=ctx.fonts.text(28))
     x = start_x + (sub_stat_width - text_width)//2
@@ -187,7 +206,7 @@ def draw_echo_sub_stats_score_text(ctx:RenderContext, echo_score, start_x, start
         draw_text(ctx.canvas_draw, (x+dx, y+dy), text, font=ctx.fonts.text(28), fill=stroke)
     draw_text(ctx.canvas_draw, (x, y), text=text, font=ctx.fonts.text(28), fill = fill)
 
-def load_stat_img(ctx:RenderContext, stat_name, valid, is_sub_stat):
+def load_stat_img(ctx: RenderContext, stat_name: str, valid: Set[str], is_sub_stat: bool):
     folder = "sub_stat" if is_sub_stat else "main_stat"
     is_valid = "invalid" if stat_name not in valid else "valid"
     file = ctx.img_path / folder / is_valid / f"{ctx.stats_name_map[stat_name]}.png"
