@@ -6,8 +6,7 @@ from application.builder import prepare_character_analysis_context
 from application.score_calculator import Calculator
 from application.renderer import RenderAgent
 from application.responsor import build_response
-from infrastructure.ocr.google_ocr import GoogleOCR
-from infrastructure.ocr.crop_area import OCR_CROP_AREAS
+from infrastructure.google_ocr.ocr import GoogleOCR, OCR_CROP_AREAS
 
 def process_image(
     source: Image.Image,

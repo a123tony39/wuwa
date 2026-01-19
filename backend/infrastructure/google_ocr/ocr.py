@@ -6,6 +6,15 @@ from google.cloud import vision
 from application.ocr.service import OCRService
 from application.ocr.ocr_result import OCRResult
 
+OCR_CROP_AREAS = [ 
+    (0, 0, 300, 150),
+    (60, 710, 380, 1050),
+    (440, 710, 380*2, 1050),
+    (815, 710, 380*3, 1050),
+    (1190, 710, 380*4, 1050),
+    (1560, 710, 380*5, 1050)
+]
+
 class GoogleOCR(OCRService):
     def __init__(self, api_key_file = "config.json"):
         with open(api_key_file, "r") as f:
