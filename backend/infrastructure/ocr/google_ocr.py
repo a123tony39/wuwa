@@ -3,8 +3,8 @@ import re
 import json
 from PIL import Image
 from google.cloud import vision
-from domain.ocr.port import OCRService
-from domain.ocr.ocr_result import OCRResult
+from application.ocr.service import OCRService
+from application.ocr.ocr_result import OCRResult
 
 class GoogleOCR(OCRService):
     def __init__(self, api_key_file = "config.json"):

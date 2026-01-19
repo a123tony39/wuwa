@@ -13,7 +13,7 @@ def stat_sort_key(stat_name: str):
         return (*STAT_GROUP_PRIORITY[stat_name], 0)
     return (99, 0, len(stat_name))
 
-def normalize_stats(valid_stats, flat_stats):
+def filter_flat_percent_stats(valid_stats, flat_stats):
     flat_percent = {f"{s}%" for s in flat_stats}
     return valid_stats - flat_percent
 

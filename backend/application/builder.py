@@ -11,10 +11,10 @@ class PreparedData:
     score_rules: ScoreRules
     player_info: PlayerInfo
 
-def prepare_character_analysis_context(ocr_results):
+def prepare_character_analysis_context(ocr_player_block):
     score_rules, character_template = load_analysis_rules()
     player_info, zh_name, en_name = parse_player_and_character(
-        ocr_results, character_template
+        ocr_player_block, character_template
     )
     character_ctx = build_character_context(
         zh_name, en_name, character_template, score_rules
@@ -31,8 +31,8 @@ def load_analysis_rules():
     character_template = load_character_template()
     return score_rules, character_template
 
-def parse_player_and_character(ocr_results, character_template):
-    player_info = get_player_info(ocr_results.player_block)
+def parse_player_and_character(ocr_player_block, character_template):
+    player_info = get_player_info(ocr_player_block)
 
     zh_name, en_name = get_character_zh_and_en_name(
         character_name=player_info.character_name,

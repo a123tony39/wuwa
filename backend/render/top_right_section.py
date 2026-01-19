@@ -18,7 +18,7 @@ class TopRightLayout:
 
 def render_top_right_section(
         ctx: RenderContext,
-        total_stats, 
+        stats_total_value, 
         layout: TopRightLayout,
         sorted_allowed_stats, 
         FLAT_STATS,
@@ -30,7 +30,7 @@ def render_top_right_section(
         color = "white" if cnt % 2 == 0 else "gray"
         img = get_stat_img(stat_name, ctx, color)
         paste_stat_img(ctx, layout, cursor_y, img)
-        stat_values = total_stats.get(stat_name, 0)
+        stat_values = stats_total_value.get(stat_name, 0)
         stat_text =  set_text(stat_name, stat_values, FLAT_STATS)
         text_pos = cal_text_pos(ctx, stat_text, layout, stat_row_width, cursor_y)
         draw_text(ctx.canvas_draw, text_pos, text=stat_text, font=ctx.fonts.stat(24),  fill = (255, 255, 255))
