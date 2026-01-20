@@ -179,6 +179,5 @@ onUnmounted(() => {
 .initial-img {
   width: 400px;
   cursor: pointer;
-  background-color: #111;
 }
 </style>
