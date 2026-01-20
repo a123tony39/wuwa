@@ -109,12 +109,16 @@ onUnmounted(() => {
     </div>
   </div>
   
-  <img
+   <div
     v-else-if="imgSrc && !isCardMode"
-    :src="imgSrc"
-    class="initial-img"
-    @click="$emit('update:isCardMode', true); $emit('update:isFlipped', false)"
-  />
+    class="image-stage"
+  >
+    <img
+      :src="imgSrc"
+      class="initial-img"
+      @click="$emit('update:isCardMode', true); $emit('update:isFlipped', false)"
+    />
+  </div>
 </template>
 
 <style scoped>
@@ -176,8 +180,16 @@ onUnmounted(() => {
   z-index: -1;
 }
 
+.image-stage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
 .initial-img {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   cursor: pointer;
 }
 </style>
