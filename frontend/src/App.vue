@@ -135,6 +135,7 @@ const reset = () => {
 
 .side {
   background: #d6dae25b;
+  color: #222;
   border-radius: 16px;
   padding: 20px;
   font-size: 12px;
