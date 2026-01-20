@@ -4,7 +4,7 @@ from PIL import Image
 from io import BytesIO
 from flask import Flask, request, jsonify, send_from_directory
 from generate_result import process_image
-from infrastructure.ocr.google_ocr import GoogleOCR
+from infrastructure.google_ocr.ocr import GoogleOCR
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
 FRONTEND_DIST = os.path.join(BASE_DIR, "..", "frontend", "dist")
