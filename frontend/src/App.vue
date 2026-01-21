@@ -70,11 +70,17 @@ const reset = () => {
         loop 
         muted 
         playsinline
-        preload="metadata"        
-        poster="/poster.png"   
+        preload="metadata"
       >
-        <source src="/1.mp4" type="video/mp4" />
+        <!-- 手機版 9:16 + 不同 poster -->
+        <source src="/1-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
+        <!-- 桌機版 16:9 + 不同 poster -->
+        <source src="/1.mp4" type="video/mp4" media="(min-width: 769px)" />
       </video>
+
+      <!-- 手機 / 桌機 poster -->
+      <img class="entry-poster mobile" src="/poster-mobile.png" />
+      <img class="entry-poster desktop" src="/poster-desktop.png" />
 
       <div class="entry-content">
         <h1>聲骸分析</h1>
@@ -139,10 +145,10 @@ const reset = () => {
 </template>
 
 <style scoped>
-/* ===================== Base Reset ===================== */
+/* Base Reset */
 html, body { height: 100%; margin: 0; padding: 0; }
 
-/* ===================== Desktop layout ===================== */
+/* Desktop layout */
 .page { display: flex; flex-direction: column; }
 
 .layout {
@@ -172,7 +178,6 @@ html, body { height: 100%; margin: 0; padding: 0; }
 
 /* Actions */
 .actions { display: flex; gap: 12px; margin: 16px 0; justify-content: center; }
-
 button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 
 /* Entry Overlay */
@@ -189,6 +194,18 @@ button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ddd; backgro
 }
 
 .entry-overlay:hover .entry-video-bg { filter: blur(0); }
+
+/* Poster Images */
+.entry-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+.entry-poster.mobile { display: none; }
+.entry-poster.desktop { display: block; }
 
 .entry-content {
   position: relative; text-align: center; color: #fff; z-index: 10;
@@ -220,5 +237,8 @@ button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ddd; backgro
     filter: blur(0);
     background-color: black;
   }
+  /* 手機 poster 顯示，桌機隱藏 */
+  .entry-poster.mobile { display: block; }
+  .entry-poster.desktop { display: none; }
 }
 </style>
