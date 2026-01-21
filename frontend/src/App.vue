@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import AppHeader from './components/AppHeader.vue'
 import UploadPanel from './components/UploadPanel.vue'
 import CardDisplay from './components/CardDisplay.vue'
@@ -17,10 +17,25 @@ const previewUrl = ref<string | null>(null)
 const analysisResult = ref<any>(null)
 const hasEntered = ref(false)
 
+const videoSrc = ref('/1.mp4')       // 預設桌機影片
+const videoPoster = ref('/poster-desktop.png') // 預設桌機 poster
+
 const enter = () => {
   hasEntered.value = true
 }
+function isMobileDevice() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+}
 
+onMounted(() => {
+  if (isMobileDevice()) {
+    videoSrc.value = '/1-mobile.mp4'
+    videoPoster.value = '/poster-mobile.png'
+  } else {
+    videoSrc.value = '/1.mp4'
+    videoPoster.value = '/poster-desktop.png'
+  }
+})
 const upload = async () => {
   if (!selectedFile.value) return
   isAnalyzing.value = true
@@ -71,16 +86,9 @@ const reset = () => {
         muted 
         playsinline
         preload="metadata"
-      >
-        <!-- 手機版 9:16 + 不同 poster -->
-        <source src="/1-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
-        <!-- 桌機版 16:9 + 不同 poster -->
-        <source src="/1.mp4" type="video/mp4" media="(min-width: 769px)" />
-      </video>
-
-      <!-- 手機 / 桌機 poster -->
-      <img class="entry-poster mobile" src="/poster-mobile.png" />
-      <img class="entry-poster desktop" src="/poster-desktop.png" />
+        :src="videoSrc"
+        :poster="videoPoster"
+      ></video>
 
       <div class="entry-content">
         <h1>聲骸分析</h1>
@@ -195,18 +203,6 @@ button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ddd; backgro
 
 .entry-overlay:hover .entry-video-bg { filter: blur(0); }
 
-/* Poster Images */
-.entry-poster {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-.entry-poster.mobile { display: none; }
-.entry-poster.desktop { display: block; }
-
 .entry-content {
   position: relative; text-align: center; color: #fff; z-index: 10;
   pointer-events: none; animation: floatIn 0.8s ease forwards;
@@ -232,13 +228,11 @@ button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ddd; backgro
   .workspace { order: 1; }
   .side.right { order: 2; max-width: none; }
   .side.left { order: 3; }
+
   .entry-video-bg {
-    object-fit: contain;
+    object-fit: cover;
     filter: blur(0);
     background-color: black;
   }
-  /* 手機 poster 顯示，桌機隱藏 */
-  .entry-poster.mobile { display: block; }
-  .entry-poster.desktop { display: none; }
 }
 </style>
