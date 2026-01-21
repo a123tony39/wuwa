@@ -57,29 +57,30 @@ const reset = () => {
 
 <template>
   <!-- Entry Overlay -->
-  <div 
-    v-if="!hasEntered"
-    class="entry-overlay"
-    @click="enter"
-  >
-    <!-- 背景影片 -->
-    <video 
-      class="entry-video-bg" 
-      autoplay 
-      loop 
-      muted 
-      playsinline
+  <Transition name="fade">
+    <div 
+      v-if="!hasEntered"
+      class="entry-overlay"
+      @click="enter"
     >
-      <source src="/1.mp4" type="video/mp4" />
-    </video>
+      <!-- 背景影片 -->
+      <video 
+        class="entry-video-bg" 
+        autoplay 
+        loop 
+        muted 
+        playsinline
+      >
+        <source src="/1.mp4" type="video/mp4" />
+      </video>
 
-    <div class="entry-content">
-      <h1>聲骸分析</h1>
-      <p>上傳圖片，自動分析並產出結果</p>
-      <span class="hint">點擊任意處開始</span>
+      <div class="entry-content">
+        <h1>聲骸分析</h1>
+        <p>上傳圖片，自動分析並產出結果</p>
+        <span class="hint">點擊任意處開始</span>
+      </div>
     </div>
-  </div>
-
+  </Transition>
   <!-- Main App -->
   <AppHeader title="聲骸分析工具" subtitle="上傳圖片，自動分析並產出結果圖" />
 
@@ -286,5 +287,16 @@ button {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Transition fade */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.8s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to, .fade-leave-from {
+  opacity: 1;
 }
 </style>
