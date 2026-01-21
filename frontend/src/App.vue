@@ -70,6 +70,8 @@ const reset = () => {
         loop 
         muted 
         playsinline
+        preload="metadata"        
+        poster="/poster.png"   
       >
         <source src="/1.mp4" type="video/mp4" />
       </video>
@@ -81,6 +83,7 @@ const reset = () => {
       </div>
     </div>
   </Transition>
+  
   <!-- Main App -->
   <AppHeader title="聲骸分析工具" subtitle="上傳圖片，自動分析並產出結果圖" />
 
@@ -136,22 +139,11 @@ const reset = () => {
 </template>
 
 <style scoped>
-/* =====================
-   Base Reset
-===================== */
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+/* ===================== Base Reset ===================== */
+html, body { height: 100%; margin: 0; padding: 0; }
 
-/* =====================
-   Desktop layout
-===================== */
-.page {
-  display: flex;
-  flex-direction: column;
-}
+/* ===================== Desktop layout ===================== */
+.page { display: flex; flex-direction: column; }
 
 .layout {
   display: grid;
@@ -159,7 +151,7 @@ html, body {
   gap: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 12px 12px;
+  padding: 12px;
 }
 
 .workspace {
@@ -178,126 +170,50 @@ html, body {
   line-height: 1.6;
 }
 
-/* =====================
-   Actions
-===================== */
-.actions {
-  display: flex;
-  gap: 12px;
-  margin: 16px 0;
-  justify-content: center;
-}
+/* Actions */
+.actions { display: flex; gap: 12px; margin: 16px 0; justify-content: center; }
 
-button {
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-}
+button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 
-/* =====================
-   Mobile layout
-===================== */
+/* Mobile layout */
 @media (max-width: 768px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .workspace {
-    order: 1;
-  }
-
-  .side.right {
-    order: 2;
-    max-width: none;
-  }
-
-  .side.left {
-    order: 3;
-  }
+  .layout { grid-template-columns: 1fr; }
+  .workspace { order: 1; }
+  .side.right { order: 2; max-width: none; }
+  .side.left { order: 3; }
 }
 
-/* =====================
-   Entry Overlay
-===================== */
+/* Entry Overlay */
 .entry-overlay {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden; /* 避免溢出 */
-  background-color: rgba(0,0,0);
+  position: fixed; inset: 0; width: 100%; height: 100%; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; background-color: rgba(0,0,0);
 }
 
 .entry-video-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 保持比例填滿 */
-  z-index: 0;
-  filter: blur(12px); /* 初始模糊 */
-  transition: filter 0.4s ease;
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+  filter: blur(12px); transition: filter 0.4s ease;
 }
 
-.entry-overlay:hover .entry-video-bg {
-  filter: blur(0); /* 滑鼠 hover 變清晰 */
-}
+.entry-overlay:hover .entry-video-bg { filter: blur(0); }
 
 .entry-content {
-  position: relative;
-  text-align: center;
-  color: #fff;
-  z-index: 10;
-  pointer-events: none; /* 文字不阻擋 hover */
-  animation: floatIn 0.8s ease forwards;
+  position: relative; text-align: center; color: #fff; z-index: 10;
+  pointer-events: none; animation: floatIn 0.8s ease forwards;
 }
 
-.entry-content h1 {
-  font-size: 28px;
-  letter-spacing: 2px;
-  margin-bottom: 12px;
-}
+.entry-content h1 { font-size: 28px; letter-spacing: 2px; margin-bottom: 12px; }
+.entry-content p { font-size: 14px; opacity: 0.85; }
+.entry-content .hint { display: block; margin-top: 32px; font-size: 12px; opacity: 0.6; }
 
-.entry-content p {
-  font-size: 14px;
-  opacity: 0.85;
-}
-
-.entry-content .hint {
-  display: block;
-  margin-top: 32px;
-  font-size: 12px;
-  opacity: 0.6;
-}
-
-/* =====================
-   文字浮入動畫
-===================== */
 @keyframes floatIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Transition fade */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.8s ease;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-.fade-enter-to, .fade-leave-from {
-  opacity: 1;
-}
+.fade-enter-active, .fade-leave-active { transition: opacity 0.8s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-to, .fade-leave-from { opacity: 1; }
 </style>
