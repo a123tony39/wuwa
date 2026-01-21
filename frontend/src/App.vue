@@ -15,6 +15,11 @@ const isCardMode = ref(false)
 const isFlipped = ref(false)
 const previewUrl = ref<string | null>(null)
 const analysisResult = ref<any>(null)
+const hasEntered = ref(false)
+
+const enter = () => {
+  hasEntered.value = true
+}
 
 const upload = async () => {
   if (!selectedFile.value) return
@@ -51,16 +56,39 @@ const reset = () => {
 </script>
 
 <template>
+  <!-- Entry Overlay -->
+  <div 
+    v-if="!hasEntered"
+    class="entry-overlay"
+    @click="enter"
+  >
+    <!-- 背景影片 -->
+    <video 
+      class="entry-video-bg" 
+      autoplay 
+      loop 
+      muted 
+      playsinline
+    >
+      <source src="/1.mp4" type="video/mp4" />
+    </video>
+
+    <div class="entry-content">
+      <h1>聲骸分析</h1>
+      <p>上傳圖片，自動分析並產出結果</p>
+      <span class="hint">點擊任意處開始</span>
+    </div>
+  </div>
+
+  <!-- Main App -->
   <AppHeader title="聲骸分析工具" subtitle="上傳圖片，自動分析並產出結果圖" />
 
   <main class="page">
     <section class="layout">
-      <!-- 左：規則說明 -->
       <aside class="side left">
         <RuleExplanation />
       </aside>
 
-      <!-- 中：主要工作區 -->
       <section class="workspace">
         <UploadPanel
           :isAnalyzing="isAnalyzing"
@@ -88,7 +116,6 @@ const reset = () => {
         />
       </section>
 
-      <!-- 右：結果說明 -->
       <aside class="side right">
         <ResultExplanation
           :imgSrc="imgSrc"
@@ -109,9 +136,17 @@ const reset = () => {
 
 <style scoped>
 /* =====================
+   Base Reset
+===================== */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* =====================
    Desktop layout
 ===================== */
-
 .page {
   display: flex;
   flex-direction: column;
@@ -142,11 +177,9 @@ const reset = () => {
   line-height: 1.6;
 }
 
-
 /* =====================
    Actions
 ===================== */
-
 .actions {
   display: flex;
   gap: 12px;
@@ -165,7 +198,6 @@ button {
 /* =====================
    Mobile layout
 ===================== */
-
 @media (max-width: 768px) {
   .layout {
     grid-template-columns: 1fr;
@@ -182,6 +214,77 @@ button {
 
   .side.left {
     order: 3;
+  }
+}
+
+/* =====================
+   Entry Overlay
+===================== */
+.entry-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* 避免溢出 */
+}
+
+.entry-video-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 保持比例填滿 */
+  z-index: 0;
+  filter: blur(12px); /* 初始模糊 */
+  transition: filter 0.4s ease;
+}
+
+.entry-overlay:hover .entry-video-bg {
+  filter: blur(0); /* 滑鼠 hover 變清晰 */
+}
+
+.entry-content {
+  position: relative;
+  text-align: center;
+  color: #fff;
+  z-index: 10;
+  pointer-events: none; /* 文字不阻擋 hover */
+  animation: floatIn 0.8s ease forwards;
+}
+
+.entry-content h1 {
+  font-size: 28px;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.entry-content p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.entry-content .hint {
+  display: block;
+  margin-top: 32px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* =====================
+   文字浮入動畫
+===================== */
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>
