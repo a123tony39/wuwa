@@ -175,14 +175,6 @@ html, body { height: 100%; margin: 0; padding: 0; }
 
 button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 
-/* Mobile layout */
-@media (max-width: 768px) {
-  .layout { grid-template-columns: 1fr; }
-  .workspace { order: 1; }
-  .side.right { order: 2; max-width: none; }
-  .side.left { order: 3; }
-}
-
 /* Entry Overlay */
 .entry-overlay {
   position: fixed; inset: 0; width: 100%; height: 100%; z-index: 9999;
@@ -216,4 +208,17 @@ button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ddd; backgro
 .fade-enter-active, .fade-leave-active { transition: opacity 0.8s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 .fade-enter-to, .fade-leave-from { opacity: 1; }
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .workspace { order: 1; }
+  .side.right { order: 2; max-width: none; }
+  .side.left { order: 3; }
+  .entry-video-bg {
+    object-fit: contain;
+    filter: blur(0);
+    background-color: black;
+  }
+}
 </style>
