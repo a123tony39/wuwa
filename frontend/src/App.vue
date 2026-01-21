@@ -231,6 +231,7 @@ button {
   align-items: center;
   justify-content: center;
   overflow: hidden; /* 避免溢出 */
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .entry-video-bg {
