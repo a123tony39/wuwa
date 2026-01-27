@@ -1,7 +1,7 @@
 from domain.character.context import CharacterContext
-from domain.score.rules import ScoreRules
-from domain.stats.cal_cdf import compute_discrete_cdf
 from domain.echo.ocr_parser import EchoData
+from .rules import ScoreRules
+from .cal_cdf import compute_discrete_cdf
 
 ECHO_SCORE_LEVELS = {
     "PERFECT": 15,

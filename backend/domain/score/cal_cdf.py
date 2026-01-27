@@ -20,12 +20,8 @@ def expand_stat_table(stat_table: dict) -> list[tuple[float, float]]:
     
     return result
 
-def compute_discrete_cdf(stat_table: dict, value: float, normalize: bool = True):
+def compute_discrete_cdf(stat_table: dict, value: float):
     pairs = expand_stat_table(stat_table)
     cdf = sum(prob for v, prob in pairs if v <= value)
-    if normalize:
-        total_prob = sum(prob for _, prob in pairs)
-        if total_prob > 0:
-            cdf /= total_prob
 
     return min(cdf, 1.0)
