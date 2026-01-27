@@ -39,14 +39,14 @@ $$
 - $\text{CDF}_\text{discrete}(v_s)$ : 該數值的累積的機率百分比，範圍 0-1
 
 ---
-## 聲骸分數
-單一聲骸的總分數計算方式如下：
+## 聲骸分數與完成度 Echo Score & Echo Completion
+單一聲骸會先計算其有效副詞條分數總和，稱為「聲骸分數（EchoScore）」。
 
 $$
 \text{EchoScore} = \sum_{s \in \text{valid stats}} \text{StatScore}(s)
 $$
 
-最終單一聲骸的完成度（Echo Completion）計算公式為：
+然而，由於相同聲骸在不同角色上所能達到的最大分數並不相同，因此實際評分時不直接使用 $\text{EchoScore}$，而是將其正規化成0-20的完成度分數 $\text{EchoCompletion}$，以利於比較。
 
 $$
 \text{EchoCompletion} = \frac{\text{EchoScore}}{\text{ScoreCeiling}} \times 20
@@ -58,18 +58,18 @@ $$
 - $\text{valid stats}$ : 該角色有效副詞條
 - $\text{StatScore}$ : 詞條分數計算公式（詳見 [詞條分數 StatScore](#詞條分數-statscore)）
 - $\text{ScoreCeiling}$ : 該聲骸理論最大總分（所有副詞條均為最大浮動值時）  
-- $\text{EchoCompletion}$ : 單一聲骸分數，範圍 0–20
-
+- $\text{EchoCompletion}$ : 單一聲骸完成度，範圍 0–20
+> 註: 最後乘上 20 是為了將每個聲骸的完成度調整到 0–20，使得角色擁有五個聲骸時，角色的滿分為 100 分。
 ---
 
-## 角色評分
+## 角色評分 CharaterScore
 角色評分為五個聲骸分數的和：
 
 $$
-\text{CharacterScore} = \sum_{x=1}^{5} \text{EchoScore}(x)
+\text{CharacterScore} = \sum_{x=1}^{5} \text{EchoCompletion}(x)
 $$
 
 其中：
 - $x$: 第 $x$ 個聲骸
-- $\text{EchoScore}(x)$: 第 $x$ 個聲骸的分數
+- $\text{EchoCompletion}(x)$: 第 $x$ 個聲骸的完成度分數
 - $\text{CharacterScore}$: 角色評分
