@@ -64,6 +64,7 @@ $$
 
 ## 角色評分
 角色評分為五個聲骸分數的和：
+
 $$
 \text{CharacterScore} = \sum_{x=1}^{5} \text{EchoScore}(x)
 $$
