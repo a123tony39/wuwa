@@ -29,10 +29,10 @@
 
 ## 📤 Output
 
-系統輸出的最終結果（圖片檔）。
+系統輸出的最終結果。
 
 <p align="center">
-  <img src="img/output/Zani.png" width="600">
+  <img src="img/output/Zani.png" width="400">
 </p>
 
 ---
