@@ -8,7 +8,7 @@ from infrastructure.google_ocr.ocr import GoogleOCR
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
 FRONTEND_DIST = os.path.join(BASE_DIR, "..", "frontend", "dist")
-ocr_service = GoogleOCR("config.json")
+ocr_service = GoogleOCR("ocr_api_key.json")
 app = Flask(
     __name__, 
     static_folder=FRONTEND_DIST,

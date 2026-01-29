@@ -1,6 +1,6 @@
 from PIL import Image
 from memory_profiler import profile
-
+from config.paths import IMG_PATH
 from application.ocr.service import OCRService
 from application.builder import prepare_character_analysis_context
 from application.score_calculator import Calculator
@@ -47,15 +47,15 @@ def process_image(
 @profile
 def main():
     source_files = [
-        # "../img/input/Cartethyia.png",
-        # "../img/input/Chisa.png",
-        # "../img/input/Zani.png",
-        "../img/input/Phrolova.png",
-        # "../img/input/Cantarella.png",
-        # "../img/input/Lupa.png",
-        # "../img/input/Changli.png",
+        # IMG_PATH / "input/Cartethyia.png",
+        # IMG_PATH / "input/Chisa.png",
+        # IMG_PATH / "input/Zani.png",
+        IMG_PATH / "input/Phrolova.png",
+        IMG_PATH / "input/Cantarella.png",
+        IMG_PATH / "input/Lupa.png",
+        IMG_PATH / "input/Changli.png",
     ]
-    ocr_service = GoogleOCR("config.json")
+    ocr_service = GoogleOCR("ocr_api_key.json")
     for _, src_file in enumerate(source_files, start=1):
         src = Image.open(src_file)
         process_image(src, ocr_service, debug=True)

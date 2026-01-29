@@ -16,7 +16,7 @@ OCR_CROP_AREAS = [
 ]
 
 class GoogleOCR(OCRService):
-    def __init__(self, api_key_file = "config.json"):
+    def __init__(self, api_key_file):
         with open(api_key_file, "r") as f:
             config = json.load(f)
         self.api_key = config["GOOGLE_VISION_API_KEY"]
@@ -27,12 +27,8 @@ class GoogleOCR(OCRService):
     def recognize(self, img, crop_areas, scale=2):
         # 先處理圖像
         img_proc = self.preprocess_image(img, crop_areas, scale=scale)
-
-        with open("config.json", "r") as f:
-            config = json.load(f)
-        api_key = config["GOOGLE_VISION_API_KEY"]
         client = vision.ImageAnnotatorClient(
-            client_options={"api_key": api_key}
+            client_options={"api_key": self.api_key}
         )
 
         buf = io.BytesIO()

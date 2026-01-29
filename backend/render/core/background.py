@@ -1,10 +1,11 @@
 import os
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 from render.core.render_setting import get_background_file
+from config.paths import IMG_PATH
 def load_background(character_ctx, template_size=(1340, 2159), background_image=None):
     # 讀圖
     if background_image is None:
-        default_file = "../img/background/default.png"
+        default_file = IMG_PATH / "background/default.png"
         background_file = get_background_file(character_ctx.en_name)
         if not os.path.exists(background_file):
             background_file = default_file
