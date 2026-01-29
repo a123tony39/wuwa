@@ -16,14 +16,14 @@
 使用鳴潮官方DC機器人產生角色聲骸圖，使用方式參考: [DC機器人製作個人角色卡](https://forum.gamer.com.tw/C.php?bsn=74934&snA=8077)。
 
 <p align="center">
-  <img src="img/input/Zani.png" width="600">
+  <img src="backend/assets/img/input/Zani.png" width="600">
 </p>
 
 ---
 ## 🎬 Processing Demo
 將圖片複製或上傳至框選區域，並按下開始分析。
 <p align="center">
-  <img src="img/demo/image.png" width="600">
+  <img src="backend/assets/img/demo/image.png" width="600">
 </p>
 
 ---
@@ -37,7 +37,7 @@
 
 
 <p align="center">
-  <img src="img/output/Zani.png" width="400">
+  <img src="backend/assets/img/output/Zani.png" width="400">
 </p>
 
 ---

@@ -2,6 +2,6 @@
 __pycache__/
 *.py[codz]
 *$py.class
-config.json
+ocr_api_key.json
 .coverage
 .pytest_cache
