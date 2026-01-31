@@ -3,17 +3,7 @@ import re
 import json
 from PIL import Image
 from google.cloud import vision
-from application.ocr.service import OCRService
-from application.ocr.ocr_result import OCRResult
-
-OCR_CROP_AREAS = [ 
-    (0, 0, 300, 150),
-    (60, 710, 380, 1050),
-    (440, 710, 380*2, 1050),
-    (815, 710, 380*3, 1050),
-    (1190, 710, 380*4, 1050),
-    (1560, 710, 380*5, 1050)
-]
+from application.ocr.service import OCRService, OCRResult
 
 class GoogleOCR(OCRService):
     def __init__(self, api_key_file):
@@ -39,31 +29,30 @@ class GoogleOCR(OCRService):
         response = client.text_detection(image=img_vision)
         texts = response.text_annotations
 
-        # texts[0] 是整張文字，其餘是每個字或區塊
+     
         all_text_per_area = [[] for _ in crop_areas]
 
         # 計算每個 crop 在新圖中的水平起始 x
         area_x_starts = []
         current_x = 0
-        for x1, y1, x2, y2 in crop_areas:
+        for x1, _, x2, _ in crop_areas:
             area_x_starts.append(current_x)
             current_x += int((x2 - x1) * scale)
-
+        # texts[0] 是整張文字，其餘是每個字或區塊
         for text in texts[1:]:  
             vertices = text.bounding_poly.vertices
             min_x = min(v.x for v in vertices)
             max_x = max(v.x for v in vertices)
             min_y = min(v.y for v in vertices)
-            max_y = max(v.y for v in vertices)
 
-            for i, (x1, y1, x2, y2) in enumerate(crop_areas):
+            for i, (x1, _, x2, _) in enumerate(crop_areas):
                 area_start_x = area_x_starts[i]
                 area_end_x = area_start_x + int((x2 - x1) * scale)
                 # 判斷文字是否在 crop 區域
                 if min_x >= area_start_x and max_x <= area_end_x:
-                    if i == 0:
+                    if i == 0: #角色特徵碼與名稱
                         filtered_text = re.sub(r"[^0-9a-zA-Z\u4e00-\u9fff\s:.\%]", "", text.description)
-                    else:
+                    else: # 聲骸詞條與數值
                         filtered_text = re.sub(r"[^0-9\u4e00-\u9fff\s:.\%]", "", text.description)
                     filtered_text = filtered_text.strip()
                     if filtered_text:
