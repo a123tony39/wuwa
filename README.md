@@ -23,10 +23,7 @@
 ## 🎬 Processing Demo
 將圖片複製或上傳至框選區域，並按下開始分析。
 <p align="center">
-  <img src="backend/assets/img/demo/image.png" 
-  width="600"
-  style="border: 1px solid #000000; border-radius: 8px;"
-  >
+  <img src="backend/assets/img/demo/image.png"  width="600">
 </p>
 
 ---
