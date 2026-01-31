@@ -25,7 +25,7 @@
 <p align="center">
   <img src="backend/assets/img/demo/image.png" 
   width="600"
-  style="border: 2px solid #ccc; border-radius: 8px;"
+  style="border: 1px solid #000000; border-radius: 8px;"
   >
 </p>
 
