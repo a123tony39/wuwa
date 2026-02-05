@@ -32,6 +32,8 @@ class Calculator:
         for idx, ocr_result in enumerate(ocr_results):
             print(f"--------聲骸評分{idx+1}--------")
             echo = get_echo_info(ocr_result)
+            if echo is None:
+                continue
             echo_score, breakdown = compute_echo_score(echo, self.character, self.rules)
             self.calc_main_stats_total_value(echo)
             self.calc_sub_stats_total_value(breakdown)

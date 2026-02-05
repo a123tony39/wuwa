@@ -29,7 +29,6 @@ class GoogleOCR(OCRService):
         response = client.text_detection(image=img_vision)
         texts = response.text_annotations
 
-     
         all_text_per_area = [[] for _ in crop_areas]
 
         # 計算每個 crop 在新圖中的水平起始 x
@@ -112,4 +111,3 @@ class GoogleOCR(OCRService):
             current_x += crop.width
 
         return new_img
-        

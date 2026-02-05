@@ -50,10 +50,10 @@ def main():
         # IMG_PATH / "input/Cartethyia.png",
         # IMG_PATH / "input/Chisa.png",
         # IMG_PATH / "input/Zani.png",
-        IMG_PATH / "input/Phrolova.png",
-        IMG_PATH / "input/Cantarella.png",
-        IMG_PATH / "input/Lupa.png",
-        IMG_PATH / "input/Changli.png",
+        IMG_PATH / "input/Aemeath.png",
+        # IMG_PATH / "input/Cantarella.png",
+        # IMG_PATH / "input/Lupa.png",
+        # IMG_PATH / "input/Changli.png",
     ]
     ocr_service = GoogleOCR("ocr_api_key.json")
     for _, src_file in enumerate(source_files, start=1):

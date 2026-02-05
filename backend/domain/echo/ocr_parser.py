@@ -15,8 +15,10 @@ class EchoData:
 
 PERCENTABLE = ["生命", "攻擊", "防禦"]
 def get_echo_info(ocr_result) -> EchoData:
-    new_echo = EchoData()
     stats = parse_ocr_result(ocr_result)
+    if not stats:
+        return None
+    new_echo = EchoData()
     for idx, (name, value) in enumerate(stats):
         print(name, value)
         name, value = parse_stat_pair(name, value, PERCENTABLE)
