@@ -49,8 +49,8 @@ def main():
     source_files = [
         # IMG_PATH / "input/Cartethyia.png",
         # IMG_PATH / "input/Chisa.png",
-        # IMG_PATH / "input/Zani.png",
-        IMG_PATH / "input/Aemeath.png",
+        IMG_PATH / "input/Zani.png",
+        # IMG_PATH / "input/Aemeath.png",
         # IMG_PATH / "input/Cantarella.png",
         # IMG_PATH / "input/Lupa.png",
         # IMG_PATH / "input/Changli.png",

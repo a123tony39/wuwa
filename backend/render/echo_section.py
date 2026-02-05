@@ -105,7 +105,6 @@ def paste_echo_main_stat(
 ):
     paste_x, paste_y = paste_pos
     main_stat_width, main_stat_height = main_stat_size.width,  main_stat_size.height
-    print("test:", main_stats_result_list)
     
     for i in range(2):
         stat_name, stat_value = main_stats_result_list[i].name, main_stats_result_list[i].value
