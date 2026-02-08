@@ -1,5 +1,5 @@
 from PIL import ImageFont
-from config.paths import IMG_PATH
+from application.config.paths import IMG_PATH
 
 TEMPLATE_FILE = IMG_PATH / "template.png"
 

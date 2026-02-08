@@ -1,10 +1,10 @@
 from typing import Callable
 from dataclasses import dataclass
 from PIL import Image, ImageDraw, ImageFont
-from config.paths import IMG_PATH
+from application.config.paths import IMG_PATH
 from infrastructure.image_loader import load_img
-from render.core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font
-from render.core.background import load_background, combine_background_template, prepare_canvas_for_drawing
+from .core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font
+from .core.background import load_background, combine_background_template, prepare_canvas_for_drawing
 
 @dataclass
 class FontSet:

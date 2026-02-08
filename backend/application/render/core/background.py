@@ -1,7 +1,7 @@
 import os
 from PIL import Image, ImageDraw
-from render.core.render_setting import get_background_file
-from config.paths import IMG_PATH
+from .render_setting import get_background_file
+from application.config.paths import IMG_PATH
 def load_background(character_ctx, template_size=(1340, 2159), background_image=None):
     # 讀圖
     if background_image is None:

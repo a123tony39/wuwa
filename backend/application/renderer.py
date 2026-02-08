@@ -1,12 +1,12 @@
 from domain.score.score import get_rank
 from domain.stats.rules import stat_sort_key, filter_flat_percent_stats, FLAT_STATS, merge_flat_and_percent_stats
 
-from render.context import build_render_context
-from render.top_left_section import render_top_left_section
-from render.echo_section import render_echo_section
-from render.top_right_section import render_top_right_section
-from render.rank_section import paste_rank
-from config.layout import ECHO_LAYOUT, CHARACTER_IMG_POSITION, TOP_RIGHT_LAYOUT, RANKLAYOUT
+from .render.context import build_render_context
+from .render.top_left_section import render_top_left_section
+from .render.echo_section import render_echo_section
+from .render.top_right_section import render_top_right_section
+from .render.rank_section import paste_rank
+from .config.layout import ECHO_LAYOUT, CHARACTER_IMG_POSITION, TOP_RIGHT_LAYOUT, RANKLAYOUT
 
 class RenderAgent:
     def __init__(self, character_ctx,  character_summary, score_rules, background_image):

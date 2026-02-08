@@ -1,6 +1,6 @@
-from render.top_right_section import TopRightLayout, stat_frame_size
-from render.echo_section import EchoLayout, AvatarSize, MainStatFrameSize
-from render.rank_section import RankLayout
+from ..render.top_right_section import TopRightLayout, stat_frame_size
+from ..render.echo_section import EchoLayout, AvatarSize, MainStatFrameSize
+from ..render.rank_section import RankLayout
 # === base positions ===
 CHARACTER_IMG_POSITION = (80, 119)
 UNDER_PANEL_POSITION = (145, 1079)
