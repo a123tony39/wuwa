@@ -154,7 +154,7 @@ const reset = () => {
 
 <style scoped>
 /* Base Reset */
-html, body { height: 100%; margin: 0; padding: 0; }
+html, body { height: 100%; margin: 0; padding: 0;}
 
 /* Desktop layout */
 .page { display: flex; flex-direction: column; }
@@ -163,11 +163,16 @@ html, body { height: 100%; margin: 0; padding: 0; }
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 12px;
-}
 
+  max-width: 1400px;
+  margin: 24px auto;   
+  padding: 20px;
+
+  background: #e6e6e6cc;            
+  backdrop-filter: blur(10px);        
+  border-radius: 10px;              
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+}
 .workspace {
   display: flex;
   flex-direction: column;

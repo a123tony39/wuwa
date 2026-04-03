@@ -5,3 +5,4 @@ __pycache__/
 ocr_api_key.json
 .coverage
 .pytest_cache
+app.log

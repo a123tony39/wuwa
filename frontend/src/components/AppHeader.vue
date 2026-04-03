@@ -16,7 +16,7 @@ const props = defineProps<{
 <style scoped>
 .header { 
   text-align: center; 
-  color: #222;
+  color: #1E1E2F;
   font-size: 14px;
   gap: 6px;
 }
