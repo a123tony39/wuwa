@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from collections import defaultdict
 from domain.score.rules import ScoreRules
 from domain.character.context import CharacterContext
-from domain.echo.ocr_parser import get_echo_info
-from domain.score.score import compute_echo_score, ECHO_SCORE_LEVELS
+from domain.echo.ocr_parser import get_echo_info, EchoData
+from domain.score.score import get_score, ECHO_SCORE_LEVELS
 
 @dataclass
 class EchoResult:
@@ -34,7 +34,7 @@ class Calculator:
             echo = get_echo_info(ocr_result)
             if echo is None:
                 continue
-            echo_score, breakdown = compute_echo_score(echo, self.character, self.rules)
+            echo_score, breakdown = self.compute_echo_score(echo)
             self.calc_main_stats_total_value(echo)
             self.calc_sub_stats_total_value(breakdown)
             self.add_echo_result(character_echo_results, idx, echo_score, [echo.main_stat, echo.static_stat], breakdown)
@@ -45,7 +45,17 @@ class Calculator:
             echo_results = character_echo_results,
             stats_total_value = self.stats_total_value
         )
-
+    
+    def compute_echo_score(self, echo: EchoData):
+        echo_score, breakdown = get_score(
+                echo = echo, 
+                valid_stats = self.character.valid_stats, 
+                character_name = self.character.zh_name,
+                base_score = self.character.base_score,
+                stats_tier_range = self.rules.stats_tier_range,
+            )
+        return echo_score, breakdown
+    
     def calc_main_stats_total_value(self, echo):
         for i in range(2):
             if i == 0:
