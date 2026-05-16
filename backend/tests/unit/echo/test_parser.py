@@ -1,4 +1,4 @@
-from domain.echo.ocr_parser import get_echo_info, parse_stat_pair, PERCENTABLE
+from backend.domain.echo.ocr_parser import get_echo_info, parse_stat_pair, PERCENTABLE
 
 def test_parse_ocr_output_basic():
     """

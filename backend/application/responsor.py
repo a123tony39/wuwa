@@ -9,6 +9,6 @@ def build_response(debug: bool, canvas, rank, score, echo_results):
         "result": {
             "rank": rank,
             "score": score,
-            "echo_results": echo_results,
+            # "echo_results": echo_results,
         }
     }

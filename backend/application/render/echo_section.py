@@ -1,12 +1,12 @@
 from PIL import Image
-from typing import Set
+from typing import Set, List
 from dataclasses import dataclass
-from domain.score.score import ECHO_SCORE_LEVELS
-from domain.stats.rules import FLAT_STATS
-from domain.character.context import CharacterContext
+from backend.domain.score.score import ECHO_SCORE_LEVELS
+from backend.domain.stats.rules import FLAT_STATS
+from backend.domain.character.context import CharacterContext
 from .context import RenderContext
 from .core.canvas import draw_text, paste_icon, add_border
-from application.score_calculator import CharacterSummary
+from backend.application.score_calculator import CharacterSummary
 
 @dataclass(frozen=True)
 class AvatarSize:
@@ -21,9 +21,9 @@ class MainStatFrameSize:
 @dataclass
 class EchoLayout:
     avatar_size: AvatarSize
-    avatar_positions: list[tuple]
+    avatar_positions: List[tuple]
     avatar_main_stat_gap: int
-    stat_positions: list[tuple]
+    stat_positions: List[tuple]
     main_stat_frame_size: MainStatFrameSize
     main_stat_top_offset: int
     sub_stat_frame_width: int
@@ -128,7 +128,7 @@ def paste_echo_main_stat(
 
 def paste_echo_sub_stats(
     ctx: RenderContext, 
-    sub_stats_result_list: list[tuple], 
+    sub_stats_result_list: List[tuple], 
     start_pos: tuple, 
     valid_stats: Set[str], 
     sub_stat_width: int

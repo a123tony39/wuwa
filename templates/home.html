@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>鳴潮工具</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg-deep:     #060912;
+    --bg-mid:      #0a0f1c;
+    --bg-card:     #0d1424;
+    --border:      rgba(99,179,255,0.12);
+    --border-glow: rgba(99,179,255,0.35);
+    --accent:      #63b3ff;
+    --accent2:     #a78bfa;
+    --accent3:     #34d399;
+    --text:        #e2eaf7;
+    --text-muted:  #5a7090;
+    --text-dim:    #2e4060;
+    --gold:        #e8c87a;
+    --gold-dim:    rgba(232,200,122,0.15);
+}
+
+*, *::before, *::after {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg-deep);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    overflow-x: hidden;
+}
+
+/* ─── background ─── */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 60% 50% at 10% 20%, rgba(99,179,255,0.055) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 90% 80%, rgba(167,139,250,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: .6;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--bg-mid);
+    border-right: 1px solid var(--border);
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 10;
+}
+
+.logo-wrap {
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo-sub {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.logo {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+}
+
+.logo span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.menu-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 12px;
+    margin-bottom: 4px;
+    margin-top: 8px;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.menu-btn::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.menu-btn:hover, .menu-btn.active {
+    background: rgba(99,179,255,0.07);
+    border-color: var(--border);
+    color: var(--accent);
+}
+
+.menu-btn:hover::before, .menu-btn.active::before {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+/* ─── MAIN ─── */
+.main {
+    flex: 1;
+    padding: 48px 52px;
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+}
+
+/* ─── 切換內容控制 ─── */
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+
+/* ─── 網格雙欄排版 ─── */
+.workspace-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.right-panel {
+    height: 100%;
+}
+
+.right-panel .result-card {
+    height: 100%;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-panel .result-card .upload-box.has-image {
+    flex: 1;
+    max-height: none; 
+    min-height: 300px;
+}
+
+.workspace-grid .card {
+    margin-bottom: 0;
+}
+
+@media (max-width: 992px) {
+    .workspace-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ─── page header ─── */
+.page-header {
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    letter-spacing: 0.08em;
+}
+
+.breadcrumb span { color: var(--accent); }
+
+/* ─── CARD ─── */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 30px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,179,255,0.3), transparent);
+}
+
+.card:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 40px rgba(99,179,255,0.04);
+}
+
+.step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(99,179,255,0.2), rgba(167,139,250,0.2));
+    border: 1px solid var(--border-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'Cinzel', serif;
+    flex-shrink: 0;
+}
+
+.step-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+}
+
+.card-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* intro card */
+.intro-card {
+    background: linear-gradient(135deg, rgba(99,179,255,0.06), rgba(167,139,250,0.04));
+    border-color: rgba(99,179,255,0.2);
+}
+
+.workflow-steps {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.wf-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: rgba(99,179,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+.wf-step .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+}
+
+.wf-arrow {
+    color: var(--text-dim);
+    font-size: 12px;
+}
+
+/* ─── UPLOAD BOX ─── */
+.upload-box {
+    margin-top: 16px;
+    padding: 24px;
+    border: 2px dashed rgba(99,179,255,0.18);
+    border-radius: 14px;
+    background: rgba(6,9,18,0.6);
+    text-align: center;
+    min-height: 150px;
+    max-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-box:hover {
+    border-color: rgba(99,179,255,0.4);
+    background: rgba(99,179,255,0.03);
+}
+
+.upload-box:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99,179,255,0.1);
+}
+
+.upload-box.has-image {
+    min-height: auto;
+    max-height: 600px;
+    padding: 16px;
+    border-style: solid;
+    border-color: var(--border);
+    cursor: default;
+}
+
+.placeholder {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.placeholder-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(99,179,255,0.08);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: transform 0.2s ease;
+}
+
+.upload-box:hover .placeholder-icon {
+    transform: translateY(-2px);
+}
+
+.placeholder-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.placeholder-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+}
+
+.upload-box img {
+    max-width: 100%;
+    max-height: 560px;
+    border-radius: 10px;
+    display: none;
+    object-fit: contain;
+}
+
+/* ─── BUTTON GROUP ─── */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.btn {
+    padding: 11px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    background: rgba(99,179,255,0.08);
+    border-color: var(--border-glow);
+    color: var(--accent);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, rgba(99,179,255,0.15), rgba(167,139,250,0.1));
+    border-color: rgba(99,179,255,0.35);
+    color: var(--accent);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, rgba(99,179,255,0.25), rgba(167,139,250,0.18));
+    box-shadow: 0 0 20px rgba(99,179,255,0.12);
+}
+
+/* ─── RESULT ─── */
+.result-card {
+    border-color: rgba(52,211,153,0.15);
+}
+
+.result-card::before {
+    background: linear-gradient(90deg, transparent, rgba(52,211,153,0.2), transparent);
+}
+
+.result-card .card-title {
+    color: var(--accent3);
+}
+
+.result-card .upload-box {
+    border-color: rgba(52,211,153,0.15);
+}
+
+.result-empty {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.result-empty-icon {
+    font-size: 28px;
+    opacity: 0.3;
+}
+
+.result-empty-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+}
+
+/* ─── result actions ─── */
+.result-actions {
+    display: none;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.result-actions.visible {
+    display: flex;
+}
+
+.btn-download {
+    background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.08));
+    border-color: rgba(52,211,153,0.35);
+    color: var(--accent3);
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-download:hover {
+    background: linear-gradient(135deg, rgba(52,211,153,0.25), rgba(52,211,153,0.15));
+    box-shadow: 0 0 20px rgba(52,211,153,0.12);
+    color: var(--accent3);
+    border-color: rgba(52,211,153,0.5);
+}
+
+/* 調整此按鈕配色與文字樣式適配「複製」功能 */
+.btn-copy {
+    background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.08));
+    border-color: rgba(167,139,250,0.35);
+    color: var(--accent2);
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-copy:hover {
+    background: linear-gradient(135deg, rgba(167,139,250,0.25), rgba(167,139,250,0.15));
+    box-shadow: 0 0 20px rgba(167,139,250,0.12);
+    color: var(--accent2);
+    border-color: rgba(167,139,250,0.5);
+}
+
+/* ─── toast ─── */
+.toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a2035;
+    border: 1px solid var(--border-glow);
+    color: var(--text);
+    font-size: 13px;
+    padding: 12px 22px;
+    border-radius: 12px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ─── divider ─── */
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 8px 0 20px;
+}
+
+/* ─── entry animation ─── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.card { animation: fadeUp 0.4s ease both; }
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.12s; }
+.card:nth-child(3) { animation-delay: 0.19s; }
+.card:nth-child(4) { animation-delay: 0.26s; }
+.card:nth-child(5) { animation-delay: 0.33s; }
+
+@keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(52,211,153,0); }
+    50%       { box-shadow: 0 0 24px rgba(52,211,153,0.15); }
+}
+
+.result-card.has-result {
+    animation: glowPulse 2.5s ease infinite;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<div class="sidebar">
+    <div class="logo-wrap">
+        <div class="logo-sub">Wuthering Waves</div>
+        <div class="logo"><span>鳴潮</span> 工具箱</div>
+    </div>
+
+    <div class="menu-label">功能選單</div>
+    <button class="menu-btn active" data-target="echo-analyser">聲骸分析</button>
+    <button class="menu-btn" data-target="resonator-mgr">共鳴者管理</button>
+    <button class="menu-btn" data-target="weapon-list">武器列表</button>
+
+    <div class="sidebar-footer">
+        v1.0 &nbsp;·&nbsp; 鳴潮工具
+    </div>
+</div>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main">
+
+    <!-- ─── 區塊一：聲骸分析 ─── -->
+    <div id="echo-analyser" class="tab-content active">
+        <div class="page-header">
+            <div class="breadcrumb">工具箱 <span>›</span> 聲骸分析</div>
+            <h1>聲骸分析</h1>
+            <p>上傳DC robot生成的聲骸圖，一鍵生成分析結果</p>
+        </div>
+
+        <!-- 說明 -->
+        <div class="card intro-card">
+            <div class="step-badge">
+                <div class="step-num">✦</div>
+                <div class="step-label">使用流程</div>
+            </div>
+            <div class="workflow-steps">
+                <div class="wf-step"><div class="dot"></div>上傳聲骸圖片</div>
+                <div class="wf-arrow">→</div>
+                <div class="wf-step"><div class="dot"></div>選擇背景</div>
+                <div class="wf-arrow">→</div>
+                <div class="wf-step"><div class="dot"></div>生成結果</div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 網格佈局 -->
+        <div class="workspace-grid">
+            
+            <!-- 左側區塊：Step 1 & Step 2 上下堆疊 -->
+            <div class="left-panel">
+                <!-- 主圖 -->
+                <div class="card">
+                    <div class="step-badge">
+                        <div class="step-num">1</div>
+                        <div class="step-label">Step One</div>
+                    </div>
+                    <div class="card-title">上傳聲骸圖片</div>
+                    <div class="card-desc">支援點擊選擇、或直接貼上（Ctrl+V）</div>
+
+                    <form id="uploadForm">
+                        {% csrf_token %}
+                        <input type="file" id="fileInput" hidden>
+
+                        <div class="upload-box" id="dropZone" tabindex="0">
+                            <div class="placeholder" id="placeholder">
+                                <div class="placeholder-icon">📷</div>
+                                <div class="placeholder-text">點擊 / 貼上圖片</div>
+                                <div class="placeholder-hint">支援 PNG、JPG、WEBP</div>
+                            </div>
+                            <img id="previewImg">
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn" id="selectFileBtn">
+                                <span>📁</span> 選擇檔案
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <span>⬆</span> 上傳分析
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 背景 -->
+                <div class="card">
+                    <div class="step-badge">
+                        <div class="step-num">2</div>
+                        <div class="step-label">Step Two</div>
+                    </div>
+                    <div class="card-title">選擇背景圖</div>
+                    <div class="card-desc">支援點擊選擇、或直接貼上（Ctrl+V）</div>
+
+                    <input type="file" id="bgFileInput" hidden accept="image/*">
+
+                    <div class="upload-box" id="bgDropZone" tabindex="0">
+                        <div class="placeholder" id="bgPlaceholder">
+                            <div class="placeholder-icon">🖼</div>
+                            <div class="placeholder-text">點擊 / 貼上背景圖片</div>
+                            <div class="placeholder-hint">支援 PNG、JPG、WEBP</div>
+                        </div>
+                        <img id="bgPreviewImg">
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn" id="selectBgBtn">
+                            <span>📁</span> 選擇檔案
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側區塊：分析結果 -->
+            <div class="right-panel">
+                <div class="card result-card" id="resultCard">
+                    <div class="step-badge">
+                        <div class="step-num">3</div>
+                        <div class="step-label">Result</div>
+                    </div>
+                    <div class="card-title">分析結果</div>
+                    <div class="card-desc">處理完成後結果將顯示於此</div>
+
+                    <div class="upload-box has-image">
+                        <div class="result-empty" id="resultEmpty">
+                            <div class="result-empty-icon">⋯</div>
+                            <div class="result-empty-text">等待上傳中</div>
+                        </div>
+                        <img id="resultImg">
+                    </div>
+
+                    <div class="btn-group result-actions" id="resultActions">
+                        <button class="btn btn-download" id="btnDownload">
+                            <span>⬇</span> 下載圖片
+                        </button>
+                        <!-- 原按鈕 id 改為 btnCopy，文字改為 📋 複製圖片 -->
+                        <button class="btn btn-copy" id="btnCopy">
+                            <span>📋</span> 複製圖片
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /.workspace-grid -->
+    </div>
+
+    <!-- ─── 區塊二：共鳴者管理 ─── -->
+    <div id="resonator-mgr" class="tab-content">
+        <div class="page-header">
+            <div class="breadcrumb">工具箱 <span>›</span> 共鳴者管理</div>
+            <h1>共鳴者管理</h1>
+            <p>設定並規劃您的隊伍角色與養成進度</p>
+        </div>
+        <div class="card">
+            <div class="card-title">共鳴者名冊</div>
+            <div class="card-desc">此功能正在開發中，敬請期待。</div>
+        </div>
+    </div>
+
+    <!-- ─── 區塊三：武器列表 ─── -->
+    <div id="weapon-list" class="tab-content">
+        <div class="page-header">
+            <div class="breadcrumb">工具箱 <span>›</span> 武器列表</div>
+            <h1>武器列表</h1>
+            <p>瀏覽各類型武器數值與突破材料需求</p>
+        </div>
+        <div class="card">
+            <div class="card-title">武庫數據庫</div>
+            <div class="card-desc">此功能正在開發中，敬請期待。</div>
+        </div>
+    </div>
+
+</div><!-- /.main -->
+
+<!-- toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── 頁籤切換邏輯 ─── */
+const menuButtons = document.querySelectorAll(".menu-btn");
+const tabContents = document.querySelectorAll(".tab-content");
+
+menuButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        menuButtons.forEach(b => b.classList.remove("active"));
+        tabContents.forEach(c => c.classList.remove("active"));
+
+        btn.classList.add("active");
+        const targetId = btn.getAttribute("data-target");
+        if (targetId) {
+            document.getElementById(targetId).classList.add("active");
+        }
+    });
+});
+
+
+/* ─── 聲骸分析 JS ─── */
+let fileInput     = document.getElementById("fileInput");
+let dropZone      = document.getElementById("dropZone");
+let previewImg    = document.getElementById("previewImg");
+let placeholder   = document.getElementById("placeholder");
+let selectFileBtn = document.getElementById("selectFileBtn");
+
+let bgFileInput   = document.getElementById("bgFileInput");
+let bgDropZone    = document.getElementById("bgDropZone");
+let bgPreviewImg  = document.getElementById("bgPreviewImg");
+let bgPlaceholder = document.getElementById("bgPlaceholder");
+let selectBgBtn   = document.getElementById("selectBgBtn");
+
+let resultImg     = document.getElementById("resultImg");
+let resultCard    = document.getElementById("resultCard");
+let resultEmpty   = document.getElementById("resultEmpty");
+
+function expandBox(box, img, ph) {
+    box.classList.add("has-image");
+    img.style.display = "block";
+    if (ph) ph.style.display = "none";
+}
+
+function setImage(file) {
+    let r = new FileReader();
+    r.onload = e => {
+        previewImg.src = e.target.result;
+        expandBox(dropZone, previewImg, placeholder);
+    };
+    r.readAsDataURL(file);
+    let dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+}
+
+function setBg(file) {
+    let r = new FileReader();
+    r.onload = e => {
+        bgPreviewImg.src = e.target.result;
+        expandBox(bgDropZone, bgPreviewImg, bgPlaceholder);
+    };
+    r.readAsDataURL(file);
+    let dt = new DataTransfer();
+    dt.items.add(file);
+    bgFileInput.files = dt.files;
+}
+
+/* 主圖：按鈕 / input change */
+selectFileBtn.onclick  = () => fileInput.click();
+fileInput.onchange     = e => { if (e.target.files[0]) setImage(e.target.files[0]); };
+
+/* 主圖：貼上 */
+dropZone.addEventListener("paste", e => {
+    for (let item of e.clipboardData.items)
+        if (item.type.includes("image")) setImage(item.getAsFile());
+});
+
+/* 背景圖：按鈕 / input change */
+selectBgBtn.onclick    = () => bgFileInput.click();
+bgFileInput.onchange   = e => { if (e.target.files[0]) setBg(e.target.files[0]); };
+
+/* 背景圖：點擊 dropzone 也開啟選檔 */
+bgDropZone.addEventListener("click", () => bgFileInput.click());
+
+/* 背景圖：貼上 */
+bgDropZone.addEventListener("paste", e => {
+    for (let item of e.clipboardData.items)
+        if (item.type.includes("image")) setBg(item.getAsFile());
+});
+
+/* 背景圖：拖曳 */
+bgDropZone.addEventListener("dragover", e => e.preventDefault());
+bgDropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    if (e.dataTransfer.files[0]) setBg(e.dataTransfer.files[0]);
+});
+
+/* ─── 表單送出：同時帶上背景圖 ─── */
+document.getElementById("uploadForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    if (!fileInput.files[0]) { showToast("⚠ 請先上傳聲骸圖片"); return; }
+
+    let fd   = new FormData();
+    fd.append("image", fileInput.files[0]);
+
+    // 有選背景圖才附上
+    if (bgFileInput.files[0]) {
+        fd.append("background", bgFileInput.files[0]);
+    }
+
+    let csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    fetch("/upload/", {
+        method: "POST",
+        headers: { "X-CSRFToken": csrf },
+        body: fd
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status === "success") {
+            let b = d.data.image.base64;
+            let f = d.data.image.format || "png";
+            resultImg.src = `data:image/${f};base64,${b}`;
+            resultImg.style.display = "block";
+            resultEmpty.style.display = "none";
+            resultCard.classList.add("has-result");
+            document.getElementById("resultActions").classList.add("visible");
+        }
+    });
+});
+
+/* ─── 下載 ─── */
+document.getElementById("btnDownload").addEventListener("click", () => {
+    let a = document.createElement("a");
+    a.href = resultImg.src;
+    a.download = "聲骸分析結果.png";
+    a.click();
+});
+
+/* ─── 複製圖片至剪貼簿 ─── */
+document.getElementById("btnCopy").addEventListener("click", async () => {
+    if (!resultImg.src) { showToast("⚠ 尚未生成分析結果"); return; }
+    try {
+        let res  = await fetch(resultImg.src);
+        let blob = await res.blob();
+        if (!blob.type.includes("png")) {
+            const img = new Image();
+            img.src = resultImg.src;
+            await new Promise(resolve => img.onload = resolve);
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width; canvas.height = img.height;
+            canvas.getContext('2d').drawImage(img, 0, 0);
+            blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        }
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        showToast("✓ 圖片已複製到剪貼簿");
+    } catch (err) {
+        console.error("複製失敗:", err);
+        showToast("⚠ 瀏覽器限制，請點擊下載或右鍵儲存");
+    }
+});
+
+function showToast(msg) {
+    let t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2800);
+}
+</script>
+
+</body>
+</html>

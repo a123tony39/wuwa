@@ -1,5 +1,5 @@
 import pytest
-from domain.character.get_character_info import get_character_zh_and_en_name
+from backend.domain.character.get_character_info import get_character_zh_and_en_name
 
 def test_exact_match():
     template = {

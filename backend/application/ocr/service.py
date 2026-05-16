@@ -14,8 +14,8 @@ OCR_CROP_AREAS = [
 
 @dataclass
 class OCRResult:
-    player_block: list[str]
-    echo_block: list[list[str]] 
+    player_block: List[str]
+    echo_block: List[List[str]] 
 
 class OCRService(ABC):
     @abstractmethod

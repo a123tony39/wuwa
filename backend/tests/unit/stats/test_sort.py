@@ -1,4 +1,4 @@
-from domain.stats.rules import stat_sort_key, merge_flat_and_percent_stats, FLAT_STATS
+from backend.domain.stats.rules import stat_sort_key, merge_flat_and_percent_stats, FLAT_STATS
 
 def test_stat_sort_key_priority_first():
     base_stats = ["生命", "攻擊", "防禦"]

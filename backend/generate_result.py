@@ -1,12 +1,11 @@
 from PIL import Image
-from memory_profiler import profile
-from application.config.paths import IMG_PATH
-from application.ocr.service import OCRService, OCR_CROP_AREAS
-from application.ctx_builder import prepare_character_analysis_context
-from application.score_calculator import Calculator
-from application.renderer import RenderAgent
-from application.responsor import build_response
-from infrastructure.google_ocr.ocr import GoogleOCR
+from .application.config.paths import IMG_PATH
+from .application.ocr.service import OCRService, OCR_CROP_AREAS
+from .application.ctx_builder import prepare_character_analysis_context
+from .application.score_calculator import Calculator
+from .application.renderer import RenderAgent
+from .application.responsor import build_response
+from .infrastructure.google_ocr.ocr import GoogleOCR
 
 def process_image(
     source: Image.Image,
@@ -44,7 +43,6 @@ def process_image(
         echo_results = character_summary.echo_results,
     )
     
-@profile
 def main():
     source_files = [
         # IMG_PATH / "input/Cartethyia.png",

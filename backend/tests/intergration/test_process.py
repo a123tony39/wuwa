@@ -1,7 +1,7 @@
 import pytest
 from PIL import Image
-from generate_result import process_image
-from infrastructure.yaml_io import load_yaml
+from backend.generate_result import process_image
+from backend.infrastructure.yaml_io import load_yaml
 
 class FakeOCR:
     def recognize(self, _, __):
@@ -9,7 +9,7 @@ class FakeOCR:
     
 class FakeOCRResults:
     def __init__(self):
-        test_ocr_results = load_yaml("./tests/test_fixtures/ocr_result.yaml")
+        test_ocr_results = load_yaml("backend/tests/test_fixtures/ocr_result.yaml")
         self.player_block = test_ocr_results['player_block']
         self.echo_block = test_ocr_results['echo_block']
 

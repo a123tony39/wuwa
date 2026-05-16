@@ -1,4 +1,6 @@
-def expand_stat_table(stat_table: dict) -> list[tuple[float, float]]:
+from typing import List, Tuple
+
+def expand_stat_table(stat_table: dict) -> List[Tuple[float, float]]:
     """
     return [(value, probability), ...]
     """

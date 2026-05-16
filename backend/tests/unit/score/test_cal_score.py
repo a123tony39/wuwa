@@ -1,10 +1,10 @@
 import pytest
-from domain.score.score import get_score
-from domain.echo.ocr_parser import EchoData, Stat
-from infrastructure.yaml_io import load_yaml
+from backend.domain.score.score import get_score
+from backend.domain.echo.ocr_parser import EchoData, Stat
+from backend.infrastructure.yaml_io import load_yaml
 
 def create_fake_echo():
-    echo = load_yaml("./tests/test_fixtures/echo.yaml")
+    echo = load_yaml("backend/tests/test_fixtures/echo.yaml")
     fake_echo = EchoData()
     fake_echo.main_stat = Stat(**echo["main_stat"])
     fake_echo.static_stat = Stat(**echo["static_stat"])
@@ -25,8 +25,8 @@ def test_empty_get_score():
 def test_get_score():
     character = "弗洛洛"
     fake_echo = create_fake_echo()
-    base_score = load_yaml("./domain/score/base_score.yaml")
-    stats_tier_range = load_yaml("./domain/stats/stats_tier_range.yaml") 
+    base_score = load_yaml("backend/domain/score/base_score.yaml")
+    stats_tier_range = load_yaml("backend/domain/stats/stats_tier_range.yaml") 
     total_score, breakdown = get_score(
         fake_echo, 
         {"暴擊", "暴擊傷害", "攻擊", "攻擊%", "湮滅傷害加成", "共鳴技能傷害加成"}, 

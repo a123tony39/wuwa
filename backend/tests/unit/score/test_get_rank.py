@@ -1,4 +1,4 @@
-from domain.score.score import get_rank
+from backend.domain.score.score import get_rank
 
 def test_rank_mid_values():
     assert get_rank(85) == "SS"

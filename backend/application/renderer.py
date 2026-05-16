@@ -1,5 +1,5 @@
-from domain.score.score import get_rank
-from domain.stats.rules import stat_sort_key, filter_flat_percent_stats, FLAT_STATS, merge_flat_and_percent_stats
+from ..domain.score.score import get_rank
+from ..domain.stats.rules import stat_sort_key, filter_flat_percent_stats, FLAT_STATS, merge_flat_and_percent_stats
 
 from .render.context import build_render_context
 from .render.top_left_section import render_top_left_section

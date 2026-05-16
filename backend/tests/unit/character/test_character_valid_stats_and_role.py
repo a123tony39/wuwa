@@ -1,9 +1,9 @@
-from domain.character.get_character_info import get_valid_stats, get_base_score
-from infrastructure.yaml_io import load_yaml
+from backend.domain.character.get_character_info import get_valid_stats, get_base_score
+from backend.infrastructure.yaml_io import load_yaml
 
-base_score_templates = load_yaml("./domain/score/base_score.yaml")
-stats_categories = load_yaml("./domain/stats/stats_categories.yaml")
-character_templates = load_yaml("./domain/character/character_template.yaml")
+base_score_templates = load_yaml("backend/domain/score/base_score.yaml")
+stats_categories = load_yaml("backend/domain/stats/stats_categories.yaml")
+character_templates = load_yaml("backend/domain/character/character_template.yaml")
 def test_phorlova():
     valid = get_valid_stats(
         character_name = "弗洛洛", 

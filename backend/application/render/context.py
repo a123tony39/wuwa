@@ -1,8 +1,8 @@
 from typing import Callable
 from dataclasses import dataclass
 from PIL import Image, ImageDraw, ImageFont
-from application.config.paths import IMG_PATH
-from infrastructure.image_loader import load_img
+from backend.application.config.paths import IMG_PATH
+from backend.infrastructure.image_loader import load_img
 from .core.render_setting import TEMPLATE_FILE,  get_text_font, get_stat_font
 from .core.background import load_background, combine_background_template, prepare_canvas_for_drawing
 

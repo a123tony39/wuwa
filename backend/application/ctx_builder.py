@@ -1,8 +1,8 @@
-from domain.player.context import PlayerInfo
-from domain.player.parser import get_player_info
-from domain.character.context import CharacterContext
-from domain.score.rules import ScoreRules, load_score_rules
-from domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats, get_base_score, load_character_template
+from ..domain.player.context import PlayerInfo
+from ..domain.player.parser import get_player_info
+from ..domain.character.context import CharacterContext
+from ..domain.score.rules import ScoreRules, load_score_rules
+from ..domain.character.get_character_info import get_character_zh_and_en_name, get_valid_stats, get_base_score, load_character_template
 from dataclasses import dataclass
 
 @dataclass

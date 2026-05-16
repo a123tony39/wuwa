@@ -1,9 +1,10 @@
+from typing import List
 from dataclasses import dataclass
 from collections import defaultdict
-from domain.score.rules import ScoreRules
-from domain.character.context import CharacterContext
-from domain.echo.ocr_parser import get_echo_info, EchoData
-from domain.score.score import get_score, ECHO_SCORE_LEVELS
+from ..domain.score.rules import ScoreRules
+from ..domain.character.context import CharacterContext
+from ..domain.echo.ocr_parser import get_echo_info, EchoData
+from ..domain.score.score import get_score, ECHO_SCORE_LEVELS
 
 @dataclass
 class EchoResult:
@@ -15,7 +16,7 @@ class EchoResult:
 
 @dataclass
 class CharacterSummary:
-    echo_results: list[EchoResult]
+    echo_results: List[EchoResult]
     total_score: float
     stats_total_value: dict
 

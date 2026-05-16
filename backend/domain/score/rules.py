@@ -1,5 +1,5 @@
 from pathlib import Path
-from infrastructure.yaml_io import load_yaml
+from backend.infrastructure.yaml_io import load_yaml
 
 class ScoreRules:
     def __init__(
@@ -14,7 +14,7 @@ class ScoreRules:
         self.stats_categories = stats_categories
         self.stats_tier_range = stats_tier_range
 
-def load_score_rules(domain_path: Path = Path("./domain")) -> ScoreRules:
+def load_score_rules(domain_path: Path = Path("backend/domain")) -> ScoreRules:
     base_score = load_yaml(domain_path / "score" / "base_score.yaml")
     stats_name_map = load_yaml(domain_path / "stats" / "stats_name_map.yaml")
     stats_categories = load_yaml(domain_path / "stats" / "stats_categories.yaml")
