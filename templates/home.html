@@ -835,6 +835,23 @@ function expandBox(box, img, ph) {
     if (ph) ph.style.display = "none";
 }
 
+/* ─── 重設兩個上傳區 ─── */
+function resetUploads() {
+    // 主圖
+    fileInput.value = "";
+    previewImg.src = "";
+    previewImg.style.display = "none";
+    dropZone.classList.remove("has-image");
+    placeholder.style.display = "";
+
+    // 背景圖
+    bgFileInput.value = "";
+    bgPreviewImg.src = "";
+    bgPreviewImg.style.display = "none";
+    bgDropZone.classList.remove("has-image");
+    bgPlaceholder.style.display = "";
+}
+
 function setImage(file) {
     let r = new FileReader();
     r.onload = e => {
@@ -869,12 +886,12 @@ dropZone.addEventListener("paste", e => {
         if (item.type.includes("image")) setImage(item.getAsFile());
 });
 
-/* 背景圖：按鈕 / input change */
+/* 背景圖：按鈕才開啟選檔 */
 selectBgBtn.onclick    = () => bgFileInput.click();
 bgFileInput.onchange   = e => { if (e.target.files[0]) setBg(e.target.files[0]); };
 
-/* 背景圖：點擊 dropzone 也開啟選檔 */
-bgDropZone.addEventListener("click", () => bgFileInput.click());
+/* 背景圖：點擊 dropzone 只做 focus，不開啟選檔 */
+bgDropZone.addEventListener("click", () => bgDropZone.focus());
 
 /* 背景圖：貼上 */
 bgDropZone.addEventListener("paste", e => {
@@ -904,6 +921,9 @@ document.getElementById("uploadForm").addEventListener("submit", e => {
     }
 
     let csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    // 送出後立刻清空兩個上傳區
+    resetUploads();
 
     fetch("/upload/", {
         method: "POST",
