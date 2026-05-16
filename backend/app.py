@@ -45,6 +45,7 @@ def analysis_echo():
     app.logger.info(f"Uploaded file: {file.filename}, Content-Type: {file.content_type}")
     
     image = Image.open(file.stream)
+    print(image.size)
     background_file = request.files.get('background')
     if background_file:
         background_image = Image.open(background_file.stream).convert("RGBA")
