@@ -25,11 +25,7 @@
     --gold-dim:    rgba(232,200,122,0.15);
 }
 
-*, *::before, *::after {
-    margin: 0; padding: 0;
-    box-sizing: border-box;
-}
-
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
 body {
@@ -41,7 +37,6 @@ body {
     overflow-x: hidden;
 }
 
-/* ─── background ─── */
 body::before {
     content: '';
     position: fixed;
@@ -174,15 +169,77 @@ body::after {
     max-width: 1200px;
 }
 
-/* ─── 切換內容控制 ─── */
-.tab-content {
-    display: none;
-}
-.tab-content.active {
-    display: block;
+/* ─── TOP PROFILE ─── */
+.top-profile {
+    position: absolute;
+    top: 40px;
+    right: 52px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 100;
+    background: rgba(10, 15, 28, 0.6);
+    padding: 6px 14px;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(8px);
 }
 
-/* ─── 網格雙欄排版 ─── */
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(99, 179, 255, 0.1);
+    border: 1px solid var(--border-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.user-info { display: flex; flex-direction: column; }
+
+.username {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-login-nav {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: text-shadow 0.2s;
+}
+
+.btn-login-nav:hover { text-shadow: 0 0 8px var(--accent); }
+
+.btn-logout {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.btn-logout:hover { color: #ef4444; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
 .workspace-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -190,15 +247,8 @@ body::after {
     align-items: start;
 }
 
-.left-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.right-panel {
-    height: 100%;
-}
+.left-panel { display: flex; flex-direction: column; gap: 20px; }
+.right-panel { height: 100%; }
 
 .right-panel .result-card {
     height: 100%;
@@ -209,24 +259,20 @@ body::after {
 
 .right-panel .result-card .upload-box.has-image {
     flex: 1;
-    max-height: none; 
+    max-height: none;
     min-height: 300px;
 }
 
-.workspace-grid .card {
-    margin-bottom: 0;
+.workspace-grid .card { margin-bottom: 0; }
+
+@media (max-width: 992px) { .workspace-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 768px) {
+    .top-profile { position: static; margin-bottom: 24px; float: right; }
+    .page-header { clear: both; }
 }
 
-@media (max-width: 992px) {
-    .workspace-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ─── page header ─── */
-.page-header {
-    margin-bottom: 40px;
-}
+.page-header { margin-bottom: 40px; }
 
 .page-header h1 {
     font-family: 'Cinzel', serif;
@@ -237,11 +283,7 @@ body::after {
     margin-bottom: 8px;
 }
 
-.page-header p {
-    font-size: 13px;
-    color: var(--text-muted);
-    letter-spacing: 0.02em;
-}
+.page-header p { font-size: 13px; color: var(--text-muted); letter-spacing: 0.02em; }
 
 .breadcrumb {
     display: flex;
@@ -255,7 +297,6 @@ body::after {
 
 .breadcrumb span { color: var(--accent); }
 
-/* ─── CARD ─── */
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -280,12 +321,7 @@ body::after {
     box-shadow: 0 0 40px rgba(99,179,255,0.04);
 }
 
-.step-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
+.step-badge { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
 
 .step-num {
     width: 26px; height: 26px;
@@ -309,33 +345,15 @@ body::after {
     color: var(--text-muted);
 }
 
-.card-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 6px;
-    letter-spacing: 0.02em;
-}
+.card-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: 0.02em; }
+.card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
 
-.card-desc {
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.6;
-}
-
-/* intro card */
 .intro-card {
     background: linear-gradient(135deg, rgba(99,179,255,0.06), rgba(167,139,250,0.04));
     border-color: rgba(99,179,255,0.2);
 }
 
-.workflow-steps {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 16px;
-    flex-wrap: wrap;
-}
+.workflow-steps { display: flex; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
 
 .wf-step {
     display: flex;
@@ -356,12 +374,8 @@ body::after {
     box-shadow: 0 0 6px var(--accent);
 }
 
-.wf-arrow {
-    color: var(--text-dim);
-    font-size: 12px;
-}
+.wf-arrow { color: var(--text-dim); font-size: 12px; }
 
-/* ─── UPLOAD BOX ─── */
 .upload-box {
     margin-top: 16px;
     padding: 24px;
@@ -379,16 +393,8 @@ body::after {
     cursor: pointer;
 }
 
-.upload-box:hover {
-    border-color: rgba(99,179,255,0.4);
-    background: rgba(99,179,255,0.03);
-}
-
-.upload-box:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(99,179,255,0.1);
-}
+.upload-box:hover { border-color: rgba(99,179,255,0.4); background: rgba(99,179,255,0.03); }
+.upload-box:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,179,255,0.1); }
 
 .upload-box.has-image {
     min-height: auto;
@@ -399,13 +405,7 @@ body::after {
     cursor: default;
 }
 
-.placeholder {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
+.placeholder { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
 .placeholder-icon {
     width: 44px; height: 44px;
@@ -419,20 +419,9 @@ body::after {
     transition: transform 0.2s ease;
 }
 
-.upload-box:hover .placeholder-icon {
-    transform: translateY(-2px);
-}
-
-.placeholder-text {
-    font-size: 13px;
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-.placeholder-hint {
-    font-size: 11px;
-    color: var(--text-dim);
-}
+.upload-box:hover .placeholder-icon { transform: translateY(-2px); }
+.placeholder-text { font-size: 13px; color: var(--text-muted); font-weight: 400; }
+.placeholder-hint { font-size: 11px; color: var(--text-dim); }
 
 .upload-box img {
     max-width: 100%;
@@ -442,12 +431,7 @@ body::after {
     object-fit: contain;
 }
 
-/* ─── BUTTON GROUP ─── */
-.btn-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 16px;
-}
+.btn-group { display: flex; gap: 10px; margin-top: 16px; }
 
 .btn {
     padding: 11px 20px;
@@ -465,11 +449,7 @@ body::after {
     gap: 8px;
 }
 
-.btn:hover {
-    background: rgba(99,179,255,0.08);
-    border-color: var(--border-glow);
-    color: var(--accent);
-}
+.btn:hover { background: rgba(99,179,255,0.08); border-color: var(--border-glow); color: var(--accent); }
 
 .btn-primary {
     background: linear-gradient(135deg, rgba(99,179,255,0.15), rgba(167,139,250,0.1));
@@ -482,52 +462,17 @@ body::after {
     box-shadow: 0 0 20px rgba(99,179,255,0.12);
 }
 
-/* ─── RESULT ─── */
-.result-card {
-    border-color: rgba(52,211,153,0.15);
-}
+.result-card { border-color: rgba(52,211,153,0.15); }
+.result-card::before { background: linear-gradient(90deg, transparent, rgba(52,211,153,0.2), transparent); }
+.result-card .card-title { color: var(--accent3); }
+.result-card .upload-box { border-color: rgba(52,211,153,0.15); }
 
-.result-card::before {
-    background: linear-gradient(90deg, transparent, rgba(52,211,153,0.2), transparent);
-}
+.result-empty { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.result-empty-icon { font-size: 28px; opacity: 0.3; }
+.result-empty-text { font-size: 12px; color: var(--text-dim); letter-spacing: 0.05em; }
 
-.result-card .card-title {
-    color: var(--accent3);
-}
-
-.result-card .upload-box {
-    border-color: rgba(52,211,153,0.15);
-}
-
-.result-empty {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.result-empty-icon {
-    font-size: 28px;
-    opacity: 0.3;
-}
-
-.result-empty-text {
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-}
-
-/* ─── result actions ─── */
-.result-actions {
-    display: none;
-    gap: 10px;
-    margin-top: 14px;
-}
-
-.result-actions.visible {
-    display: flex;
-}
+.result-actions { display: none; gap: 10px; margin-top: 14px; }
+.result-actions.visible { display: flex; }
 
 .btn-download {
     background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.08));
@@ -544,7 +489,6 @@ body::after {
     border-color: rgba(52,211,153,0.5);
 }
 
-/* 調整此按鈕配色與文字樣式適配「複製」功能 */
 .btn-copy {
     background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.08));
     border-color: rgba(167,139,250,0.35);
@@ -560,7 +504,84 @@ body::after {
     border-color: rgba(167,139,250,0.5);
 }
 
-/* ─── toast ─── */
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.history-item {
+    background: rgba(13, 20, 36, 0.7);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.history-item:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.history-img-wrap {
+    width: 100%;
+    height: 180px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #060912;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.history-img-wrap::after {
+    content: '🔍';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    background: rgba(6, 9, 18, 0.55);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border-radius: 8px;
+}
+
+.history-img-wrap:hover::after { opacity: 1; }
+
+.history-img-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    cursor: zoom-in;
+    display: block;
+}
+
+.history-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.btn-history-dl {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-history-dl:hover { text-shadow: 0 0 5px var(--accent); }
+
 .toast {
     position: fixed;
     bottom: 32px;
@@ -580,19 +601,14 @@ body::after {
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 
-.toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ─── divider ─── */
 .divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--border), transparent);
     margin: 8px 0 20px;
 }
 
-/* ─── entry animation ─── */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -610,13 +626,404 @@ body::after {
     50%       { box-shadow: 0 0 24px rgba(52,211,153,0.15); }
 }
 
-.result-card.has-result {
-    animation: glowPulse 2.5s ease infinite;
+.result-card.has-result { animation: glowPulse 2.5s ease infinite; }
+
+/* ─── LIGHTBOX ─── */
+.lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    transition: background 0.25s ease;
+}
+
+.lightbox.open { display: flex; background: rgba(0, 0, 0, 0.88); }
+
+.lightbox-inner {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-inner img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 14px;
+    box-shadow: 0 10px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(99,179,255,0.15);
+    object-fit: contain;
+    transform: scale(0.92);
+    opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    cursor: default;
+}
+
+.lightbox.open .lightbox-inner img { transform: scale(1); opacity: 1; }
+
+.lightbox-close {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(10, 15, 28, 0.9);
+    border: 1px solid var(--border-glow);
+    color: var(--text-muted);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    line-height: 1;
+}
+
+.lightbox-close:hover { color: var(--text); border-color: var(--accent); }
+
+.lightbox-hint {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.2s;
+}
+
+.lightbox.open .lightbox-hint { opacity: 1; }
+
+/* ════════════════════════════════════════
+   ── 分析進度條 Overlay ──
+   ════════════════════════════════════════ */
+
+/* 整個遮罩層 */
+.analysis-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 8000;
+    background: rgba(6, 9, 18, 0.82);
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.analysis-overlay.visible {
+    display: flex;
+    opacity: 1;
+}
+
+/* 主要彈窗面板 */
+.analysis-panel {
+    width: 540px;
+    background: var(--bg-card);
+    border: 1px solid rgba(99,179,255,0.22);
+    border-radius: 20px;
+    padding: 32px 36px 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 面板頂部漸層光條 */
+.analysis-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+}
+
+/* 頂部標題列 */
+.ap-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.ap-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(99,179,255,0.15), rgba(167,139,250,0.1));
+    border: 1px solid rgba(99,179,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    animation: apIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes apIconPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(99,179,255,0); }
+    50%       { box-shadow: 0 0 16px 4px rgba(99,179,255,0.18); }
+}
+
+.ap-title-group {}
+
+.ap-title {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+}
+
+.ap-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+}
+
+/* 目前步驟標籤 */
+.ap-step-label {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    min-height: 18px;
+    transition: opacity 0.3s ease;
+}
+
+/* 進度條軌道 */
+.ap-bar-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(99,179,255,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+/* 進度條填充 */
+.ap-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+}
+
+/* 進度條右端光暈 */
+.ap-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: -1px; top: 50%;
+    transform: translateY(-50%);
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px 4px rgba(99,179,255,0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ap-bar-fill.active::after { opacity: 1; }
+
+/* 進度百分比 */
+.ap-percent-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.ap-percent {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    min-width: 42px;
+}
+
+.ap-time-est {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+}
+
+/* ── 掃描線動畫（裝飾） ── */
+.ap-scanner {
+    width: 100%;
+    height: 56px;
+    background: rgba(6,9,18,0.7);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 10px;
+}
+
+.ap-scanner-beam {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, transparent, var(--accent), transparent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: scanBeam 1.8s ease-in-out infinite;
+}
+
+@keyframes scanBeam {
+    0%   { left: 0%;   opacity: 0; }
+    5%   { opacity: 1; }
+    95%  { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+}
+
+.ap-scanner-hex {
+    font-family: monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
+/* ── 步驟日誌 ── */
+.ap-log {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 130px;
+    overflow: hidden;
+}
+
+.ap-log-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    background: rgba(99,179,255,0.03);
+}
+
+.ap-log-item.shown {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.ap-log-item.done {
+    color: var(--text-muted);
+}
+
+.ap-log-item.current {
+    color: var(--text);
+    background: rgba(99,179,255,0.06);
+    border: 1px solid rgba(99,179,255,0.1);
+}
+
+.ap-log-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+}
+
+.ap-log-item.done .ap-log-icon {
+    background: rgba(52,211,153,0.15);
+    color: var(--accent3);
+    font-size: 10px;
+}
+
+.ap-log-item.current .ap-log-icon {
+    background: rgba(99,179,255,0.15);
+    color: var(--accent);
+    animation: spinDot 1s linear infinite;
+}
+
+@keyframes spinDot {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.ap-log-text {
+    flex: 1;
+    letter-spacing: 0.03em;
+}
+
+.ap-log-ms {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-family: monospace;
+    flex-shrink: 0;
 }
 </style>
 </head>
 
 <body>
+
+<!-- ══════════ LIGHTBOX ══════════ -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="圖片放大檢視">
+    <div class="lightbox-inner" id="lightboxInner">
+        <img id="lightboxImg" alt="放大圖片">
+        <button class="lightbox-close" id="lightboxClose" title="關閉 (ESC)">✕</button>
+    </div>
+    <div class="lightbox-hint">點擊背景或按 ESC 關閉</div>
+</div>
+
+<!-- ══════════ 分析進度條 Overlay ══════════ -->
+<div id="analysisOverlay" class="analysis-overlay" role="dialog" aria-modal="true" aria-label="聲骸分析中">
+    <div class="analysis-panel">
+        <div class="ap-header">
+            <div class="ap-icon">⚙</div>
+            <div class="ap-title-group">
+                <div class="ap-title">ECHO ANALYSER</div>
+                <div class="ap-subtitle">聲骸裝備深度評估系統 · v3.2.1</div>
+            </div>
+        </div>
+
+        <div class="ap-step-label" id="apStepLabel">初始化中...</div>
+
+        <div class="ap-bar-track">
+            <div class="ap-bar-fill active" id="apBarFill"></div>
+        </div>
+
+        <div class="ap-percent-row">
+            <div class="ap-percent" id="apPercent">0%</div>
+            <div class="ap-time-est" id="apTimeEst">預計剩餘 — 秒</div>
+        </div>
+
+        <!-- 掃描動畫 -->
+        <div class="ap-scanner">
+            <div class="ap-scanner-beam"></div>
+            <div class="ap-scanner-hex" id="apHexFeed">讀取位元組流...</div>
+        </div>
+
+        <!-- 步驟日誌列表 -->
+        <div class="ap-log" id="apLog"></div>
+    </div>
+</div>
 
 <!-- ══════════ SIDEBAR ══════════ -->
 <div class="sidebar">
@@ -627,18 +1034,36 @@ body::after {
 
     <div class="menu-label">功能選單</div>
     <button class="menu-btn active" data-target="echo-analyser">聲骸分析</button>
+
+    {% if user.is_authenticated %}
+    <button class="menu-btn" data-target="history-log">歷史紀錄查詢</button>
+    {% endif %}
+
     <button class="menu-btn" data-target="resonator-mgr">共鳴者管理</button>
     <button class="menu-btn" data-target="weapon-list">武器列表</button>
 
-    <div class="sidebar-footer">
-        v1.0 &nbsp;·&nbsp; 鳴潮工具
-    </div>
+    <div class="sidebar-footer">v1.0 &nbsp;·&nbsp; 鳴潮工具</div>
 </div>
 
 <!-- ══════════ MAIN ══════════ -->
 <div class="main">
+    {% csrf_token %}
+    <div class="top-profile">
+        {% if user.is_authenticated %}
+            <div class="user-avatar" title="個人設定">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ user.username }}" alt="Avatar">
+            </div>
+            <div class="user-info">
+                <span class="username">{{ user.username }}</span>
+                <a href="/logout/" class="btn-logout">登出</a>
+            </div>
+        {% else %}
+            <div class="user-avatar" title="訪客狀態"><span>👤</span></div>
+            <button class="btn-login-nav" onclick="location.href='/login/'">登入</button>
+        {% endif %}
+    </div>
 
-    <!-- ─── 區塊一：聲骸分析 ─── -->
+    <!-- ─── 聲骸分析 ─── -->
     <div id="echo-analyser" class="tab-content active">
         <div class="page-header">
             <div class="breadcrumb">工具箱 <span>›</span> 聲骸分析</div>
@@ -646,7 +1071,6 @@ body::after {
             <p>上傳DC robot生成的聲骸圖，一鍵生成分析結果</p>
         </div>
 
-        <!-- 說明 -->
         <div class="card intro-card">
             <div class="step-badge">
                 <div class="step-num">✦</div>
@@ -663,12 +1087,8 @@ body::after {
 
         <div class="divider"></div>
 
-        <!-- 網格佈局 -->
         <div class="workspace-grid">
-            
-            <!-- 左側區塊：Step 1 & Step 2 上下堆疊 -->
             <div class="left-panel">
-                <!-- 主圖 -->
                 <div class="card">
                     <div class="step-badge">
                         <div class="step-num">1</div>
@@ -701,7 +1121,6 @@ body::after {
                     </form>
                 </div>
 
-                <!-- 背景 -->
                 <div class="card">
                     <div class="step-badge">
                         <div class="step-num">2</div>
@@ -722,14 +1141,11 @@ body::after {
                     </div>
 
                     <div class="btn-group">
-                        <button type="button" class="btn" id="selectBgBtn">
-                            <span>📁</span> 選擇檔案
-                        </button>
+                        <button type="button" class="btn" id="selectBgBtn"><span>📁</span> 選擇檔案</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 右側區塊：分析結果 -->
             <div class="right-panel">
                 <div class="card result-card" id="resultCard">
                     <div class="step-badge">
@@ -748,21 +1164,35 @@ body::after {
                     </div>
 
                     <div class="btn-group result-actions" id="resultActions">
-                        <button class="btn btn-download" id="btnDownload">
-                            <span>⬇</span> 下載圖片
-                        </button>
-                        <!-- 原按鈕 id 改為 btnCopy，文字改為 📋 複製圖片 -->
-                        <button class="btn btn-copy" id="btnCopy">
-                            <span>📋</span> 複製圖片
-                        </button>
+                        <button class="btn btn-download" id="btnDownload"><span>⬇</span> 下載圖片</button>
+                        <button class="btn btn-copy" id="btnCopy"><span>📋</span> 複製圖片</button>
                     </div>
                 </div>
             </div>
-
-        </div> <!-- /.workspace-grid -->
+        </div>
     </div>
 
-    <!-- ─── 區塊二：共鳴者管理 ─── -->
+    <!-- ─── 歷史紀錄 ─── -->
+    {% if user.is_authenticated %}
+    <div id="history-log" class="tab-content">
+        <div class="page-header">
+            <div class="breadcrumb">工具箱 <span>›</span> 歷史紀錄查詢</div>
+            <h1>歷史紀錄查詢</h1>
+            <p>瀏覽您過去上傳並分析的聲骸歷史紀錄</p>
+        </div>
+        <div class="card">
+            <div class="card-title">過往分析檔案</div>
+            <div class="card-desc">這裡保存了您綁定此帳號後的歷史生成圖，方便您快速找回或重新下載。</div>
+            <div class="history-grid" id="historyGrid"></div>
+            <div id="history-empty-view"
+                style="margin-top:24px;color:var(--text-dim);text-align:center;padding:40px 0;border:1px dashed var(--border);border-radius:12px;font-size:13px;display:none;">
+                🔍 暫無歷史紀錄數據
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ─── 共鳴者管理 ─── -->
     <div id="resonator-mgr" class="tab-content">
         <div class="page-header">
             <div class="breadcrumb">工具箱 <span>›</span> 共鳴者管理</div>
@@ -775,7 +1205,7 @@ body::after {
         </div>
     </div>
 
-    <!-- ─── 區塊三：武器列表 ─── -->
+    <!-- ─── 武器列表 ─── -->
     <div id="weapon-list" class="tab-content">
         <div class="page-header">
             <div class="breadcrumb">工具箱 <span>›</span> 武器列表</div>
@@ -790,29 +1220,288 @@ body::after {
 
 </div><!-- /.main -->
 
-<!-- toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-/* ─── 頁籤切換邏輯 ─── */
-const menuButtons = document.querySelectorAll(".menu-btn");
-const tabContents = document.querySelectorAll(".tab-content");
+/* ══════════════════════════════════════
+   Lightbox
+   ══════════════════════════════════════ */
+const lightbox      = document.getElementById("lightbox");
+const lightboxImg   = document.getElementById("lightboxImg");
+const lightboxClose = document.getElementById("lightboxClose");
 
-menuButtons.forEach(btn => {
+function openLightbox(src) {
+    lightboxImg.src = src;
+    lightbox.style.display = "flex";
+    requestAnimationFrame(() => requestAnimationFrame(() => lightbox.classList.add("open")));
+    document.body.style.overflow = "hidden";
+}
+
+function closeLightbox() {
+    lightbox.classList.remove("open");
+    lightbox.addEventListener("transitionend", () => {
+        lightbox.style.display = "none";
+        lightboxImg.src = "";
+        document.body.style.overflow = "";
+    }, { once: true });
+}
+
+lightbox.addEventListener("click", e => { if (e.target === lightbox) closeLightbox(); });
+lightboxClose.addEventListener("click", e => { e.stopPropagation(); closeLightbox(); });
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && lightbox.classList.contains("open")) closeLightbox();
+});
+
+
+/* ══════════════════════════════════════
+   ── 分析進度條 Engine ──
+   ══════════════════════════════════════ */
+const overlay   = document.getElementById("analysisOverlay");
+const barFill   = document.getElementById("apBarFill");
+const percent   = document.getElementById("apPercent");
+const stepLabel = document.getElementById("apStepLabel");
+const timeEst   = document.getElementById("apTimeEst");
+const logEl     = document.getElementById("apLog");
+const hexFeed   = document.getElementById("apHexFeed");
+
+/* 定義每個階段：label 顯示名稱、target 目標進度 %、duration 持續毫秒 */
+const STAGES = [
+    { label: "▸ 初始化分析引擎",         target:  6,  duration:  700 },
+    { label: "▸ 讀取圖像位元組流",        target: 14,  duration:  900 },
+    { label: "▸ 識別聲骸元素屬性",        target: 26,  duration: 1400 },
+    { label: "▸ 解析主屬性數值矩陣",      target: 38,  duration: 1600 },
+    { label: "▸ 掃描副屬性詞條組合",      target: 51,  duration: 1800 },
+    { label: "▸ 套用 RNG 詞條評分模型",   target: 63,  duration: 1500 },
+    { label: "▸ 計算 CV 值 / 強度百分位", target: 74,  duration: 1300 },
+    { label: "▸ 比對裝備最優化基準庫",    target: 84,  duration: 1200 },
+    { label: "▸ 生成評級報告輸出",        target: 93,  duration: 1000 },
+    { label: "▸ 等待伺服器回應",          target: 97,  duration:  800 },
+];
+
+/* 隨機 hex 字串，用來假裝掃描 */
+const HEX_POOL = "0123456789ABCDEF";
+function randomHex(len) {
+    return Array.from({length: len}, () => HEX_POOL[Math.floor(Math.random() * 16)]).join('');
+}
+
+const HEX_TEMPLATES = [
+    () => `0x${randomHex(8)} → ECHO_TYPE[${randomHex(4)}]`,
+    () => `ATTR_HASH: ${randomHex(16)} ✓`,
+    () => `SUB[${Math.floor(Math.random()*4)+1}]: ${(Math.random()*12+1).toFixed(1)}% · SID=${randomHex(4)}`,
+    () => `CV_CALC: ${(Math.random()*80+20).toFixed(2)} | TIER=${['S','S+','A','A+'][Math.floor(Math.random()*4)]}`,
+    () => `NORM[${randomHex(6)}] = ${(Math.random()).toFixed(6)}`,
+    () => `DB_CMP: ${Math.floor(Math.random()*9000+1000)} records scanned`,
+];
+
+let hexInterval = null;
+
+function startHexFeed() {
+    hexInterval = setInterval(() => {
+        const fn = HEX_TEMPLATES[Math.floor(Math.random() * HEX_TEMPLATES.length)];
+        hexFeed.textContent = fn();
+    }, 280);
+}
+
+function stopHexFeed() {
+    clearInterval(hexInterval);
+    hexFeed.textContent = "分析完成 · CHECKSUM OK";
+}
+
+/* 在日誌中加入一筆紀錄 */
+function addLogItem(text, state = "current", ms = null) {
+    const item = document.createElement("div");
+    item.className = `ap-log-item ${state}`;
+
+    const icon = document.createElement("div");
+    icon.className = "ap-log-icon";
+    icon.textContent = state === "done" ? "✓" : "◌";
+
+    const label = document.createElement("div");
+    label.className = "ap-log-text";
+    label.textContent = text;
+
+    item.appendChild(icon);
+    item.appendChild(label);
+
+    if (ms !== null) {
+        const msEl = document.createElement("div");
+        msEl.className = "ap-log-ms";
+        msEl.textContent = ms + "ms";
+        item.appendChild(msEl);
+    }
+
+    logEl.appendChild(item);
+
+    /* 超過 5 筆時，移除最舊的那筆 */
+    const items = logEl.querySelectorAll(".ap-log-item");
+    if (items.length > 5) items[0].remove();
+
+    /* 觸發動畫 */
+    requestAnimationFrame(() => requestAnimationFrame(() => item.classList.add("shown")));
+
+    return item;
+}
+
+/* 用 Promise + setTimeout 做非同步延遲 */
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* 進度從 from 線性爬到 to，在 duration 毫秒內完成，更新 UI */
+async function animateTo(from, to, duration) {
+    const start = performance.now();
+    return new Promise(resolve => {
+        function tick(now) {
+            const elapsed = now - start;
+            const raw = elapsed / duration;
+            /* easeOutCubic 讓末段感覺變慢 */
+            const eased = 1 - Math.pow(1 - Math.min(raw, 1), 3);
+            const cur = from + (to - from) * eased;
+
+            barFill.style.width = cur + "%";
+            percent.textContent = Math.floor(cur) + "%";
+
+            /* 剩餘時間估算（純裝飾） */
+            const remaining = Math.max(0, Math.ceil((1 - cur / 100) * 8));
+            timeEst.textContent = remaining > 0
+                ? `預計剩餘 ${remaining} 秒`
+                : "即將完成...";
+
+            if (raw < 1) requestAnimationFrame(tick);
+            else resolve();
+        }
+        requestAnimationFrame(tick);
+    });
+}
+
+/* 主流程：傳入 fetchPromise，在它完成後跑完進度條 */
+async function runAnalysisAnimation(fetchPromise) {
+    /* 顯示 Overlay */
+    overlay.style.display = "flex";
+    requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add("visible")));
+
+    barFill.style.width = "0%";
+    percent.textContent = "0%";
+    logEl.innerHTML = "";
+    stepLabel.textContent = "初始化中...";
+    startHexFeed();
+
+    let currentProgress = 0;
+    let fetchDone = false;
+    let fetchResult = null;
+
+    /* 讓 fetch 在背景跑，完成後記下結果 */
+    fetchPromise.then(r => r.json()).then(data => {
+        fetchDone = true;
+        fetchResult = data;
+    }).catch(() => {
+        fetchDone = true;
+        fetchResult = { status: "error" };
+    });
+
+    /* 跑完前 N-1 個階段（不等伺服器） */
+    for (let i = 0; i < STAGES.length - 1; i++) {
+        const stage = STAGES[i];
+        stepLabel.textContent = stage.label;
+
+        /* 每個階段開始時，把前一筆 current → done */
+        const prev = logEl.querySelector(".ap-log-item.current");
+        if (prev) {
+            prev.classList.remove("current");
+            prev.classList.add("done");
+            prev.querySelector(".ap-log-icon").textContent = "✓";
+        }
+
+        /* 加入本階段為 current */
+        const stageName = stage.label.replace("▸ ", "");
+        const logItem = addLogItem(stageName, "current");
+
+        /* 動畫爬到目標 */
+        const jitter = (Math.random() * 0.4 + 0.8); /* 0.8~1.2x 速度變化 */
+        await animateTo(currentProgress, stage.target, stage.duration * jitter);
+        currentProgress = stage.target;
+
+        /* 假裝「計算時間」顯示在日誌 */
+        const fakeMs = Math.floor(stage.duration * jitter * (0.5 + Math.random() * 0.5));
+        logItem.querySelector(".ap-log-text").textContent = stageName;
+        const msEl = document.createElement("div");
+        msEl.className = "ap-log-ms";
+        msEl.textContent = fakeMs + "ms";
+        logItem.appendChild(msEl);
+
+        /* 短暫停頓，讓每個步驟更有重量感 */
+        await delay(Math.random() * 120 + 60);
+    }
+
+    /* 最後一個階段：等伺服器真的回來 */
+    const lastStage = STAGES[STAGES.length - 1];
+    stepLabel.textContent = lastStage.label;
+
+    const prev2 = logEl.querySelector(".ap-log-item.current");
+    if (prev2) {
+        prev2.classList.remove("current");
+        prev2.classList.add("done");
+        prev2.querySelector(".ap-log-icon").textContent = "✓";
+    }
+    addLogItem(lastStage.label.replace("▸ ", ""), "current");
+
+    /* 先爬到 97% */
+    await animateTo(currentProgress, 97, lastStage.duration);
+    currentProgress = 97;
+
+    /* 若伺服器還沒回，就在 97% 處緩緩蠕動，直到回來 */
+    while (!fetchDone) {
+        const nudge = Math.random() * 0.4;
+        currentProgress = Math.min(99, currentProgress + nudge);
+        barFill.style.width = currentProgress + "%";
+        percent.textContent = Math.floor(currentProgress) + "%";
+        await delay(400 + Math.random() * 300);
+    }
+
+    /* 伺服器已回，跑到 100% */
+    const finalLog = logEl.querySelector(".ap-log-item.current");
+    if (finalLog) {
+        finalLog.classList.remove("current");
+        finalLog.classList.add("done");
+        finalLog.querySelector(".ap-log-icon").textContent = "✓";
+    }
+
+    stepLabel.textContent = "▸ 分析完成";
+    addLogItem("輸出報告已就緒", "done");
+    await animateTo(currentProgress, 100, 500);
+    stopHexFeed();
+    timeEst.textContent = "完成";
+
+    await delay(600);
+
+    /* 關閉 Overlay */
+    overlay.classList.remove("visible");
+    overlay.addEventListener("transitionend", () => {
+        overlay.style.display = "none";
+    }, { once: true });
+
+    return fetchResult;
+}
+
+
+/* ══════════════════════════════════════
+   頁籤切換
+   ══════════════════════════════════════ */
+document.querySelectorAll(".menu-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-        menuButtons.forEach(b => b.classList.remove("active"));
-        tabContents.forEach(c => c.classList.remove("active"));
-
-        btn.classList.add("active");
         const targetId = btn.getAttribute("data-target");
-        if (targetId) {
-            document.getElementById(targetId).classList.add("active");
+        const targetContent = document.getElementById(targetId);
+        if (targetId && targetContent) {
+            document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            btn.classList.add("active");
+            targetContent.classList.add("active");
         }
     });
 });
 
 
-/* ─── 聲骸分析 JS ─── */
+/* ══════════════════════════════════════
+   聲骸分析 - 上傳邏輯
+   ══════════════════════════════════════ */
 let fileInput     = document.getElementById("fileInput");
 let dropZone      = document.getElementById("dropZone");
 let previewImg    = document.getElementById("previewImg");
@@ -825,9 +1514,9 @@ let bgPreviewImg  = document.getElementById("bgPreviewImg");
 let bgPlaceholder = document.getElementById("bgPlaceholder");
 let selectBgBtn   = document.getElementById("selectBgBtn");
 
-let resultImg     = document.getElementById("resultImg");
-let resultCard    = document.getElementById("resultCard");
-let resultEmpty   = document.getElementById("resultEmpty");
+let resultImg   = document.getElementById("resultImg");
+let resultCard  = document.getElementById("resultCard");
+let resultEmpty = document.getElementById("resultEmpty");
 
 function expandBox(box, img, ph) {
     box.classList.add("has-image");
@@ -835,16 +1524,13 @@ function expandBox(box, img, ph) {
     if (ph) ph.style.display = "none";
 }
 
-/* ─── 重設兩個上傳區 ─── */
 function resetUploads() {
-    // 主圖
     fileInput.value = "";
     previewImg.src = "";
     previewImg.style.display = "none";
     dropZone.classList.remove("has-image");
     placeholder.style.display = "";
 
-    // 背景圖
     bgFileInput.value = "";
     bgPreviewImg.src = "";
     bgPreviewImg.style.display = "none";
@@ -853,106 +1539,100 @@ function resetUploads() {
 }
 
 function setImage(file) {
-    let r = new FileReader();
-    r.onload = e => {
-        previewImg.src = e.target.result;
-        expandBox(dropZone, previewImg, placeholder);
-    };
+    const r = new FileReader();
+    r.onload = e => { previewImg.src = e.target.result; expandBox(dropZone, previewImg, placeholder); };
     r.readAsDataURL(file);
-    let dt = new DataTransfer();
-    dt.items.add(file);
+    const dt = new DataTransfer(); dt.items.add(file);
     fileInput.files = dt.files;
 }
 
 function setBg(file) {
-    let r = new FileReader();
-    r.onload = e => {
-        bgPreviewImg.src = e.target.result;
-        expandBox(bgDropZone, bgPreviewImg, bgPlaceholder);
-    };
+    const r = new FileReader();
+    r.onload = e => { bgPreviewImg.src = e.target.result; expandBox(bgDropZone, bgPreviewImg, bgPlaceholder); };
     r.readAsDataURL(file);
-    let dt = new DataTransfer();
-    dt.items.add(file);
+    const dt = new DataTransfer(); dt.items.add(file);
     bgFileInput.files = dt.files;
 }
 
-/* 主圖：按鈕 / input change */
-selectFileBtn.onclick  = () => fileInput.click();
-fileInput.onchange     = e => { if (e.target.files[0]) setImage(e.target.files[0]); };
+selectFileBtn.onclick = () => fileInput.click();
+fileInput.onchange    = e => { if (e.target.files[0]) setImage(e.target.files[0]); };
 
-/* 主圖：貼上 */
 dropZone.addEventListener("paste", e => {
-    for (let item of e.clipboardData.items)
+    for (const item of e.clipboardData.items)
         if (item.type.includes("image")) setImage(item.getAsFile());
 });
 
-/* 背景圖：按鈕才開啟選檔 */
-selectBgBtn.onclick    = () => bgFileInput.click();
-bgFileInput.onchange   = e => { if (e.target.files[0]) setBg(e.target.files[0]); };
+selectBgBtn.onclick   = () => bgFileInput.click();
+bgFileInput.onchange  = e => { if (e.target.files[0]) setBg(e.target.files[0]); };
 
-/* 背景圖：點擊 dropzone 只做 focus，不開啟選檔 */
 bgDropZone.addEventListener("click", () => bgDropZone.focus());
-
-/* 背景圖：貼上 */
 bgDropZone.addEventListener("paste", e => {
-    for (let item of e.clipboardData.items)
+    for (const item of e.clipboardData.items)
         if (item.type.includes("image")) setBg(item.getAsFile());
 });
-
-/* 背景圖：拖曳 */
 bgDropZone.addEventListener("dragover", e => e.preventDefault());
 bgDropZone.addEventListener("drop", e => {
     e.preventDefault();
     if (e.dataTransfer.files[0]) setBg(e.dataTransfer.files[0]);
 });
 
-/* ─── 表單送出：同時帶上背景圖 ─── */
-document.getElementById("uploadForm").addEventListener("submit", e => {
+/* ─── 表單送出（整合進度條） ─── */
+document.getElementById("uploadForm").addEventListener("submit", async e => {
     e.preventDefault();
 
     if (!fileInput.files[0]) { showToast("⚠ 請先上傳聲骸圖片"); return; }
 
-    let fd   = new FormData();
+    const fd   = new FormData();
     fd.append("image", fileInput.files[0]);
+    if (bgFileInput.files[0]) fd.append("background", bgFileInput.files[0]);
 
-    // 有選背景圖才附上
-    if (bgFileInput.files[0]) {
-        fd.append("background", bgFileInput.files[0]);
-    }
+    const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
-    let csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
-
-    // 送出後立刻清空兩個上傳區
     resetUploads();
 
-    fetch("/upload/", {
+    /* 發出 fetch，把 Promise 交給動畫引擎 */
+    const fetchPromise = fetch("/upload/", {
         method: "POST",
         headers: { "X-CSRFToken": csrf },
         body: fd
-    })
-    .then(r => r.json())
-    .then(d => {
-        if (d.status === "success") {
-            let b = d.data.image.base64;
-            let f = d.data.image.format || "png";
-            resultImg.src = `data:image/${f};base64,${b}`;
-            resultImg.style.display = "block";
-            resultEmpty.style.display = "none";
-            resultCard.classList.add("has-result");
-            document.getElementById("resultActions").classList.add("visible");
-        }
     });
+
+    /* 動畫執行，等待完成並拿回伺服器資料 */
+    const d = await runAnalysisAnimation(fetchPromise);
+
+    if (d && d.status === "success") {
+        const b = d.data.image.base64;
+        const f = d.data.image.format || "png";
+        const imgSrc = `data:image/${f};base64,${b}`;
+
+        resultImg.src = imgSrc;
+        resultImg.style.display = "block";
+        resultEmpty.style.display = "none";
+        resultCard.classList.add("has-result");
+        document.getElementById("resultActions").classList.add("visible");
+
+        fetchHistory();
+    } else if (d) {
+        showToast("⚠ 分析失敗，請重試");
+    }
 });
 
 /* ─── 下載 ─── */
 document.getElementById("btnDownload").addEventListener("click", () => {
-    let a = document.createElement("a");
+    const a = document.createElement("a");
     a.href = resultImg.src;
     a.download = "聲骸分析結果.png";
     a.click();
 });
 
-/* ─── 複製圖片至剪貼簿 ─── */
+function downloadHistory(src) {
+    const a = document.createElement("a");
+    a.href = src;
+    a.download = "歷史聲骸分析結果.png";
+    a.click();
+}
+
+/* ─── 複製圖片 ─── */
 document.getElementById("btnCopy").addEventListener("click", async () => {
     if (!resultImg.src) { showToast("⚠ 尚未生成分析結果"); return; }
     try {
@@ -962,10 +1642,10 @@ document.getElementById("btnCopy").addEventListener("click", async () => {
             const img = new Image();
             img.src = resultImg.src;
             await new Promise(resolve => img.onload = resolve);
-            const canvas = document.createElement('canvas');
+            const canvas = document.createElement("canvas");
             canvas.width = img.width; canvas.height = img.height;
-            canvas.getContext('2d').drawImage(img, 0, 0);
-            blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            canvas.getContext("2d").drawImage(img, 0, 0);
+            blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
         }
         await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
         showToast("✓ 圖片已複製到剪貼簿");
@@ -976,12 +1656,63 @@ document.getElementById("btnCopy").addEventListener("click", async () => {
 });
 
 function showToast(msg) {
-    let t = document.getElementById("toast");
+    const t = document.getElementById("toast");
     t.textContent = msg;
     t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 2800);
 }
-</script>
 
+
+/* ══════════════════════════════════════
+   歷史紀錄
+   ══════════════════════════════════════ */
+async function fetchHistory() {
+    try {
+        const response = await fetch("/history/");
+        const data = await response.json();
+        if (data.status !== "success") return;
+
+        const historyGrid = document.getElementById("historyGrid");
+        const emptyView   = document.getElementById("history-empty-view");
+        if (!historyGrid) return;
+
+        historyGrid.innerHTML = "";
+
+        if (data.data.length === 0) {
+            emptyView.style.display = "block";
+            return;
+        }
+
+        emptyView.style.display = "none";
+
+        data.data.forEach(item => {
+            const escapedSrc = item.result_image.replace(/'/g, "\\'");
+            const html = `
+                <div class="history-item">
+                    <div class="history-img-wrap" onclick="openLightbox('${escapedSrc}')">
+                        <img src="${item.result_image}" alt="歷史聲骸結果" loading="lazy">
+                    </div>
+                    <div class="history-meta">
+                        <span>${formatTime(item.created_at)}</span>
+                        <button class="btn-history-dl"
+                            onclick="event.stopPropagation(); downloadHistory('${escapedSrc}')">
+                            💾 下載
+                        </button>
+                    </div>
+                </div>`;
+            historyGrid.insertAdjacentHTML("beforeend", html);
+        });
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function formatTime(dateString) {
+    const d = new Date(dateString);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+fetchHistory();
+</script>
 </body>
 </html>

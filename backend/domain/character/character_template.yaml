@@ -32,6 +32,15 @@
 #     - 導電
 
 # 拉海洛
+達妮婭:
+  en: Denia
+  main_attr: 攻擊
+  dmg_type: 
+    - 共鳴解放
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 熱熔
+
 緋雪:
   en: Hiyuki
   main_attr: 攻擊
