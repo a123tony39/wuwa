@@ -6,3 +6,4 @@ ocr_api_key.json
 .coverage
 .pytest_cache
 app.log
+db.sqlite3
