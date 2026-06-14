@@ -39,7 +39,7 @@
     - 重擊
   valid_stat_rule: 輸出
   base_score_rule: 輸出
-  element: 導電
+  element: 衍射
 
 蕾貝卡:
   en: Rebecca
