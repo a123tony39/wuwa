@@ -11,7 +11,6 @@ from backend.infrastructure.google_ocr.ocr import GoogleOCR
 from history.models import EchoHistory
 from django.core.files.base import ContentFile
 import uuid
-from django.db.models import Count
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 json_path = BASE_DIR / "backend" / "ocr_api_key.json"

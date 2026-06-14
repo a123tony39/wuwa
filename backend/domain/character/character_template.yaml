@@ -32,6 +32,33 @@
 #     - 導電
 
 # 拉海洛
+露西:
+  en: Lucy
+  main_attr: 攻擊
+  dmg_type: 
+    - 重擊
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 導電
+
+蕾貝卡:
+  en: Rebecca
+  main_attr: 攻擊
+  dmg_type: 
+    - 普攻
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 導電
+
+洛瑟菈:
+  en: Lucila
+  main_attr: 攻擊
+  dmg_type: 
+    - 普攻
+  valid_stat_rule: 輸出
+  base_score_rule: 輸出
+  element: 冷凝
+
 達妮婭:
   en: Denia
   main_attr: 攻擊
