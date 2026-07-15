@@ -19,8 +19,8 @@
 #   可選值:
 #     - 輸出
 #     - 輔助
-#     - 弗洛洛 (特殊)
-#     - 布蘭特 (特殊)
+#     - 不吃共效輸出 (特殊)
+
 # element
 #   元素傷害
 #   可選值:
@@ -31,16 +31,26 @@
 #     - 冷凝
 #     - 導電
 
-# 拉海洛
-露西:
-  en: Lucy
+# 夢州
+穗穗:
+  en: Suisui
+  main_attr: 生命
+  dmg_type: 
+    - 普攻
+  valid_stat_rule: 輔助
+  base_score_rule: 輔助
+  element: 冷凝
+
+秧秧·玄翎:
+  en: YangyangXuanling
   main_attr: 攻擊
   dmg_type: 
     - 重擊
   valid_stat_rule: 輸出
   base_score_rule: 輸出
-  element: 衍射
-
+  element: 湮滅
+  
+# 拉海洛
 蕾貝卡:
   en: Rebecca
   main_attr: 攻擊
@@ -55,7 +65,7 @@
   main_attr: 攻擊
   dmg_type: 
     - 普攻
-  valid_stat_rule: 輸出
+  valid_stat_rule: 不吃共效輸出
   base_score_rule: 輸出
   element: 冷凝
 
@@ -156,7 +166,7 @@
   main_attr: 攻擊
   dmg_type:
     - 共鳴技能
-  valid_stat_rule: 弗洛洛
+  valid_stat_rule: 不吃共效輸出
   base_score_rule: 輸出
   element: 湮滅
 

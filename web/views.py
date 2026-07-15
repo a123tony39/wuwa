@@ -37,12 +37,12 @@ def upload_image(request):
         result_file = pil_to_file(output_image)
         # 原圖重新讀取
         img.seek(0)
-        
-        EchoHistory.objects.create(
-            user=request.user,
-            image=result_file
-        )
-        enforce_limit(request.user)
+        if request.user.is_authenticated:
+            EchoHistory.objects.create(
+                user=request.user,
+                image=result_file
+            )
+            enforce_limit(request.user)
         
         return JsonResponse({
             "status": "success",
