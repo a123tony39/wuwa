@@ -37,7 +37,7 @@
   main_attr: 攻擊
   dmg_type: 
     - 共鳴技能
-  valid_stat_rule: 不吃共效輸出
+  valid_stat_rule: 輸出
   base_score_rule: 輸出
   element: 導電
 
